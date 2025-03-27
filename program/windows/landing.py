@@ -5,6 +5,8 @@ from Model.searchModel import searchModel as sm
 import Constant.errorCode as errorCode
 import Constant.dbColumn as dbCol
 import csv
+from Components.selectableRowTable import Table
+
 
 
 class LandingWindow:
@@ -13,15 +15,18 @@ class LandingWindow:
         self.root.title("YSL DB Management")
         self.root.geometry("600x400")
 
+        self.table = Table(self.root, [])
         # Create a result frame
         self.resultFrame = tk.Frame(self.root)   
         self.resultFrame.grid(column=0, columnspan=3, row=1, rowspan=5)
+
 
         # Entry with placeholder
         self.searchCustomerField = entry.EntryWithPlaceholder(
             self.root, placeholder="Customer ID...", on_text_change=self.print_user_input
         )
         self.searchCustomerField.grid(column=0, row=0)
+        
 
         self.root.mainloop()
 
@@ -31,10 +36,10 @@ class LandingWindow:
             header = next(csvFile)           
             res = []
             if dbCol.ic in header and dbCol.name in header:
-                ic_index, name_index = header.index(dbCol.ic), header.index(dbCol.name)
+                ic_index, name_index, email_index = header.index(dbCol.ic), header.index(dbCol.name), header.index(dbCol.email)
                 for lines in csvFile:
                     if lines[ic_index] == userId:
-                        res.append(sm(lines[ic_index], lines[name_index])) 
+                        res.append([lines[ic_index], lines[name_index],lines[email_index] ])
                 return res
             else:
                 return errorCode.NO_USER_FOUND
@@ -42,20 +47,23 @@ class LandingWindow:
     def print_user_input(self, text):
         """Callback function to handle user input."""
         if text == "":
-            for widget in self.resultFrame.winfo_children():
-                widget.destroy()
+            print("text is null")
+            self.table.update_table([])  # Properly clear table
             return
 
-        #Based on the user input text, search 
-        searchResult  = self.searchForUser(text)
+        print("awdawdw")  # Debugging print
+
+        # Based on user input, search for results
+        searchResult = self.searchForUser(text)
+
         if searchResult == errorCode.NO_USER_FOUND:
+            searchResult = []
             yourTextPanel = tk.Label(self.resultFrame, text=errorCode.NO_USER_FOUND, fg="red") 
             yourTextPanel.grid(column=1, row=1)
         else:
-            for i, customer in enumerate(searchResult): 
-                structuredText = f'${customer.userId} - {customer.customerName}'
-                yourTextPanel = cPanel(self.resultFrame, text=structuredText, command=self.onUserResultClick) 
-                yourTextPanel.grid(column=1, row=i)
+            searchResult.insert(0, [dbCol.ic, dbCol.name, dbCol.email])  # Add headers
+            self.table.update_table(searchResult)  # ✅ Update existing table instead of recreating it
+
 
     def onUserResultClick(self, customerName):
         print(f'Clicked on user: ${customerName}')
