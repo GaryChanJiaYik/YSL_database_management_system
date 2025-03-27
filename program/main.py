@@ -1,4 +1,4 @@
-from windows import landing;
+from windows import landing
 
 #Entry point of app
 landing.LandingWindow()

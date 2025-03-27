@@ -1,0 +1,1 @@
+NO_USER_FOUND = "No customer in database"
