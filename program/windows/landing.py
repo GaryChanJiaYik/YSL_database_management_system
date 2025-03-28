@@ -7,12 +7,13 @@ import Constant.dbColumn as dbCol
 import csv
 from Components.selectableRowTable import Table
 from windows.customerDetails import CustomerDetailsPage
+from Constant.appConstant import STANDARD_WINDOW_SIZE
 
 class LandingWindow:
     def __init__(self):        
         self.root = tk.Tk()
         self.root.title("YSL DB Management")
-        self.root.geometry("600x500")
+        self.root.geometry(STANDARD_WINDOW_SIZE)
 
         self.table = Table(self.root, [], onRowClickCallback=self.openNewWindow)
         # Create a result frame

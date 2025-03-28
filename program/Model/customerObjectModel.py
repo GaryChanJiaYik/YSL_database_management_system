@@ -1,15 +1,15 @@
 class CustomerModel():
     def __init__(self, 
-                pCustomerId="", 
-                pEmail="", 
-                pIc="",
-                pCustomerName="",
-                pGender="",
-                pRace="",
-                pAddress="",
-                pHandphoneNum="",
-                pInstagram="",
-                pHowDidYouFindUs= "",
+                pCustomerId="-", 
+                pEmail="-", 
+                pIc="-",
+                pCustomerName="-",
+                pGender="-",
+                pRace="-",
+                pAddress="-",
+                pHandphoneNum="-",
+                pInstagram="-",
+                pHowDidYouFindUs= "-",
                 ):
         self.customerId = pCustomerId
         self.email = pEmail

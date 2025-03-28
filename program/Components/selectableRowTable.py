@@ -1,6 +1,6 @@
 import tkinter as tk
 from Constant.converterFunctions import convertTimeStampToId
-
+from Constant.appConstant import STANDARD_WINDOW_WIDTH
 class Table:
     def __init__(self, root, data, onRowClickCallback=None):
         self.root = root
@@ -27,7 +27,7 @@ class Table:
                 else:
                     text = self.data[i][j]
 
-                lbl = tk.Label(self.root, text=text, width=18, fg='black', 
+                lbl = tk.Label(self.root, text=text, width=20, fg='black', 
                                font=('Arial', 12), borderwidth=2, padx=0, pady=5, 
                                bg="white" if i % 2 == 0 else "lightgray")
                 lbl.grid(row=i + 1, column=j + offset, columnspan=2, sticky="nsew")
