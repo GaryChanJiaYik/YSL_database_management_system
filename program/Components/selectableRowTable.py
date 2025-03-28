@@ -1,13 +1,15 @@
 import tkinter as tk
+from Constant.converterFunctions import convertTimeStampToId
 
 class Table:
-    def __init__(self, root, data):
+    def __init__(self, root, data, onRowClickCallback=None):
         self.root = root
         self.data = data
         self.total_rows = len(data)
         self.total_columns = len(data[0]) if data else 0
         self.selected_row = None  # Track selected row
         self.entries = []  # Store label widgets
+        self.onRowClickCallback =onRowClickCallback
         self.createTable()
 
     def createTable(self):
@@ -19,7 +21,13 @@ class Table:
             row_labels = []
             offset = 0
             for j in range(self.total_columns):
-                lbl = tk.Label(self.root, text=self.data[i][j], width=18, fg='black', 
+                text = ""
+                if j == 0:
+                    text = convertTimeStampToId(self.data[i][0])
+                else:
+                    text = self.data[i][j]
+
+                lbl = tk.Label(self.root, text=text, width=18, fg='black', 
                                font=('Arial', 12), borderwidth=2, padx=0, pady=5, 
                                bg="white" if i % 2 == 0 else "lightgray")
                 lbl.grid(row=i + 1, column=j + offset, columnspan=2, sticky="nsew")
@@ -36,6 +44,11 @@ class Table:
         for cell in self.entries[row][1]:
             cell.config(bg="lightblue")
         self.selected_row = row  
+
+        #Get the id and pass it into the new window
+        if self.onRowClickCallback != None:
+            self.onRowClickCallback(self.data[row][0])
+            #self.onRowClickCallback(self.entries[self.selected_row][1][0]["text"])
 
     def clearData(self):
         """Removes all labels and clears the list"""
@@ -54,7 +67,4 @@ class Table:
 
         if self.total_rows > 0:
             self.createTable()  # Recreate the table only if new data exists
-        else:
-            print("Table cleared. No new data.")
-
-        print(f'self.entries AFTER CREATING TABLE: {self.entries}')
+       

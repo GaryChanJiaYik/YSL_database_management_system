@@ -1,3 +1,4 @@
+customerId = "Timestamp"
 ic = "IC身份证"
 name = "Name名"
 email = "Email电邮"
