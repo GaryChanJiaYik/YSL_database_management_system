@@ -15,18 +15,18 @@ def getAllTreatmentByCustomerId(customerId):
         treatment_name = header.index(dbCol.treatmentName)
         treatment_description = header.index(dbCol.treatmentDescription)
         treatment_date = header.index(dbCol.treatmentDate)
-
         result = []
 
         for line in csvFile:
-            if line[customer_id_index] == customerId:
-                treatment = TreatmentModel(
-                    pCustomerId=customerId,
-                    pTreatmentName=line[treatment_name],
-                    pTreatmentDescription= line[treatment_description],
-                    pTreatmentDate=line[treatment_date]
-                )
-                result.append(treatment)
+            if line != []:
+                if line[customer_id_index] == customerId:
+                    treatment = TreatmentModel(
+                        pCustomerId=customerId,
+                        pTreatmentName=line[treatment_name],
+                        pTreatmentDescription= line[treatment_description],
+                        pTreatmentDate=line[treatment_date]
+                    )
+                    result.append(treatment)
         
         return result
 
@@ -34,15 +34,10 @@ def getAllTreatmentByCustomerId(customerId):
 
 
 def createTreatment(treatmentModel):
-    #!!!!!!!!!!!!! customerId --> converted format
-    with open(DB_PATH, mode='a', encoding='utf-8') as file:
-        writer_object = writer(file)
+    with open(DB_PATH, mode='a', encoding='utf-8', newline='\n') as file:
+        # Ensure there's a newline before writing if needed
+        file.write("\n")  
 
-        data = []
-        for key, value in enumerate(vars(treatmentModel).items(), start=0):
-      
-            data.append(value[1])
-        # Pass the list as an argument into
+        writer_object = writer(file)
+        data = [value for key, value in vars(treatmentModel).items()]
         writer_object.writerow(data)
-        # Close the file object
-        file.close()       

@@ -5,21 +5,33 @@ from Constant.appConstant import STANDARD_WINDOW_SIZE
 import Constant.treatmentDatabaseFunctions as TreatmentFunc
 import Model.treatmentModel as TM
 import datetime
-
+from tkinter import ttk
 class AddTreatmentView:
 
     entryFieldList = [dbCol.treatmentName, dbCol.treatmentDescription, dbCol.treatmentPainLevel, dbCol.treatmentNumbLevel, dbCol.treatmentSoreLevel, dbCol.treatmentTenseLevel]
 
-    def createLabelWithTextfield(self, root, label, entryFields):
+    def createLabelWithInputfield(self, root, label, entryFields,selectedLevelVar, isSelectBox=False, ):
 
         frame = tk.Frame(root)
         tk.Label(frame, text =label, width=25, fg='black', font=('Arial', 12), justify="left", anchor="w", pady=1).grid(row=0, column=0, columnspan=2)
-        entry = tk.Entry(frame, bg='lightgray')
-        entry.grid(row=0, column=2)
+        entry = None
+
+        if isSelectBox: 
+            entry = ttk.OptionMenu(
+                frame,
+                selectedLevelVar,
+                self.optionLevel[0],
+                *self.optionLevel)
+        else:    
+            entry = tk.Entry(frame, bg='lightgray')
+        
+
+        entry.grid(row=0, column=2, sticky='w')
         if entryFields.get(label) is None:
             entryFields[label] = entry
 
         return frame
+    
 
 
     def createTreatment(self, customerID, entryFields):
@@ -30,10 +42,10 @@ class AddTreatmentView:
             pCustomerId=customerID, 
             pTreatmentName= entryFields[dbCol.treatmentName].get() ,
             pTreatmentDescription=entryFields[dbCol.treatmentDescription].get(), 
-            pNumbLevel= entryFields[dbCol.treatmentNumbLevel].get(),
-            pPainLevel=entryFields[dbCol.treatmentPainLevel].get(),
-            pSoreLevel=entryFields[dbCol.treatmentSoreLevel].get(),
-            pTenseLevel=entryFields[dbCol.treatmentTenseLevel].get(),
+            pNumbLevel= self.selected_levels[dbCol.treatmentNumbLevel].get(),
+            pPainLevel=self.selected_levels[dbCol.treatmentPainLevel].get(),
+            pSoreLevel=self.selected_levels[dbCol.treatmentSoreLevel].get(),
+            pTenseLevel=self.selected_levels[dbCol.treatmentTenseLevel].get(),
             pTreatmentDate=date,
             )
         TreatmentFunc.createTreatment(treatment)
@@ -55,25 +67,29 @@ class AddTreatmentView:
 
         tk.Label(root, text=f'Add Treatment for customer: {convertTimeStampToId(customerId)}' ).grid(column=0, row=0)
 
+         # initialize data
+        self.optionLevel = ['1', '2', '3','4', '5', '6', '7', '8','9','10']
+        # set up variable
+        
+
+        self.selected_levels = {
+            dbCol.treatmentPainLevel:tk.StringVar(value=self.optionLevel[0]), 
+            dbCol.treatmentNumbLevel:tk.StringVar(value=self.optionLevel[0]),
+            dbCol.treatmentSoreLevel:tk.StringVar(value=self.optionLevel[0]),
+            dbCol.treatmentTenseLevel:tk.StringVar(value=self.optionLevel[0])
+            }
+        #self.selected_level = tk.StringVar(value=self.optionLevel[0])
+
+
+
 
         for idx, field in enumerate(self.entryFieldList):
-            self.createLabelWithTextfield(self.newWindow, field, self.entryFields).grid(row=idx+1, column=0)
+            if field is dbCol.treatmentName or field is dbCol.treatmentDescription:
+                self.createLabelWithInputfield(self.newWindow, field, self.entryFields, None, False).grid(row=idx+1, column=0, sticky='w')
+            else:
+                self.createLabelWithInputfield(self.newWindow, field, self.entryFields,self.selected_levels[field], isSelectBox=True,).grid(row=idx+1, column=0, sticky='w')
+
+       
 
 
-        '''
-        #For 
-        self.frame1 = tk.Frame(self.newWindow)
-        tk.Label(self.frame1, text=dbCol.treatmentName, width=25, fg='black', font=('Arial', 12), justify="left", anchor="w", pady=1).grid(row=0, column=0, columnspan=2)
-        self.treatmentNameEntry = tk.Entry(self.frame1, bg='lightgray')
-        self.treatmentNameEntry.grid(row=0, column=2)
-        self.frame1.grid(row=2, column=0)
-
-        self.frame2 = tk.Frame(self.newWindow)
-        tk.Label(self.frame2, text=dbCol.treatmentDescription, width=25, fg='black', font=('Arial', 12), justify="left", anchor="w", pady=1).grid(row=0, column=0, columnspan=2)
-
-        self.treatmentDescriptionEntry = tk.Entry(self.frame2, bg='lightgray')
-        self.treatmentDescriptionEntry.grid(row=0, column=2)
-
-        self.frame2.grid(row=3, column=0)
-'''
         tk.Button(self.newWindow, text="Add Treatment", command=lambda: self.createTreatment(convertTimeStampToId(customerId), self.entryFields)).grid(row=10, column=0)
