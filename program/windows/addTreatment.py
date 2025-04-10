@@ -36,7 +36,7 @@ class AddTreatmentView:
 
     def createTreatment(self, customerID, entryFields):
         print(entryFields)
-        date = datetime.datetime.now()
+        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         treatment = TM.TreatmentModel(
             pCustomerId=customerID, 
@@ -51,6 +51,7 @@ class AddTreatmentView:
         TreatmentFunc.createTreatment(treatment)
         print("Create treatment button pressed")
 
+   
 
 
     def __init__(self, root, customerId):
@@ -65,12 +66,10 @@ class AddTreatmentView:
         # sets the geometry of toplevel
         self.newWindow.geometry(STANDARD_WINDOW_SIZE)
 
-        tk.Label(root, text=f'Add Treatment for customer: {convertTimeStampToId(customerId)}' ).grid(column=0, row=0)
+        tk.Label(self.newWindow, text=f'Add Treatment for customer: {convertTimeStampToId(customerId)}' ).grid(column=0, row=0)
 
          # initialize data
-        self.optionLevel = ['1', '2', '3','4', '5', '6', '7', '8','9','10']
-        # set up variable
-        
+        self.optionLevel = ['1', '2', '3','4', '5', '6', '7', '8','9','10']        
 
         self.selected_levels = {
             dbCol.treatmentPainLevel:tk.StringVar(value=self.optionLevel[0]), 

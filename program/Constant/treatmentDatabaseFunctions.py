@@ -14,7 +14,11 @@ def getAllTreatmentByCustomerId(customerId):
         customer_id_index = header.index(dbCol.customerIdTreatment)
         treatment_name = header.index(dbCol.treatmentName)
         treatment_description = header.index(dbCol.treatmentDescription)
-        treatment_date = header.index(dbCol.treatmentDate)
+        treatment_date = header.index(dbCol.treatmentDate)    
+        pain_lvl = header.index(dbCol.treatmentPainLevel)
+        tense_lvl = header.index(dbCol.treatmentTenseLevel)
+        sore_lvl = header.index(dbCol.treatmentSoreLevel)
+        numb_lvl = header.index(dbCol.treatmentNumbLevel)
         result = []
 
         for line in csvFile:
@@ -24,7 +28,11 @@ def getAllTreatmentByCustomerId(customerId):
                         pCustomerId=customerId,
                         pTreatmentName=line[treatment_name],
                         pTreatmentDescription= line[treatment_description],
-                        pTreatmentDate=line[treatment_date]
+                        pTreatmentDate=line[treatment_date],
+                        pNumbLevel=line[numb_lvl],
+                        pPainLevel=line[pain_lvl],
+                        pSoreLevel=line[sore_lvl],
+                        pTenseLevel=line[tense_lvl]
                     )
                     result.append(treatment)
         

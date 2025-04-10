@@ -5,6 +5,7 @@ from Constant.dbColumn import customerModelAttributeToField
 from Constant.converterFunctions import convertTimeStampToId
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByCustomerId
 from windows.addTreatment import AddTreatmentView
+from pdfModule.pdfGenerator import generate_customer_pdf
 
 class CustomerDetailsPage:
      
@@ -41,6 +42,12 @@ class CustomerDetailsPage:
 
          return container
 
+      def generatePDF(self):
+         # Implement PDF generation logic here
+         generate_customer_pdf(self.customerModel)
+         print("Generate PDF button pressed fro customer ID:", self.customerModel.customerId) 
+         pass
+
       def openAddTreatmentWindow(self, customerId):
          AddTreatmentView(self.root, customerId)
 
@@ -67,15 +74,17 @@ class CustomerDetailsPage:
                     # A Label widget to show in toplevel
             index = 0
             for idx, (key, value) in enumerate(vars(self.customerModel).items(), start=0):  # or customer.__dict__.items()
-                  print(f"Step {index}: Processing attribute '{key}' with value '{value}'")
                   if key == 'customerId':
                      self.createDetailField(self.customerDetailFrame, customerModelAttributeToField[key], convertTimeStampToId(value)).grid(row=idx, column=0)
                   else:
                      self.createDetailField(self.customerDetailFrame, customerModelAttributeToField[key], value).grid(row=idx, column=0)
                   index+=1
-            tk.Button(self.customerDetailFrame, text="Add treatment", command=lambda: self.openAddTreatmentWindow(self.customerId)).grid(row=index+2, column=0, sticky='w')
 
-
+            self.buttonFrame = tk.Frame(self.customerDetailFrame)
+            
+            tk.Button(self.buttonFrame, text="Add treatment", command=lambda: self.openAddTreatmentWindow(self.customerId)).grid(row=0, column=0, sticky='w')
+            tk.Button(self.buttonFrame, text="Generate PDF", command=lambda: self.generatePDF()).grid(row=0, column=1)
+            self.buttonFrame.grid(row=index+2, column=0, sticky='w')
 
 
 
