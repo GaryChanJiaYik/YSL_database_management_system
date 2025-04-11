@@ -6,6 +6,7 @@ from Constant.converterFunctions import convertTimeStampToId
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByCustomerId
 from windows.addTreatment import AddTreatmentView
 from pdfModule.pdfGenerator import generate_customer_pdf
+from Components.popupModal import renderPopUpModal
 
 class CustomerDetailsPage:
      
@@ -46,6 +47,7 @@ class CustomerDetailsPage:
          # Implement PDF generation logic here
          generate_customer_pdf(self.customerModel)
          print("Generate PDF button pressed fro customer ID:", self.customerModel.customerId) 
+         renderPopUpModal(self.root, "PDF generated successfully","Successful", "Success")
          pass
 
       def openAddTreatmentWindow(self, customerId):

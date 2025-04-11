@@ -6,6 +6,10 @@ import Constant.treatmentDatabaseFunctions as TreatmentFunc
 import Model.treatmentModel as TM
 import datetime
 from tkinter import ttk
+from Components.popupModal import renderPopUpModal
+
+
+
 class AddTreatmentView:
 
     entryFieldList = [dbCol.treatmentName, dbCol.treatmentDescription, dbCol.treatmentPainLevel, dbCol.treatmentNumbLevel, dbCol.treatmentSoreLevel, dbCol.treatmentTenseLevel]
@@ -50,6 +54,8 @@ class AddTreatmentView:
             )
         TreatmentFunc.createTreatment(treatment)
         print("Create treatment button pressed")
+        renderPopUpModal(self.root, "Treatment added successfully","Successful", "Success")
+        self.newWindow.destroy()
 
    
 
