@@ -7,7 +7,7 @@ from Constant.treatmentDatabaseFunctions import getAllTreatmentByCustomerId
 from windows.addTreatment import AddTreatmentView
 from pdfModule.pdfGenerator import generate_customer_pdf
 from Components.popupModal import renderPopUpModal
-
+from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunction
 class CustomerDetailsPage:
      
       def createDetailField(self, root, fieldName, content):
@@ -18,6 +18,9 @@ class CustomerDetailsPage:
          return frame
 
       def renderTreatmentSummaryBlock(self, parentContainer, treatmentModel):
+
+         return renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel)
+         '''
          marginContainer = tk.Frame(parentContainer, pady=2)
          wrapperContainer = tk.Frame(marginContainer, padx=10, pady=5, highlightbackground='black', highlightthickness=1)
          wrapperContainer.grid_columnconfigure(0, weight=1)
@@ -31,7 +34,7 @@ class CustomerDetailsPage:
          treatmentDateLabel = tk.Label(wrapperContainer, text=treatmentModel.treatmentDate, font=('Arial', 9), anchor="w")
          treatmentDateLabel.grid(row=2, column=0, sticky="w")  # Add sticky="w"
          wrapperContainer.grid(row=0, column=0, sticky="w")
-         return marginContainer   
+         return marginContainer  ''' 
 
       def renderTreatmentSummaryFields(self, parentContainer, customerID):
          treatmentList = getAllTreatmentByCustomerId(customerID)  # A list of treatmentModel objects
