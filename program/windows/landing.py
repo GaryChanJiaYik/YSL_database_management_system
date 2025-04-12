@@ -8,6 +8,11 @@ import csv
 from Components.selectableRowTable import Table
 from windows.customerDetails import CustomerDetailsPage
 from Constant.appConstant import STANDARD_WINDOW_SIZE
+from tkinter.filedialog import askopenfilename
+
+import shutil
+
+
 
 class LandingWindow:
     def __init__(self):        
@@ -15,20 +20,38 @@ class LandingWindow:
         self.root.title("YSL DB Management")
         self.root.geometry(STANDARD_WINDOW_SIZE)
 
+
+        
+
+
         self.table = Table(self.root, [], onRowClickCallback=self.openNewWindow)
         # Create a result frame
         self.resultFrame = tk.Frame(self.root)   
         self.resultFrame.grid(column=0, columnspan=3, row=1, rowspan=5)
 
-
+        self.Entryframe = tk.Frame(self.root)  # Create a frame for the entry field
         # Entry with placeholder
         self.searchCustomerField = entry.EntryWithPlaceholder(
-            self.root, placeholder="Customer ID...", on_text_change=self.print_user_input
+            self.Entryframe, placeholder="Customer ID...", on_text_change=self.print_user_input
         )
         self.searchCustomerField.grid(column=0, row=0)
-        
+        tk.Frame(self.Entryframe, width=40).grid(column=1, row=0)  
+
+        tk.Button(
+            self.Entryframe, text="Update CSV", command=self.selectAndUpdateCsv
+        ).grid(column=2, row=0)
+        self.Entryframe.grid(column=0, row=0)
 
         self.root.mainloop()
+
+    def selectAndUpdateCsv(self):
+        """Open a file dialog to select a new CSV file."""
+        filePath = askopenfilename(defaultextension='.csv', filetypes=[("CSV files", "*.csv")])
+        if filePath:
+            filename = filePath.split("/")[-1]
+            shutil.copyfile(filePath, f'./data/{filename}')  # Copy the selected file to the target location
+            print(f"Selected file: {filePath}")
+
 
     def searchForUser(self, userId):
         with open('./data/db.csv', mode='r', encoding='utf-8') as file:

@@ -50,3 +50,4 @@ def generate_customer_pdf(customerModel):
     }
     pdfkit.from_string(output_text, f'{DESKTOP_PATH}/{customer_name}_{customer_id}_report.pdf', configuration=config, options=options)
     print(f"PDF generated for customer {customer_id}")
+    print(f'treatment_list0: {treatment_list[len(treatment_list)-1]}')
