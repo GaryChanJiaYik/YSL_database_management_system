@@ -24,7 +24,7 @@ class AddTreatmentView:
             entry = ttk.OptionMenu(
                 frame,
                 selectedLevelVar,
-                self.optionLevel[0],
+                '0',
                 *self.optionLevel)
         else:  
             if label is dbCol.treatmentDescription:
@@ -109,10 +109,10 @@ class AddTreatmentView:
         self.optionLevel = ['1', '2', '3','4', '5', '6', '7', '8','9','10']        
 
         self.selected_levels = {
-            dbCol.treatmentPainLevel:tk.StringVar(value=self.optionLevel[0]), 
-            dbCol.treatmentNumbLevel:tk.StringVar(value=self.optionLevel[0]),
-            dbCol.treatmentSoreLevel:tk.StringVar(value=self.optionLevel[0]),
-            dbCol.treatmentTenseLevel:tk.StringVar(value=self.optionLevel[0])
+            dbCol.treatmentPainLevel:tk.StringVar(value='0'), 
+            dbCol.treatmentNumbLevel:tk.StringVar(value='0'),
+            dbCol.treatmentSoreLevel:tk.StringVar(value='0'),
+            dbCol.treatmentTenseLevel:tk.StringVar(value='0')
             }
         #self.selected_level = tk.StringVar(value=self.optionLevel[0])
 
