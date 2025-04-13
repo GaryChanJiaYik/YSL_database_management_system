@@ -18,9 +18,6 @@ def renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel):
 
     treatmentDetailContainer = tk.Frame(wrapperContainer, padx=5, pady=5) 
 
-    treatmentNameLabel = tk.Label(treatmentDetailContainer, text=treatmentModel.treatmentName, font=('Arial', 12), anchor="w")
-    treatmentNameLabel.grid(row=0, column=0, sticky="w")
-
     treatmentDescriptionLabel = tk.Label(treatmentDetailContainer, text=treatmentModel.treatmentDescription, font=('Arial', 9), anchor="w")
     treatmentDescriptionLabel.grid(row=1, column=0, sticky="w") 
 

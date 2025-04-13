@@ -34,7 +34,6 @@ TreatmentModelAttributeToField = {
 
 # FOR TREATMENT DB
 customerIdTreatment = "CustomerId"
-treatmentName = "TreatmentName"
 treatmentDescription = "treatmentDescription"
 treatmentPainLevel = "treatmentPainLevel"
 treatmentTenseLevel = "treatmentTenseLevel"

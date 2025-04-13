@@ -1,7 +1,6 @@
 class TreatmentModel:
     def __init__(self, 
                 pCustomerId="", 
-                pTreatmentName="", 
                 pTreatmentDescription="", 
                 pTreatmentDate="",
                 pPainLevel = 0,
@@ -10,7 +9,6 @@ class TreatmentModel:
                 pNumbLevel = 0 
                  ):
         self.customerId = pCustomerId
-        self.treatmentName = pTreatmentName
         self.treatmentDescription = pTreatmentDescription
         self.painLevel = pPainLevel
         self.tenseLevel = pTenseLevel

@@ -12,7 +12,7 @@ from Components.popupModal import renderPopUpModal
 
 class AddTreatmentView:
 
-    entryFieldList = [dbCol.treatmentName, dbCol.treatmentDescription, dbCol.treatmentPainLevel, dbCol.treatmentNumbLevel, dbCol.treatmentSoreLevel, dbCol.treatmentTenseLevel]
+    entryFieldList = [ dbCol.treatmentDescription, dbCol.treatmentPainLevel, dbCol.treatmentNumbLevel, dbCol.treatmentSoreLevel, dbCol.treatmentTenseLevel]
 
     def createLabelWithInputfield(self, root, label, entryFields,selectedLevelVar, isSelectBox=False, ):
 
@@ -59,7 +59,6 @@ class AddTreatmentView:
         print("OK PASSED DATE CONVERSION")
         treatment = TM.TreatmentModel(
             pCustomerId=customerID, 
-            pTreatmentName= entryFields[dbCol.treatmentName].get("1.0", tk.END).strip() ,
             pTreatmentDescription=entryFields[dbCol.treatmentDescription].get("1.0", tk.END).strip(), 
             pNumbLevel= self.selected_levels[dbCol.treatmentNumbLevel].get(),
             pPainLevel=self.selected_levels[dbCol.treatmentPainLevel].get(),
@@ -121,7 +120,7 @@ class AddTreatmentView:
         index = 1
 
         for idx, field in enumerate(self.entryFieldList):
-            if field is dbCol.treatmentName or field is dbCol.treatmentDescription:
+            if field is dbCol.treatmentDescription:
                 self.createLabelWithInputfield(self.newWindow, field, self.entryFields, None, False).grid(row=idx+1, column=0, sticky='w')
             else:
                 self.createLabelWithInputfield(self.newWindow, field, self.entryFields,self.selected_levels[field], isSelectBox=True,).grid(row=idx+1, column=0, sticky='w')
