@@ -17,9 +17,9 @@ class CustomerDetailsPage:
          tk.Label(frame, text =content if content != "" else "---", width=20, fg='black', font=('Arial', 12), justify="left", anchor="w", pady=1).grid(row=0, column=2)
          return frame
 
-      def renderTreatmentSummaryBlock(self, parentContainer, treatmentModel):
+      def renderTreatmentSummaryBlock(self, parentContainer, treatmentModel, on_click=None):
 
-         return renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel)
+         return renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel, on_click)
          '''
          marginContainer = tk.Frame(parentContainer, pady=2)
          wrapperContainer = tk.Frame(marginContainer, padx=10, pady=5, highlightbackground='black', highlightthickness=1)
@@ -41,7 +41,7 @@ class CustomerDetailsPage:
          container = tk.Frame(parentContainer,)
 
          for id, treatment in enumerate(treatmentList):
-            block = self.renderTreatmentSummaryBlock(container, treatment)
+            block = self.renderTreatmentSummaryBlock(container, treatment, self.handleTreatmentBlockClick)
             block.grid(row=id, column=0, columnspan=2, sticky="w")  # Ensure left alignment
 
          return container
@@ -55,6 +55,10 @@ class CustomerDetailsPage:
 
       def openAddTreatmentWindow(self, customerId):
          AddTreatmentView(self.root, customerId)
+
+      def handleTreatmentBlockClick(self, model):
+         print("Clicked summary for:", model.treatmentID)
+
 
       def __init__(self, root, customerId):
             # !!!!!!!!!!!!!!!!! CustomerId is in timestamp format

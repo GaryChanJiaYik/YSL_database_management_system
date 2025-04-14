@@ -11,7 +11,7 @@ def create_level_cell(parent, row, col, label_text, value_text):
     value.grid(row=1, column=0, sticky="w")
 
 
-def renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel):
+def renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel, on_click=None):
     marginContainer = tk.Frame(parentContainer, pady=2)
     wrapperContainer = tk.Frame(marginContainer, highlightbackground='black', highlightthickness=1)
     wrapperContainer.grid_columnconfigure(0, weight=1)
@@ -34,6 +34,15 @@ def renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel):
     create_level_cell(treatmentLevelsContainer, 1, 0, "Tense", treatmentModel.tenseLevel)
     create_level_cell(treatmentLevelsContainer, 0, 1, "Sore", treatmentModel.soreLevel)
     create_level_cell(treatmentLevelsContainer, 1, 1, "Numb", treatmentModel.numbLevel)
+
+
+    if on_click:
+        marginContainer.bind("<Button-1>", lambda e: on_click(treatmentModel))
+        # Also bind children to make sure the whole area is clickable
+        for child in marginContainer.winfo_children():
+            child.bind("<Button-1>", lambda e: on_click(treatmentModel))
+
+
 
     wrapperContainer.grid(row=0, column=0, sticky="w")
     return marginContainer   
