@@ -17,7 +17,7 @@ import shutil
 class LandingWindow:
     def __init__(self):        
         self.root = tk.Tk()
-        self.root.title("YSL DB Management")
+        self.root.title("YSL DB Management jhabwwdjhawj")
         self.root.geometry(STANDARD_WINDOW_SIZE)
 
 
