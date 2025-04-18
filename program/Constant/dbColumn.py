@@ -40,3 +40,12 @@ treatmentTenseLevel = "treatmentTenseLevel"
 treatmentSoreLevel = "treatmentSoreLevel"
 treatmentNumbLevel = "treatmentNumbLevel"
 treatmentDate = "treatmentDate"
+
+
+# For condition db
+customerIdConditionDb = "customerId"
+conditionId = "conditionId"
+conditionDescription = "conditionDescription"
+undergoingTreatment = "undergoingTreatment"
+conditionDate = "conditionDate"
+
