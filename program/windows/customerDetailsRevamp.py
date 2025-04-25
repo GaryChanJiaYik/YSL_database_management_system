@@ -10,7 +10,7 @@ from Constant.converterFunctions import convertTimeStampToId, getFormattedDateTi
 import datetime
 from Components.conditionModelBlock import instantiateConditionModelBlock
 from windows.conditionDetailsView import ConditionDetailsView
-
+from services.customerFilesServices import customerHasConsentForm, viewCustomerFilePDF
 
 class CustomerDetailsViewRevamp:
 
@@ -94,6 +94,36 @@ class CustomerDetailsViewRevamp:
         ConditionDetailsView(self.root, self.customerId, cm )
         print("Clicked condition details for:", cm.conditionId)
 
+    def renderConsentFormOptionButton(self, row, column):
+        
+        customerHasConsentFormVar = customerHasConsentForm(self.customerId)
+        print("")
+        print("Customer has consent form: ", customerHasConsentFormVar)
+        print("")
+        if not customerHasConsentFormVar:
+            # Create a button to upload consent form
+            customtkinter.CTkButton(
+                master=self.customerDetailFrame,
+                text="Upload Consent Form",
+                command=lambda: self.uploadConsentForm(),
+            ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
+        else:
+            # Create a button to view consent form
+            customtkinter.CTkButton(
+                master=self.customerDetailFrame,
+                text="View Consent Form",
+                command=lambda: self.viewConsentForm(),
+            ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
+
+
+    def uploadConsentForm(self):
+        pass
+
+    def viewConsentForm(self):
+        viewCustomerFilePDF(self.customerId)
+
+
+
     def __init__(self, root, customerId):
         self.root = root
         self.newWindow = customtkinter.CTkToplevel(self.root)
@@ -147,7 +177,7 @@ class CustomerDetailsViewRevamp:
             # Decide which column to put this field in
             if key in columnTwoKeys:
                  # Address field spans 2 rows
-               
+
                 self.createDetailField(
                     self.customerDetailFrame, field_name, display_value,
                     row=columnTwoRowIndex, column=3
@@ -160,6 +190,13 @@ class CustomerDetailsViewRevamp:
                     row=columnOneRowIndex, column=0
                 )
                 columnOneRowIndex += 1
+
+        #render consent form option button
+        
+
+        # Will display upload consent form if DO NOT HAVE consent form
+        # Will display view consent form if HAVE consent form
+        self.renderConsentFormOptionButton(row=columnTwoRowIndex, column=3)
 
 
         #For condition
