@@ -3,6 +3,7 @@ import Constant.errorCode as errorCode
 import Constant.dbColumn as dbCol
 from Model.customerObjectModel import CustomerModel
 from Constant.converterFunctions import convertTimeStampToId
+
 def searchForSingleUser( userId):
     print("from searching constant function")
     print(userId)
@@ -21,9 +22,11 @@ def searchForSingleUser( userId):
             insta_index = header.index(dbCol.instagram)
             knowUsMethod_index = header.index(dbCol.knowUsMethod)
             race_index = header.index(dbCol.race)  
-
+            print("From search single user")
+          
             for lines in csvFile:
                 if lines[customer_id] == userId:
+                    print(lines[address_index])
                     customer = CustomerModel(
                         pCustomerId=lines[customer_id],
                         pIc=lines[ic_index],

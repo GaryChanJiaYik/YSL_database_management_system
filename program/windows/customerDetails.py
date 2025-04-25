@@ -8,6 +8,7 @@ from windows.addTreatment import AddTreatmentView
 from pdfModule.pdfGenerator import generate_customer_pdf
 from Components.popupModal import renderPopUpModal
 from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunction
+
 class CustomerDetailsPage:
      
       def createDetailField(self, root, fieldName, content):

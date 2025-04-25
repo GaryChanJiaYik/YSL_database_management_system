@@ -9,7 +9,7 @@ from Components.selectableRowTable import Table
 from windows.customerDetails import CustomerDetailsPage
 from Constant.appConstant import STANDARD_WINDOW_SIZE
 from tkinter.filedialog import askopenfilename
-
+from windows.customerDetailsRevamp import CustomerDetailsViewRevamp
 import shutil
 
 
@@ -89,6 +89,6 @@ class LandingWindow:
 
 
     def openNewWindow(self, customerId):
-        CustomerDetailsPage(self.root, customerId)
+        CustomerDetailsViewRevamp(self.root, customerId)
        
 

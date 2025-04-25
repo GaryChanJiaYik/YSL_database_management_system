@@ -33,3 +33,10 @@ def formatDateTime(root, hour, minute, am_pm):
         print(f"Error in formatDateTime: {e}")
         popupModal.renderPopUpModal(root, "Invalid time format", "Error", "Error")
         return
+    
+def getFormattedDateTime():
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M") 
+
+
+def getDatefromTimeStamp(timestamp):
+    return timestamp[:10] 

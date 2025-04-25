@@ -21,6 +21,8 @@ def getAllConditionsByCustomerId(customerId):
 
         for line in csvFile:
             if line != []:
+
+                print(f'{line[customer_id_index]} == {customerId} --> {line[customer_id_index] == customerId}')
                 if line[customer_id_index] == customerId:
                     condition = CM.ConditionModel(
                         customerId=customerId,

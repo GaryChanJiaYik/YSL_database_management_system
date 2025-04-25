@@ -25,9 +25,13 @@ customerModelAttributeToField = {
 
 
 TreatmentModelAttributeToField = {
-    ''
+    'treatmentDescription': "Treatment Description",
+    'treatmentPainLevel': "Pain Level",
+    'treatmentTenseLevel': "Tense Level",
+    'treatmentSoreLevel': "Sore Level",
+    'treatmentNumbLevel': "Numb Level",
+    'treatmentDate': "Treatment Date"
 }
-
 
 
 
