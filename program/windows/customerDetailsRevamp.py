@@ -10,7 +10,9 @@ from Constant.converterFunctions import convertTimeStampToId, getFormattedDateTi
 import datetime
 from Components.conditionModelBlock import instantiateConditionModelBlock
 from windows.conditionDetailsView import ConditionDetailsView
-from services.customerFilesServices import customerHasConsentForm, viewCustomerFilePDF
+from services.customerFilesServices import customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile
+from tkinter.filedialog import askopenfilename
+import shutil
 
 class CustomerDetailsViewRevamp:
 
@@ -105,7 +107,7 @@ class CustomerDetailsViewRevamp:
             customtkinter.CTkButton(
                 master=self.customerDetailFrame,
                 text="Upload Consent Form",
-                command=lambda: self.uploadConsentForm(),
+                command=lambda: self.uploadOrReplaceConsentForm(),
             ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
         else:
             # Create a button to view consent form
@@ -115,9 +117,18 @@ class CustomerDetailsViewRevamp:
                 command=lambda: self.viewConsentForm(),
             ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
 
+            # Updaet button
+            customtkinter.CTkButton(
+                master=self.customerDetailFrame,
+                text="Update Consent Form",
+                command=lambda: self.uploadOrReplaceConsentForm(),
+            ).grid(row=row, column=column +1, sticky="w", padx=(10, 5), pady=5)
 
-    def uploadConsentForm(self):
-        pass
+    
+    def uploadOrReplaceConsentForm(self):
+        filePath = askopenfilename(defaultextension='.pdf', filetypes=[('pdf file', '*.pdf')])
+        if filePath:
+            uploadCustomerFile(self.customerId, filePath, self.root)
 
     def viewConsentForm(self):
         viewCustomerFilePDF(self.customerId)

@@ -1,6 +1,8 @@
 import os
 from pdfModule.pdfFunctions import openPdf
 from Constant.fileKeywords import CONSENT_FORM_KEYWORD
+import shutil
+from Components.popupModal import renderPopUpModal
 #CONSTANTs
 attachment_path = "C:\\Users\\User\\Desktop\\YSL\\data\\attachment"
 
@@ -50,19 +52,20 @@ def viewCustomerFilePDF(customerId):
 
 
 
-def uploadCustomerFile():
+def uploadCustomerFile(customer_id, filePath, root):
     #check if foolder to store customer file exist 
+    customer_folder_path = os.path.join(attachment_path, customer_id)
 
-    #If yes the get the path
-    if os.path.exists("..\\..\\data\\attachment"):
-        # Placeholder for actual implementation
-        pass
-
-    else:
-        #if no create one and get the path
-
-
-        os.makedirs("..\\..\\data\\attachment")
+    # if no folder storing customer file exist create one
+    if not os.path.exists(customer_folder_path):
+        os.makedirs(customer_folder_path)
+    new_file_path = os.path.join(customer_folder_path, f'{CONSENT_FORM_KEYWORD}.pdf')
     
-    
-    pass
+    #Save the file in the folder with the name consentForm
+    try:
+        shutil.copyfile(filePath, new_file_path)  # Copy the selected file to the target location
+        renderPopUpModal(root, "File uploaded successfully", "Upload", "Success")
+    except Exception as e:
+        renderPopUpModal(root, "Error uploading file", "Upload", "Error")
+
+        print(f"Error copying file: {e}")
