@@ -7,7 +7,7 @@ from tkinter.filedialog import askopenfilename
 import glob
 from Constant.errorCode import ERROR, SUCCESS
 #CONSTANTs
-attachment_path = "C:\\Users\\User\\Desktop\\YSL\\data\\attachment"
+attachment_path = os.path.join(os.getcwd(), "data", "attachment")
 
 
 def customerHasConsentForm(customer_id):
@@ -65,7 +65,7 @@ def uploadCustomerFile(customer_id, filePath, root, fileName):
     # if no folder storing customer file exist create one
     if not os.path.exists(customer_folder_path):
         os.makedirs(customer_folder_path)
-    new_file_path = os.path.join(customer_folder_path, f'{fileName}.{extension}')
+    new_file_path = os.path.join(customer_folder_path, f'{fileName}{extension}')
     
     #Save the file in the folder with the name consentForm
     try:
