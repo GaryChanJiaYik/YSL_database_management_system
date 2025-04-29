@@ -8,7 +8,7 @@ address ="Address地址"
 handPhoneNumber = "HP No.手机号"
 instagram = "Instagram"
 knowUsMethod = "How did get know our centre?你是怎么来到我们这里？"
-
+oldCustomerId = "Old Customer ID"
 
 customerModelAttributeToField = {
   'customerId': "Customer ID",
@@ -20,7 +20,8 @@ customerModelAttributeToField = {
   'address': "Address",
   'handphone': "Handphone Number",
   'instagram': "Instagram",
-  'howDidYouFindUs': "How did get know our centre?"
+  'howDidYouFindUs': "How did get know our centre?",
+  "oldCustomerId": "Old Customer ID"
 }
 
 

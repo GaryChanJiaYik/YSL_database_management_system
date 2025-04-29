@@ -22,13 +22,15 @@ def searchForSingleUser( userId):
             insta_index = header.index(dbCol.instagram)
             knowUsMethod_index = header.index(dbCol.knowUsMethod)
             race_index = header.index(dbCol.race)  
-            print("From search single user")
+            old_cus_id_index = header.index(dbCol.oldCustomerId)
           
             for lines in csvFile:
                 if lines[customer_id] == userId:
-                    print(lines[address_index])
+                    print(lines[old_cus_id_index])
+
                     customer = CustomerModel(
                         pCustomerId=lines[customer_id],
+                        pOldCustomerId= lines[old_cus_id_index],
                         pIc=lines[ic_index],
                         pCustomerName=lines[name_index],
                         pEmail= lines[email_index],
@@ -42,3 +44,42 @@ def searchForSingleUser( userId):
                     return customer          
         else:
             return errorCode.NO_USER_FOUND
+        
+def addOldCustomerID(customerID, oldCustomerId):
+    print(f'{customerID} --> {oldCustomerId}')
+    updated = False
+    file_path = './data/db.csv'
+
+    # Read all rows
+    with open(file_path, mode='r', encoding='utf-8') as file:
+        csv_reader = csv.reader(file)
+        rows = list(csv_reader)
+
+    if not rows:
+        print("Empty CSV")
+        return
+
+    header = rows[0]
+    if dbCol.customerId in header and dbCol.oldCustomerId in header:
+        customer_id_index = header.index(dbCol.customerId)
+        old_customer_id_index = header.index(dbCol.oldCustomerId)
+
+        for i in range(1, len(rows)):  # Skip header
+            if rows[i][customer_id_index] == customerID:
+                rows[i][old_customer_id_index] = oldCustomerId
+                updated = True
+                break
+
+        if updated:
+            # Write the updated rows back to the file
+            with open(file_path, mode='w', encoding='utf-8', newline='') as file:
+                csv_writer = csv.writer(file)
+                csv_writer.writerows(rows)
+            print("Added old customer ID successfully.")
+        else:
+            print("Customer ID not found.")
+            return errorCode.NO_USER_FOUND
+    else:
+        print("Required columns not found.")
+        return errorCode.NO_USER_FOUND
+        

@@ -1,6 +1,7 @@
 class CustomerModel():
     def __init__(self, 
-                pCustomerId="-", 
+                pCustomerId="-",
+                pOldCustomerId="", 
                 pEmail="-", 
                 pIc="-",
                 pCustomerName="-",
@@ -12,6 +13,7 @@ class CustomerModel():
                 pHowDidYouFindUs= "-",
                 ):
         self.customerId = pCustomerId
+        self.oldCustomerId = pOldCustomerId
         self.email = pEmail
         self.ic = pIc
         self.customerName = pCustomerName
@@ -21,6 +23,7 @@ class CustomerModel():
         self.handphone = pHandphoneNum
         self.instagram = pInstagram
         self.howDidYouFindUs = pHowDidYouFindUs
+        
 
 
 

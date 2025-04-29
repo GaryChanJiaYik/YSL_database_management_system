@@ -1,7 +1,7 @@
 import customtkinter
 from Constant.appConstant import STANDARD_WINDOW_SIZE
-from Constant.databaseManipulationFunctions import searchForSingleUser
-from Constant.dbColumn import customerModelAttributeToField
+from Constant.databaseManipulationFunctions import searchForSingleUser, addOldCustomerID
+from Constant.dbColumn import customerModelAttributeToField, oldCustomerId
 from Constant.converterFunctions import convertTimeStampToId
 from services.conditionDbFunctions import insertConditionToDb, getAllConditionsByCustomerId
 from Model.conditionModel import ConditionModel
@@ -12,6 +12,7 @@ from Components.conditionModelBlock import instantiateConditionModelBlock
 from windows.conditionDetailsView import ConditionDetailsView
 from services.customerFilesServices import customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile
 from tkinter.filedialog import askopenfilename
+from Components.popupModal import renderPopUpModal
 import shutil
 
 class CustomerDetailsViewRevamp:
@@ -24,18 +25,95 @@ class CustomerDetailsViewRevamp:
             bg_color='transparent',
             anchor="w"
         ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
-        # Content label (support rowspan)
-        customtkinter.CTkLabel(
-            root,
-            text=content if content != "" else "---", 
-            bg_color='transparent',
-            wraplength=200,
-            anchor="w",
-            justify="left",
-        ).grid(row=row, column=column + 1, rowspan=rowspan, sticky="w", padx=(5, 10), pady=5)
+
+        #If is old customer id and is empty,
+        if fieldName == oldCustomerId and content == "":
+            self.oldCustomerIdInputFieldContainer = None
+            self.addOldCustomerIdButton = None
+            self.renderAddOldCustomerIdButton(root, row, column, rowspan)
+        else:
+            # Content label (support rowspan)
+            customtkinter.CTkLabel(
+                root,
+                text=content if content != "" else "---", 
+                bg_color='transparent',
+                wraplength=200,
+                anchor="w",
+                justify="left",
+            ).grid(row=row, column=column + 1, rowspan=rowspan, sticky="w", padx=(5, 10), pady=5)
+
+    def renderAddOldCustomerIdButton(self, root, row, column, rowspan=1):
+        if self.oldCustomerIdInputFieldContainer is not None:
+            self.oldCustomerIdInputFieldContainer.destroy()
+            
+        self.addOldCustomerIdButton = customtkinter.CTkButton(
+                root,
+                text="Add old ID",
+                command=lambda: self.renderCustomerOldIDInputField(root,row, column+1, rowspan),
+            )
+
+        self.addOldCustomerIdButton.grid(row=row, column=column+1, rowspan=rowspan, sticky="w", padx=(5, 10), pady=5)
+        
+    def renderCustomerOldIDInputField(self,root,row, column, rowspan=1):
+        if self.addOldCustomerIdButton is not None:
+            self.addOldCustomerIdButton.destroy()  # Remove the button
+
+        self.oldCustomerIdInputFieldContainer = customtkinter.CTkFrame(master=root, bg_color="transparent")
+        self.oldCustomerIdInputFieldContainer.grid(row=row, column=column, rowspan=rowspan, sticky="w", padx=(2, 2), pady=0)
+
+        self.oldCustomerIdInputFieldContainer.grid_columnconfigure(0, weight=2)
+        self.oldCustomerIdInputFieldContainer.grid_columnconfigure(1, weight=1)
+        self.oldCustomerIdInputFieldContainer.grid_columnconfigure(2, weight=1)
+
+        self.oldCustomerIdInputField = customtkinter.CTkEntry(
+            master=self.oldCustomerIdInputFieldContainer,
+            placeholder_text="Enter old ID",
+            width=110,
+        )
+
+        self.oldCustomerIdInputField.grid(row=0, column=0, rowspan=1, sticky="w", padx=(5, 10), pady=5)
+        self.submitOldCustomerIdButton = customtkinter.CTkButton(
+            master=self.oldCustomerIdInputFieldContainer,
+            text="Submit",
+            command=lambda: self.addOldCustomerIdToDb(root,row, column),
+            fg_color="green",
+            hover_color="darkgreen",
+            width=10,
+        )
+
+        self.submitOldCustomerIdButton.grid(row=0, column=1, rowspan=1, sticky="w")
+
+        self.closeOldCustomerIdInputField = customtkinter.CTkButton(
+            master=self.oldCustomerIdInputFieldContainer,
+            text="Close",
+            command=lambda: self.renderAddOldCustomerIdButton(root, row, column-1, rowspan),
+            fg_color="red",
+            hover_color="darkred",
+            width=10,
+        )
+        self.closeOldCustomerIdInputField.grid(row=0, column=2, rowspan=1, sticky="w", padx=(5, 10), pady=5)
+
+    def addOldCustomerIdToDb(self, root, row, column):
+        oldCustomerId = self.oldCustomerIdInputField.get()
+
+        if oldCustomerId:
+            addOldCustomerID(self.customerTimeStamp, self.oldCustomerIdInputField.get())
+
+            self.oldCustomerIdInputFieldContainer.destroy()  # Remove the input field container
+
+            #display this new data
+            customtkinter.CTkLabel(
+                    root,
+                    text=oldCustomerId, 
+                    bg_color='transparent',
+                    wraplength=200,
+                    anchor="w",
+                    justify="left",
+                ).grid(row=row, column=column, rowspan=1, sticky="w", padx=(5, 10), pady=5)
+        else:
+            renderPopUpModal(root, "Old ID CANNOT be empty!", "Error", "Error")
 
     def addConditionToDb(self):
-        print(self.conditionEntry.get("1.0", "end-1c"))  # Get the text from the Text widget
         conditionModel = ConditionModel(
             customerId=convertTimeStampToId(self.customerId),
             condition_id= generateUUID(),  # Assuming this is auto-generated in the database
@@ -145,7 +223,7 @@ class CustomerDetailsViewRevamp:
         
         # sets the geometry of toplevel
         self.newWindow.geometry(STANDARD_WINDOW_SIZE)
-
+        self.customerTimeStamp = customerId
         self.customerId = convertTimeStampToId(customerId) 
         self.customerModel = searchForSingleUser(customerId)
 
@@ -159,7 +237,7 @@ class CustomerDetailsViewRevamp:
 
         self.customerDetailFrame = customtkinter.CTkFrame(master=self.newWindow, bg_color="transparent")
         self.customerDetailFrame.grid_columnconfigure(0, weight=1)
-        self.customerDetailFrame.grid_columnconfigure(1, weight=2)
+        self.customerDetailFrame.grid_columnconfigure(1, minsize=330)
         self.customerDetailFrame.grid_columnconfigure(2, minsize=80)
         self.customerDetailFrame.grid_columnconfigure(3, weight=1)
         self.customerDetailFrame.grid_columnconfigure(4, weight=2)
