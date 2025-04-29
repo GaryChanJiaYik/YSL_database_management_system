@@ -13,6 +13,7 @@ from windows.conditionDetailsView import ConditionDetailsView
 from services.customerFilesServices import customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile
 from tkinter.filedialog import askopenfilename
 from Components.popupModal import renderPopUpModal
+from Constant.fileKeywords import CONSENT_FORM_KEYWORD
 import shutil
 
 class CustomerDetailsViewRevamp:
@@ -206,7 +207,7 @@ class CustomerDetailsViewRevamp:
     def uploadOrReplaceConsentForm(self):
         filePath = askopenfilename(defaultextension='.pdf', filetypes=[('pdf file', '*.pdf')])
         if filePath:
-            uploadCustomerFile(self.customerId, filePath, self.root)
+            uploadCustomerFile(self.customerId, filePath, self.root, CONSENT_FORM_KEYWORD)
 
     def viewConsentForm(self):
         viewCustomerFilePDF(self.customerId)

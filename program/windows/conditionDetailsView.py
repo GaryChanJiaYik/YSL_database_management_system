@@ -5,7 +5,9 @@ from Constant.converterFunctions import formatDateTime
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
 from windows.addTreatmentRevamp import AddTreatmentViewRevamp
 from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunctionRevamp
-
+from services.customerFilesServices import getConditionPicturePath,renderFilePicker, uploadCustomerFile
+from PIL import Image, ImageTk
+from Constant.errorCode import SUCCESS
 class ConditionDetailsView:
 
     def treatmentChecked(self):
@@ -16,6 +18,49 @@ class ConditionDetailsView:
 
     def handleTreatmentBlockEditClick(self, model):
         print("Clicked on something!!")
+
+    def renderConditionPictureContainerContent(self, root):
+        self.uploadConditionPictureBtn = None
+        #Check if there is any picture for the condition
+        # If yes, render the picture,
+        # else, render button to upload a picture
+        conditionPicturePath = getConditionPicturePath(self.customerId, self.conditionModel.conditionId)
+        if conditionPicturePath is not None:
+            self.renderConditionPicture(root, conditionPicturePath)
+        else:
+            self.uploadConditionPictureBtn = ctk.CTkButton(root, text="Upload Picture", command=self.uploadConditionPicture)
+            self.uploadConditionPictureBtn.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
+
+    def renderConditionPicture(self, root, conditionPicturePath):
+        #render the picture
+        image = Image.open(conditionPicturePath)
+        #resize
+        image = image.resize((250, 250))  # Resize the image to fit the label
+        # Convert for Tkinter
+        photo = ImageTk.PhotoImage(image)
+
+
+        # Display in CTkLabel
+        label = ctk.CTkLabel(root, image=photo, text="")    #     # If no picture, render button to upload a picture
+        label.grid(row=0, column=0, sticky="nsew")
+
+
+    def uploadConditionPicture(self):
+        filePath = renderFilePicker(pdefaultextension='',pfiletypes=[
+            ("Image files", "*.png *.jpg *.jpeg *.gif *.bmp *.tiff"),
+            ("All files", "*.*")  # Optional fallback
+        ], ptitle="Select a picture")
+        
+        if filePath is not None:
+            #manipulate the file path to the condition picture path            
+            result = uploadCustomerFile(self.customerId,filePath, self.root,  self.conditionModel.conditionId)
+            if result == SUCCESS:
+                self.uploadConditionPictureBtn.destroy()
+                self.renderConditionPicture(self.conditionPictureContainer, filePath)
+                
+            print(filePath)
+
+
 
 
     def __init__(self, root, customerId, conditionModel):
@@ -46,12 +91,25 @@ class ConditionDetailsView:
         createDetailField(root=self.customerInfoFrame, fieldName="Customer Name", content="William", row=1, column=0)
 
         #Condition details
-        self.conditionDetailsField = ctk.CTkFrame(
+
+        # conditionContainer
+        #   -conditionDetailsField
+        #   -conditionPicture
+
+        self.conditionContainer = ctk.CTkFrame(
             self.newWindow,
             fg_color='transparent',
             bg_color='transparent'
+            )
+        self.conditionContainer.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=5)
+
+
+        self.conditionDetailsField = ctk.CTkFrame(
+            self.conditionContainer,
+            fg_color='transparent',
+            bg_color='transparent'
         )
-        self.conditionDetailsField.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=5)
+        self.conditionDetailsField.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=5)
         self.conditionDetailSubFrame = ctk.CTkFrame(
             self.conditionDetailsField,
             fg_color='transparent',
@@ -82,6 +140,14 @@ class ConditionDetailsView:
         createDetailField(root=self.conditionDetailsField, fieldName="Description", content=conditionModel.conditionDescription, row=1, column=0)
         createDetailField(root=self.conditionDetailsField, fieldName="Added Date", content=conditionModel.conditionDate, row=2, column=0)
         createDetailField(root=self.conditionDetailsField, fieldName="Status", content="Undergoing Treatement" if conditionModel.undergoingTreatment else "Treated", row=3, column=0)
+
+
+        #conditionPicture
+        self.conditionPictureContainer = ctk.CTkFrame(
+            self.conditionContainer,
+        )
+        self.conditionPictureContainer.grid(row=0, column=1, sticky="nsew", padx=(10, 5), pady=5)
+        self.renderConditionPictureContainerContent(self.conditionPictureContainer)
 
 
         #Treatment list 

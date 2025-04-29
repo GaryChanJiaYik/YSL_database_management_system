@@ -3,6 +3,9 @@ from pdfModule.pdfFunctions import openPdf
 from Constant.fileKeywords import CONSENT_FORM_KEYWORD
 import shutil
 from Components.popupModal import renderPopUpModal
+from tkinter.filedialog import askopenfilename
+import glob
+from Constant.errorCode import ERROR, SUCCESS
 #CONSTANTs
 attachment_path = "C:\\Users\\User\\Desktop\\YSL\\data\\attachment"
 
@@ -52,20 +55,54 @@ def viewCustomerFilePDF(customerId):
 
 
 
-def uploadCustomerFile(customer_id, filePath, root):
+def uploadCustomerFile(customer_id, filePath, root, fileName):
+    _, extension = os.path.splitext(filePath)
+
+
     #check if foolder to store customer file exist 
     customer_folder_path = os.path.join(attachment_path, customer_id)
 
     # if no folder storing customer file exist create one
     if not os.path.exists(customer_folder_path):
         os.makedirs(customer_folder_path)
-    new_file_path = os.path.join(customer_folder_path, f'{CONSENT_FORM_KEYWORD}.pdf')
+    new_file_path = os.path.join(customer_folder_path, f'{fileName}.{extension}')
     
     #Save the file in the folder with the name consentForm
     try:
         shutil.copyfile(filePath, new_file_path)  # Copy the selected file to the target location
         renderPopUpModal(root, "File uploaded successfully", "Upload", "Success")
+        return SUCCESS
     except Exception as e:
         renderPopUpModal(root, "Error uploading file", "Upload", "Error")
 
         print(f"Error copying file: {e}")
+        return ERROR
+
+def getConditionPicturePath(customerId, conditionId):
+    """
+    This function retrieves the condition picture path for a given customer ID and condition ID.
+    :param customerId: The ID of the customer.
+    :param conditionId: The ID of the condition.
+    :return: The path to the condition picture.
+    """
+    customer_folder_path = os.path.join(attachment_path, customerId)
+    allowed_extensions = ('.jpg', '.jpeg', '.png', '.webp')
+
+    # Find all files starting with conditionId and any extension
+    pattern = os.path.join(customer_folder_path, f"{conditionId}.*")
+    matches = glob.glob(pattern)
+
+    # Filter only image files
+    for file_path in matches:
+        if file_path.lower().endswith(allowed_extensions):
+            return file_path
+
+    return None
+
+def renderFilePicker(pdefaultextension, pfiletypes, ptitle=""):
+    """
+    This function renders a file picker dialog to select a file.
+    :return: The path of the selected file.
+    """
+    file_path = askopenfilename(defaultextension=pdefaultextension, filetypes=pfiletypes, title=ptitle)
+    return file_path
