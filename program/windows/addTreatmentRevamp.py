@@ -1,5 +1,5 @@
 import customtkinter
-from Constant.appConstant import STANDARD_WINDOW_SIZE, STANDARD_TEXT_BOX_WIDTH
+from Constant.appConstant import STANDARD_WINDOW_SIZE, STANDARD_TEXT_BOX_WIDTH, TREATMENT_DESCRIPTION_CHARACTER_LIMIT
 import datetime
 import Constant.dbColumn as dbCol
 from Constant.converterFunctions import formatDateTime
@@ -8,7 +8,7 @@ import Model.treatmentModel as TM
 import datetime
 from tkinter import ttk
 from Components.popupModal import renderPopUpModal
-
+from Constant.inputValidations import checkLengthOfInput
 
 class AddTreatmentViewRevamp:
 
@@ -86,6 +86,18 @@ class AddTreatmentViewRevamp:
             self.am_pm_label.grid(row=0, column=0, sticky="w")
             self.am_pm_dropdown.grid(row=0, column=1, sticky="w", padx=(20, 0))
 
+    
+    def on_text_change(self, event=None):
+        current_text = self.entryFields[dbCol.treatmentDescription].get("1.0", "end-1c")
+        if not checkLengthOfInput(current_text, 0, TREATMENT_DESCRIPTION_CHARACTER_LIMIT):
+            # Truncate extra characters
+            self.entryFields[dbCol.treatmentDescription].delete("1.0", "end")
+            self.entryFields[dbCol.treatmentDescription].insert("1.0", current_text[:TREATMENT_DESCRIPTION_CHARACTER_LIMIT])
+            self.warning_label.configure(text=f"Maximum {TREATMENT_DESCRIPTION_CHARACTER_LIMIT} characters reached!", text_color="red")
+        else:
+
+            self.warning_label.configure(text=f"{len(current_text)}/{TREATMENT_DESCRIPTION_CHARACTER_LIMIT}", text_color="green")
+
     def __init__(self, root, conditionID):
         self.root = root
         self.newWindow = customtkinter.CTkToplevel(self.root)
@@ -121,7 +133,7 @@ class AddTreatmentViewRevamp:
             }
         #self.selected_level = customtkinter.StringVar(value=self.optionLevel[0])
 
-        self.entryGridFrame = customtkinter.CTkFrame(self.newWindow, width=500)
+        self.entryGridFrame = customtkinter.CTkFrame(self.newWindow, width=500, fg_color="transparent", bg_color="transparent")
         self.entryGridFrame.grid_columnconfigure(0, weight=2)
         self.entryGridFrame.grid_columnconfigure(1, weight=1)
         self.entryGridFrame.grid_columnconfigure(2, weight=2)
@@ -136,8 +148,17 @@ class AddTreatmentViewRevamp:
             #render entry
             if field is dbCol.treatmentDescription:
                 #create enty text 
-                entry = customtkinter.CTkTextbox(self.entryGridFrame, width=STANDARD_TEXT_BOX_WIDTH)
-                entry.grid(row=idx+1, column=2, sticky='w')
+                treatmentDescFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent", bg_color="transparent")
+                treatmentDescFrame.grid(row=idx+1, column=2, sticky='w')
+
+                entry = customtkinter.CTkTextbox(treatmentDescFrame, width=STANDARD_TEXT_BOX_WIDTH)
+                entry.bind("<KeyRelease>", self.on_text_change)
+                entry.bind("<<Paste>>", lambda e: root.after(1, self.on_text_change))
+                
+                entry.grid(row=0, column=0, sticky='w')
+
+                self.warning_label = customtkinter.CTkLabel(treatmentDescFrame, text="", text_color="red")
+                self.warning_label.grid(row=1, column=0, sticky='e')
 
                 #self.createLabelWithInputfield(self.newWindow, field, self.entryFields, None, False).grid(row=idx+1, column=0, sticky='w')
             else:
