@@ -11,6 +11,7 @@ from Constant.appConstant import STANDARD_WINDOW_SIZE
 from tkinter.filedialog import askopenfilename
 from windows.customerDetailsRevamp import CustomerDetailsViewRevamp
 import shutil
+from Constant.databaseManipulationFunctions import searchForUserBasedOn_ID_IC_Name_Email
 
 
 
@@ -53,19 +54,6 @@ class LandingWindow:
             print(f"Selected file: {filePath}")
 
 
-    def searchForUser(self, userId):
-        with open('./data/db.csv', mode='r', encoding='utf-8') as file:
-            csvFile = csv.reader(file)
-            header = next(csvFile)           
-            res = []
-            if dbCol.ic in header and dbCol.name in header:
-                customer_id, ic_index, name_index, email_index = header.index(dbCol.customerId), header.index(dbCol.ic), header.index(dbCol.name), header.index(dbCol.email)
-                for lines in csvFile:
-                    if lines[ic_index] == userId:
-                        res.append([lines[customer_id],lines[ic_index], lines[name_index],lines[email_index] ])
-                return res
-            else:
-                return errorCode.NO_USER_FOUND
 
     def print_user_input(self, text):
         """Callback function to handle user input."""
@@ -74,7 +62,7 @@ class LandingWindow:
             return
 
         # Based on user input, search for results
-        searchResult = self.searchForUser(text)
+        searchResult = searchForUserBasedOn_ID_IC_Name_Email(text)
 
         if searchResult == errorCode.NO_USER_FOUND:
             searchResult = []

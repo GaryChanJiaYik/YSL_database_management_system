@@ -4,10 +4,12 @@ import Constant.dbColumn as dbCol
 from Model.customerObjectModel import CustomerModel
 from Constant.converterFunctions import convertTimeStampToId
 
+DB_PATH = './data/db.csv'
+
 def searchForSingleUser( userId):
     print("from searching constant function")
     print(userId)
-    with open('./data/db.csv', mode='r', encoding='utf-8') as file:
+    with open(DB_PATH, mode='r', encoding='utf-8') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)           
         
@@ -44,14 +46,32 @@ def searchForSingleUser( userId):
                     return customer          
         else:
             return errorCode.NO_USER_FOUND
-        
+
+def searchForUserBasedOn_ID_IC_Name_Email(userId):
+    with open(DB_PATH, mode='r', encoding='utf-8') as file:
+        csvFile = csv.reader(file)
+        header = next(csvFile)           
+        res = []
+        if dbCol.ic in header and dbCol.name in header:
+            customer_id, ic_index, name_index, email_index = header.index(dbCol.customerId), header.index(dbCol.ic), header.index(dbCol.name), header.index(dbCol.email)
+            for lines in csvFile:
+                if (
+                    userId.lower() in lines[ic_index].lower() or
+                    userId.lower() in lines[customer_id].lower() or
+                    userId.lower() in lines[name_index].lower() or
+                    userId.lower() in lines[email_index].lower()
+                ):
+                    res.append([lines[customer_id], lines[ic_index], lines[name_index], lines[email_index]])
+            return res
+        else:
+            return errorCode.NO_USER_FOUND
+                    
 def addOldCustomerID(customerID, oldCustomerId):
     print(f'{customerID} --> {oldCustomerId}')
     updated = False
-    file_path = './data/db.csv'
 
     # Read all rows
-    with open(file_path, mode='r', encoding='utf-8') as file:
+    with open(DB_PATH, mode='r', encoding='utf-8') as file:
         csv_reader = csv.reader(file)
         rows = list(csv_reader)
 
