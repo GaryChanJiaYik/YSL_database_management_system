@@ -65,9 +65,12 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         renderPopUpModal(self, "Treatment added successfully","Successful", "Success")
         #self.newWindow.destroy()
         #Go back previous window
+        self.backToPreviousWindow()
+       
+    def backToPreviousWindow(self):
+        print("back to previous window")
         from windows.conditionDetailsView import ConditionDetailsView
         self.controller.switch_frame(ConditionDetailsView, customerId=self.conditionModel.customerId, conditionModel=self.conditionModel)
-
 
     def toggle_time_fields(self):
         if self.auto_time_var.get():       
@@ -199,5 +202,14 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         self.am_pm_label.grid(row=0, column=0, sticky="w")
         self.am_pm_dropdown.grid(row=0, column=1, sticky="w", padx=(20, 0))
 
-        customtkinter.CTkButton(self.entryGridFrame, text="Add Treatment", command=lambda: self.createTreatment(conditionID, self.entryFields)).grid(row=index+3, column=0)
+        # Add frame for buttons
+        self.actionButtonsFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent", bg_color="transparent")
+        self.actionButtonsFrame.grid(row=index+3, column=0)
+        self.actionButtonsFrame.grid_columnconfigure(0, weight=1)
+        self.actionButtonsFrame.grid_columnconfigure(1, minsize=50)
+        self.actionButtonsFrame.grid_columnconfigure(2, weight=1)
+    
+        customtkinter.CTkButton(self.actionButtonsFrame, text="Add Treatment", command=lambda: self.createTreatment(conditionID, self.entryFields)).grid(row=0, column=0)
+        customtkinter.CTkButton(self.actionButtonsFrame, text="Cancel" , fg_color="red", command=lambda: self.backToPreviousWindow()).grid(row=0, column=2, padx=(20, 20))
+
         self.toggle_time_fields()
