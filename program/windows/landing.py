@@ -13,15 +13,13 @@ from windows.customerDetailsRevamp import CustomerDetailsViewRevamp
 import shutil
 from Constant.databaseManipulationFunctions import searchForUserBasedOn_ID_IC_Name_Email
 
+import customtkinter as ctk
 
-
-class LandingWindow:
-    def __init__(self):        
-        self.root = tk.Tk()
-        self.root.title("YSL DB Management")
-        self.root.geometry(STANDARD_WINDOW_SIZE)
-
-
+class LandingWindow(ctk.CTkFrame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        self.root = self
         
 
 
@@ -43,7 +41,6 @@ class LandingWindow:
         ).grid(column=2, row=0)
         self.Entryframe.grid(column=0, row=0)
 
-        self.root.mainloop()
 
     def selectAndUpdateCsv(self):
         """Open a file dialog to select a new CSV file."""
@@ -77,6 +74,7 @@ class LandingWindow:
 
 
     def openNewWindow(self, customerId):
-        CustomerDetailsViewRevamp(self.root, customerId)
+        self.controller.switch_frame(CustomerDetailsViewRevamp, customerId=customerId)
+        #CustomerDetailsViewRevamp(self.root, customerId)
        
 

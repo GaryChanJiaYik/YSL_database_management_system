@@ -1,4 +1,5 @@
 from windows import landing
+import app
 
 #Entry point of app
-landing.LandingWindow()
+app.App()

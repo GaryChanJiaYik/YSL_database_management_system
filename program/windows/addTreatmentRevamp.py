@@ -10,7 +10,7 @@ from tkinter import ttk
 from Components.popupModal import renderPopUpModal
 from Constant.inputValidations import checkLengthOfInput
 
-class AddTreatmentViewRevamp:
+class AddTreatmentViewRevamp(customtkinter.CTkFrame):
 
     entryFieldList = [ dbCol.treatmentDescription, dbCol.treatmentPainLevel, dbCol.treatmentNumbLevel, dbCol.treatmentSoreLevel, dbCol.treatmentTenseLevel]
     def createLabelWithInputfield(self, root, label, entryFields,selectedLevelVar, isSelectBox=False, ):
@@ -47,7 +47,7 @@ class AddTreatmentViewRevamp:
             combined_datetime = now
         else:
             combined_datetime = formatDateTime(
-                self.newWindow,
+                self,
                 self.hour_entry.get(), self.minute_entry.get(), self.am_pm_dropdown.get())
         final_time_string = combined_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -62,8 +62,12 @@ class AddTreatmentViewRevamp:
             )
         TreatmentFunc.createTreatment(treatment)
         print("Create treatment button pressed")
-        renderPopUpModal(self.root, "Treatment added successfully","Successful", "Success")
-        self.newWindow.destroy()
+        renderPopUpModal(self, "Treatment added successfully","Successful", "Success")
+        #self.newWindow.destroy()
+        #Go back previous window
+        from windows.conditionDetailsView import ConditionDetailsView
+        self.controller.switch_frame(ConditionDetailsView, customerId=self.conditionModel.customerId, conditionModel=self.conditionModel)
+
 
     def toggle_time_fields(self):
         if self.auto_time_var.get():       
@@ -98,27 +102,13 @@ class AddTreatmentViewRevamp:
 
             self.warning_label.configure(text=f"{len(current_text)}/{TREATMENT_DESCRIPTION_CHARACTER_LIMIT}", text_color="green")
 
-    def __init__(self, root, conditionID):
-        self.root = root
-        self.newWindow = customtkinter.CTkToplevel(self.root)
-        self.newWindow.columnconfigure(0, weight=1)
-        # sets the title of the
-        # Toplevel widget
-        self.newWindow.title("Add Treatment")
-        
-        # sets the geometry of toplevel
-        self.newWindow.geometry(STANDARD_WINDOW_SIZE)
-
-        self.entryFields = {} #Store the label name(variables) corresponding to the entry field
-
-        self.root = root
-        self.newWindow = customtkinter.CTkToplevel(self.root)
-        self.newWindow.title("Add treatment")
+    def __init__(self, parent, controller, conditionID, conditionModel):
+        super().__init__(parent)
+        self.controller = controller
+        self.grid_columnconfigure(0, weight=1)
+        self.conditionModel = conditionModel
     
-        # sets the geometry of toplevel
-        self.newWindow.geometry(STANDARD_WINDOW_SIZE)
-        self.newWindow.grid_columnconfigure(0, weight=1)
-
+        self.entryFields = {} #Store the label name(variables) corresponding to the entry field
          
         #customtkinter.CTkLabel(self.newWindow, text=f'Add Treatment' , font=('Arial',12)).grid(column=0, row=0, sticky='w')
 
@@ -133,7 +123,7 @@ class AddTreatmentViewRevamp:
             }
         #self.selected_level = customtkinter.StringVar(value=self.optionLevel[0])
 
-        self.entryGridFrame = customtkinter.CTkFrame(self.newWindow, width=500, fg_color="transparent", bg_color="transparent")
+        self.entryGridFrame = customtkinter.CTkFrame(self, width=500, fg_color="transparent", bg_color="transparent")
         self.entryGridFrame.grid_columnconfigure(0, weight=2)
         self.entryGridFrame.grid_columnconfigure(1, weight=1)
         self.entryGridFrame.grid_columnconfigure(2, weight=2)
@@ -153,7 +143,7 @@ class AddTreatmentViewRevamp:
 
                 entry = customtkinter.CTkTextbox(treatmentDescFrame, width=STANDARD_TEXT_BOX_WIDTH)
                 entry.bind("<KeyRelease>", self.on_text_change)
-                entry.bind("<<Paste>>", lambda e: root.after(1, self.on_text_change))
+                entry.bind("<<Paste>>", lambda e: self.after(1, self.on_text_change))
                 
                 entry.grid(row=0, column=0, sticky='w')
 

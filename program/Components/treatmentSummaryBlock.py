@@ -126,7 +126,6 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, o
     #Get the image
     try:
         image_path = "program\\asset\icons\edit.png"
-        print(f"Checking if path exists: {os.path.exists(image_path)}")
         button_image = Image.open(image_path)
         resized_image = button_image.resize((20, 20)) # Resize if needed
         ctk_button_image = ctk.CTkImage(light_image=resized_image, dark_image=resized_image)

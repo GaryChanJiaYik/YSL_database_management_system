@@ -8,13 +8,16 @@ from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunction
 from services.customerFilesServices import getConditionPicturePath,renderFilePicker, uploadCustomerFile
 from PIL import Image, ImageTk
 from Constant.errorCode import SUCCESS
-class ConditionDetailsView:
+
+class ConditionDetailsView(ctk.CTkFrame):
 
     def treatmentChecked(self):
         print("Checked pressed: ", self.treatedCheck.get())
 
     def OpenAddTreatmentWindow(self):
-        AddTreatmentViewRevamp(self.root, self.conditionModel.conditionId)
+        self.controller.switch_frame(AddTreatmentViewRevamp, conditionID=self.conditionModel.conditionId, conditionModel = self.conditionModel)
+
+        #AddTreatmentViewRevamp(self.root, self.conditionModel.conditionId)
 
     def handleTreatmentBlockEditClick(self, model):
         print("Clicked on something!!")
@@ -63,27 +66,19 @@ class ConditionDetailsView:
 
 
 
-    def __init__(self, root, customerId, conditionModel):
+    def __init__(self, parent, controller, customerId, conditionModel):
         # !!!!!!!! customerId is formattted
-        self.root = root
-        self.newWindow = ctk.CTkToplevel(self.root)
-        self.newWindow.columnconfigure(0, weight=1)
-        # sets the title of the
-        # Toplevel widget
-        self.newWindow.title("Condition Details")
-        self.newWindow.grid_columnconfigure(0, weight=1)
-        
-        # sets the geometry of toplevel
-        self.newWindow.geometry(STANDARD_WINDOW_SIZE)
-
+        super().__init__(parent)
+        self.controller = controller
         self.customerId = customerId
         self.conditionModel = conditionModel
-        
+        self.grid_columnconfigure(0, weight=1)
+
         #Customer info
         self.customerInfoFrame = ctk.CTkFrame(
-            self.newWindow,
-            fg_color='transparent',
-            bg_color='transparent'
+            self,
+            bg_color='transparent',
+            fg_color='transparent'
         )
         self.customerInfoFrame.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=5)
         
@@ -97,7 +92,7 @@ class ConditionDetailsView:
         #   -conditionPicture
 
         self.conditionContainer = ctk.CTkFrame(
-            self.newWindow,
+            self,
             fg_color='transparent',
             bg_color='transparent'
             )
@@ -152,7 +147,7 @@ class ConditionDetailsView:
 
         #Treatment list 
         self.treatmentListFrame = ctk.CTkFrame(
-            self.newWindow,
+            self,
             bg_color='transparent',
             fg_color='transparent'
         )
@@ -175,19 +170,21 @@ class ConditionDetailsView:
 
         #treatment
         self.treatmentList = getAllTreatmentByConditionID(self.conditionModel.conditionId)
-        print("len of treatrments: ", len(self.treatmentList))
 
-
-        self.scrollableTreatmentListContainer = ctk.CTkScrollableFrame(
-            self.treatmentListFrame,
-            bg_color='transparent',
-            fg_color='transparent',
-            width=500,
-            height=250
-        )
-        self.scrollableTreatmentListContainer.grid_columnconfigure(0, weight=1)
-        self.scrollableTreatmentListContainer.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=5)
-        for idx, treatment in enumerate(self.treatmentList):
-            renderTreatmentSummaryBlockFunctionRevamp(self.scrollableTreatmentListContainer,treatment,self.handleTreatmentBlockEditClick).grid(row=idx, column=0, sticky="w")
+        if len(self.treatmentList) <= 0:
+            ctk.CTkLabel(self.treatmentListFrame, text="No treatment found", font=('Arial', 12)).grid(row=1, column=0, sticky="w", padx=(10, 5), pady=5)
+            return
+        else:
+            self.scrollableTreatmentListContainer = ctk.CTkScrollableFrame(
+                self.treatmentListFrame,
+                bg_color='transparent',
+                fg_color='transparent',
+                width=500,
+                height=250
+            )
+            self.scrollableTreatmentListContainer.grid_columnconfigure(0, weight=1)
+            self.scrollableTreatmentListContainer.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=5)
+            for idx, treatment in enumerate(self.treatmentList):
+                renderTreatmentSummaryBlockFunctionRevamp(self.scrollableTreatmentListContainer,treatment,self.handleTreatmentBlockEditClick).grid(row=idx, column=0, sticky="w")
+                
             
-        

@@ -16,7 +16,7 @@ from Components.popupModal import renderPopUpModal
 from Constant.fileKeywords import CONSENT_FORM_KEYWORD
 import shutil
 
-class CustomerDetailsViewRevamp:
+class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
     def createDetailField(self, root, fieldName, content, row, column, rowspan=1):
         # Field name label
@@ -172,7 +172,8 @@ class CustomerDetailsViewRevamp:
 
 
     def openConditionDetailsWindowCallback(self, cm):
-        ConditionDetailsView(self.root, self.customerId, cm )
+        self.controller.switch_frame(ConditionDetailsView, customerId=self.customerId, conditionModel=cm)
+        #ConditionDetailsView(self.root, self.customerId, cm )
         print("Clicked condition details for:", cm.conditionId)
 
     def renderConsentFormOptionButton(self, row, column):
@@ -214,16 +215,11 @@ class CustomerDetailsViewRevamp:
 
 
 
-    def __init__(self, root, customerId):
-        self.root = root
-        self.newWindow = customtkinter.CTkToplevel(self.root)
-        self.newWindow.columnconfigure(0, weight=1)
-        # sets the title of the
-        # Toplevel widget
-        self.newWindow.title("Customer Details")
-        
-        # sets the geometry of toplevel
-        self.newWindow.geometry(STANDARD_WINDOW_SIZE)
+    def __init__(self, parent, controller, customerId):
+        super().__init__(parent)
+        self.controller = controller
+        self.root = self
+
         self.customerTimeStamp = customerId
         self.customerId = convertTimeStampToId(customerId) 
         self.customerModel = searchForSingleUser(customerId)
@@ -236,7 +232,7 @@ class CustomerDetailsViewRevamp:
         print(len(self.conditionList))
 
 
-        self.customerDetailFrame = customtkinter.CTkFrame(master=self.newWindow, bg_color="transparent")
+        self.customerDetailFrame = customtkinter.CTkFrame(master=self.root, bg_color="transparent")
         self.customerDetailFrame.grid_columnconfigure(0, weight=1)
         self.customerDetailFrame.grid_columnconfigure(1, minsize=330)
         self.customerDetailFrame.grid_columnconfigure(2, minsize=80)
@@ -290,7 +286,7 @@ class CustomerDetailsViewRevamp:
 
 
         #For condition
-        self.conditionFrame = customtkinter.CTkFrame(master=self.newWindow, bg_color="transparent")
+        self.conditionFrame = customtkinter.CTkFrame(master=self.root, bg_color="transparent")
         self.conditionFrame.grid_columnconfigure(0, weight=1)
         self.conditionFrame.grid(column=0, row=1, sticky="nsew")
 
