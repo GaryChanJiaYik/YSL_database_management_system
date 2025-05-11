@@ -5,6 +5,7 @@ from windows.customerDetailsRevamp import CustomerDetailsViewRevamp
 from windows.conditionDetailsView import ConditionDetailsView
 from windows.addTreatmentRevamp import AddTreatmentViewRevamp
 from Components.previousWindowButton import PreviousWindowButton
+from windows.signIn import SignInWindow
 
 class App:
 
@@ -55,8 +56,10 @@ class App:
         ctk.CTkLabel(self.appCommonHeaderContainer, text="YSL DB Management", font=ctk.CTkFont(size=20, weight="bold"), text_color="white").grid(row=0, column=0, padx=10, pady=5, sticky="w")
 
         self.backButtonContainer = ctk.CTkFrame(self.appCommonHeaderContainer, fg_color="transparent", bg_color="transparent", height=50)
-        self.backButtonContainer.grid(row=0, column=2, padx=0, pady=0)
+        self.backButtonContainer.grid(row=0, column=1, padx=0, pady=0)
 
+        self.adminSignInButton = ctk.CTkButton(self.appCommonHeaderContainer, text="Admin", command=self.signInWindow)
+        self.adminSignInButton.grid(row=0, column=2, padx=0, pady=0, sticky="e")
 
         self.appCommonHeaderContainer.pack(pady=2, fill="x")
 
@@ -115,3 +118,8 @@ class App:
                 if isinstance(widget, ctk.CTkButton):
                     widget.destroy()
             
+    def signInWindow(self):
+        # Placeholder for sign-in logic
+        # This should open a new window for admin sign-in
+        print("Sign In logic goes here")
+        SignInWindow(self.appRoot)
