@@ -27,7 +27,7 @@ def searchForSingleUser( userId):
             old_cus_id_index = header.index(dbCol.oldCustomerId)
           
             for lines in csvFile:
-                if lines[customer_id] == userId:
+                if convertTimeStampToId(lines[customer_id]) == userId:
                     print(lines[old_cus_id_index])
 
                     customer = CustomerModel(

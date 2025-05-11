@@ -1,5 +1,5 @@
 import customtkinter
-from Constant.appConstant import STANDARD_WINDOW_SIZE, STANDARD_TEXT_BOX_WIDTH, TREATMENT_DESCRIPTION_CHARACTER_LIMIT
+from Constant.appConstant import STANDARD_WINDOW_SIZE, STANDARD_TEXT_BOX_WIDTH, TREATMENT_DESCRIPTION_CHARACTER_LIMIT,WINDOW_CONDITION_DETAIL
 import datetime
 import Constant.dbColumn as dbCol
 from Constant.converterFunctions import formatDateTime
@@ -70,7 +70,12 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
     def backToPreviousWindow(self):
         print("back to previous window")
         from windows.conditionDetailsView import ConditionDetailsView
-        self.controller.switch_frame(ConditionDetailsView, customerId=self.conditionModel.customerId, conditionModel=self.conditionModel)
+        self.controller.setCustomerID(self.conditionModel.customerId)
+        self.controller.setConditionModel(self.conditionModel)
+
+
+
+        self.controller.switch_frame(WINDOW_CONDITION_DETAIL)
 
     def toggle_time_fields(self):
         if self.auto_time_var.get():       
@@ -210,6 +215,5 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         self.actionButtonsFrame.grid_columnconfigure(2, weight=1)
     
         customtkinter.CTkButton(self.actionButtonsFrame, text="Add Treatment", command=lambda: self.createTreatment(conditionID, self.entryFields)).grid(row=0, column=0)
-        customtkinter.CTkButton(self.actionButtonsFrame, text="Cancel" , fg_color="red", command=lambda: self.backToPreviousWindow()).grid(row=0, column=2, padx=(20, 20))
 
         self.toggle_time_fields()

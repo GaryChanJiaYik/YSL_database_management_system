@@ -1,5 +1,5 @@
 import customtkinter
-from Constant.appConstant import STANDARD_WINDOW_SIZE
+from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CONDITION_DETAIL
 from Constant.databaseManipulationFunctions import searchForSingleUser, addOldCustomerID
 from Constant.dbColumn import customerModelAttributeToField, oldCustomerId
 from Constant.converterFunctions import convertTimeStampToId
@@ -172,7 +172,12 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
 
     def openConditionDetailsWindowCallback(self, cm):
-        self.controller.switch_frame(ConditionDetailsView, customerId=self.customerId, conditionModel=cm)
+        self.controller.setCustomerID(self.customerId)
+
+        self.controller.setConditionModel(cm)
+
+
+        self.controller.switch_frame(WINDOW_CONDITION_DETAIL)
         #ConditionDetailsView(self.root, self.customerId, cm )
         print("Clicked condition details for:", cm.conditionId)
 
@@ -222,7 +227,9 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
         self.customerTimeStamp = customerId
         self.customerId = convertTimeStampToId(customerId) 
-        self.customerModel = searchForSingleUser(customerId)
+        self.customerModel = searchForSingleUser(self.customerId)
+        print("THIS IS THE CUSTOMER MODEL")
+        print(self.customerModel)
 
         self.conditionList = getAllConditionsByCustomerId(self.customerId)
         print("customerId")
@@ -249,6 +256,9 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         ).grid(row=0, column=0, sticky="w", padx=(10, 5), pady=5)
 
 
+
+
+
         index = 0
        # Set of fields to go into column 2 (column index 3)
         columnTwoKeys = {'address', 'handphone', 'instagram', 'howDidYouFindUs'}
@@ -256,6 +266,9 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         columnOneRowIndex = 1
         columnTwoRowIndex = 1
         
+        print("iaidjwaidawd")
+        print(self.customerModel)
+
         for key, value in vars(self.customerModel).items():
             # Get field name and value
             field_name = customerModelAttributeToField.get(key, key)

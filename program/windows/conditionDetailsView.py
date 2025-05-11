@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from Constant.appConstant import STANDARD_WINDOW_SIZE
+from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_ADD_TREATMENT
 from Components.customFields import createDetailField
 from Constant.converterFunctions import formatDateTime
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
@@ -15,7 +15,9 @@ class ConditionDetailsView(ctk.CTkFrame):
         print("Checked pressed: ", self.treatedCheck.get())
 
     def OpenAddTreatmentWindow(self):
-        self.controller.switch_frame(AddTreatmentViewRevamp, conditionID=self.conditionModel.conditionId, conditionModel = self.conditionModel)
+        self.controller.setCustomerID(self.conditionModel.customerId)
+        self.controller.setConditionModel(self.conditionModel)
+        self.controller.switch_frame(WINDOW_ADD_TREATMENT)
 
         #AddTreatmentViewRevamp(self.root, self.conditionModel.conditionId)
 

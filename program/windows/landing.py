@@ -7,7 +7,7 @@ import Constant.dbColumn as dbCol
 import csv
 from Components.selectableRowTable import Table
 from windows.customerDetails import CustomerDetailsPage
-from Constant.appConstant import STANDARD_WINDOW_SIZE
+from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CUSTOMER_DETAIL
 from tkinter.filedialog import askopenfilename
 from windows.customerDetailsRevamp import CustomerDetailsViewRevamp
 import shutil
@@ -74,7 +74,8 @@ class LandingWindow(ctk.CTkFrame):
 
 
     def openNewWindow(self, customerId):
-        self.controller.switch_frame(CustomerDetailsViewRevamp, customerId=customerId)
+        self.controller.setCustomerID(customerId) 
+        self.controller.switch_frame(WINDOW_CUSTOMER_DETAIL)
         #CustomerDetailsViewRevamp(self.root, customerId)
        
 
