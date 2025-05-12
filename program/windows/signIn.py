@@ -4,7 +4,8 @@ from securityModule import security
 from Components.popupModal import renderPopUpModal
 from Constant.errorCode import ERROR, INVALID_CREDENTIALS
 class SignInWindow:
-    def __init__(self, root):
+    def __init__(self, controller, root):
+        self.controller = controller
         self.signInWindow = ctk.CTkToplevel(root)
         self.signInWindow.title("Admin Sign In")
         self.signInWindow.geometry(STANDARD_WINDOW_SIZE) 
@@ -68,6 +69,9 @@ class SignInWindow:
         if username == "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918" and password == "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9":
             print("Sign In Successful")
             # Close the sign-in window
+            self.controller.setAdminAccess(True)
+            print("Admin access: ", self.controller.getIsAdminAccess())
+
             self.signInWindow.destroy()
         else:
             self.errorLabel.configure(text=INVALID_CREDENTIALS)

@@ -13,6 +13,7 @@ class App:
     currentTreatmentID = None
     currentConditionID = None
     currentConditionModel = None
+    adminAccess = False
 
     window_stack = []
 
@@ -40,6 +41,33 @@ class App:
     def getConditionModel(self):
         return self.currentConditionModel
 
+    def setAdminAccess(self, access):
+        self.adminAccess = access
+        if access:
+            print("Admin Access Granted")
+            self.resetWindow()
+
+        print("Stack: ", self.window_stack)
+
+    def getIsAdminAccess(self):
+        return self.adminAccess
+    
+    def resetWindow(self):
+        self.window_stack = []
+        print("Stack: ", self.window_stack)
+        self.appRoot.destroy()
+        self.__init__() 
+        
+
+    def renderAdminButton(self):
+        if self.adminAccess:
+            return ctk.CTkButton(self.buttonContainer, text="Logout", command=self.adminLogout, fg_color="red", text_color="white", hover_color="darkred")
+        else:
+            return ctk.CTkButton(self.buttonContainer, text="Admin", command=self.signInWindow)
+
+    def adminLogout(self):
+        self.adminAccess = False
+        self.resetWindow()
 
     def __init__(self):        
         self.appRoot = ctk.CTk()
@@ -53,13 +81,18 @@ class App:
         self.appCommonHeaderContainer.grid_columnconfigure(1, weight=1)  
         self.appCommonHeaderContainer.grid_columnconfigure(2, weight=1)  
 
-        ctk.CTkLabel(self.appCommonHeaderContainer, text="YSL DB Management", font=ctk.CTkFont(size=20, weight="bold"), text_color="white").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        ctk.CTkLabel(self.appCommonHeaderContainer, text="(ADMIN) YSL DB Management" if self.adminAccess else "YSL DB Management", font=ctk.CTkFont(size=20, weight="bold"), text_color="white").grid(row=0, column=0, padx=10, pady=5, sticky="w")
 
-        self.backButtonContainer = ctk.CTkFrame(self.appCommonHeaderContainer, fg_color="transparent", bg_color="transparent", height=50)
-        self.backButtonContainer.grid(row=0, column=1, padx=0, pady=0)
+        self.buttonContainer = ctk.CTkFrame(self.appCommonHeaderContainer, fg_color="transparent", bg_color="transparent", height=50)
+        self.buttonContainer.grid(row=0, column=2, padx=0, pady=0)
 
-        self.adminSignInButton = ctk.CTkButton(self.appCommonHeaderContainer, text="Admin", command=self.signInWindow)
-        self.adminSignInButton.grid(row=0, column=2, padx=0, pady=0, sticky="e")
+        # Add buttons to the buttonContainer if needed
+
+        self.backButtonContainer = ctk.CTkFrame(self.buttonContainer, fg_color="transparent", bg_color="transparent", height=50)
+        self.backButtonContainer.grid(row=0, column=0, padx=0, pady=0)
+
+        self.adminSignInButton = self.renderAdminButton()
+        self.adminSignInButton.grid(row=0, column=1, padx=2, pady=0, sticky="e")
 
         self.appCommonHeaderContainer.pack(pady=2, fill="x")
 
@@ -110,6 +143,7 @@ class App:
 
     def set_header(self):
         if len(self.window_stack) > 1:
+            print("setting header back button")
             PreviousWindowButton(self, self.backButtonContainer)
         else:
             
@@ -122,4 +156,4 @@ class App:
         # Placeholder for sign-in logic
         # This should open a new window for admin sign-in
         print("Sign In logic goes here")
-        SignInWindow(self.appRoot)
+        SignInWindow(self, self.appRoot)

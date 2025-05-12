@@ -11,13 +11,12 @@ class PreviousWindowButton:
             fg_color="red",
             text_color="white",
             hover_color="darkred",
+            width=90
         )
 
         backButton.grid(
             row=0,
             column=0,
-            padx=(10, 5),
-            pady=(10, 5),
             sticky="nsew",
         )
 

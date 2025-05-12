@@ -63,7 +63,7 @@ def renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel, on_clic
 
 
 
-def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, on_click=None):
+def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, on_click=None, showEditButton=False):
     # Margin container
     marginContainer = ctk.CTkFrame(master=parentContainer, height=90, width=500, corner_radius=10, fg_color="transparent")
 
