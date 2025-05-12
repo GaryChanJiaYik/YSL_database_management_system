@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_ADD_TREATMENT
+from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_ADD_TREATMENT,WINDOW_EDIT_TREATMENT
 from Components.customFields import createDetailField
 from Constant.converterFunctions import formatDateTime
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
@@ -23,6 +23,15 @@ class ConditionDetailsView(ctk.CTkFrame):
 
     def handleTreatmentBlockEditClick(self, model):
         print("Clicked on something!!")
+        print("Clicked summary for:", model.treatmentID)
+
+        self.controller.setTreatmentID(model.treatmentID)
+        self.controller.setCustomerID(self.conditionModel.customerId)
+        self.controller.setConditionModel(self.conditionModel)
+        self.controller.setConditionID(self.conditionModel.conditionId)
+        self.controller.switch_frame(WINDOW_EDIT_TREATMENT)
+
+        
 
     def renderConditionPictureContainerContent(self, root):
         self.uploadConditionPictureBtn = None

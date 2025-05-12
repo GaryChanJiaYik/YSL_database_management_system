@@ -136,6 +136,9 @@ class App:
             
         elif frameClass == WINDOW_ADD_TREATMENT:
             self.current_frame = AddTreatmentViewRevamp(self.container, self, self.currentCustomerID, self.currentConditionModel)
+        elif frameClass == WINDOW_EDIT_TREATMENT:
+            self.current_frame = AddTreatmentViewRevamp(self.container, self, self.currentConditionID, self.currentConditionModel, isEditMode=True)
+
         self.current_frame.pack(fill="both", expand=True)
     
         self.set_header()

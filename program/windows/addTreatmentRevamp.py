@@ -5,7 +5,7 @@ import Constant.dbColumn as dbCol
 from Constant.converterFunctions import formatDateTime
 import Constant.treatmentDatabaseFunctions as TreatmentFunc
 import Model.treatmentModel as TM
-import datetime
+from datetime import datetime
 from tkinter import ttk
 from Components.popupModal import renderPopUpModal
 from Constant.inputValidations import checkLengthOfInput
@@ -40,8 +40,8 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
 
         return frame
 
-    def createTreatment(self, conditionId, entryFields):
-        now = datetime.datetime.now()
+    def createTreatment(self, conditionId, entryFields, saveMode=False):
+        now = datetime.now()
 
         if self.auto_time_var.get():
             combined_datetime = now
@@ -51,16 +51,28 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
                 self.hour_entry.get(), self.minute_entry.get(), self.am_pm_dropdown.get())
         final_time_string = combined_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
-        treatment = TM.TreatmentModel(
-            pConditionId=conditionId, 
-            pTreatmentDescription=entryFields[dbCol.treatmentDescription].get("1.0", customtkinter.END).strip(), 
-            pNumbLevel= self.selected_levels[dbCol.treatmentNumbLevel].get(),
-            pPainLevel=self.selected_levels[dbCol.treatmentPainLevel].get(),
-            pSoreLevel=self.selected_levels[dbCol.treatmentSoreLevel].get(),
-            pTenseLevel=self.selected_levels[dbCol.treatmentTenseLevel].get(),
-            pTreatmentDate=final_time_string,
-            )
-        TreatmentFunc.createTreatment(treatment)
+        params = {
+            "pConditionId": conditionId,
+            "pTreatmentDescription": entryFields[dbCol.treatmentDescription].get("1.0", customtkinter.END).strip(),
+            "pNumbLevel": self.selected_levels[dbCol.treatmentNumbLevel].get(),
+            "pPainLevel": self.selected_levels[dbCol.treatmentPainLevel].get(),
+            "pSoreLevel": self.selected_levels[dbCol.treatmentSoreLevel].get(),
+            "pTenseLevel": self.selected_levels[dbCol.treatmentTenseLevel].get(),
+            "pTreatmentDate": final_time_string,
+        }
+
+        if saveMode:
+            params["pTreatmentId"] = self.treatmentModel.treatmentID
+            params["pTreatmentId"] = self.treatmentModel.treatmentID
+
+        treatment = TM.TreatmentModel(**params)
+
+        if saveMode:
+            res = TreatmentFunc.updateTreatmentByID(treatment)
+            print("\nres:", res, "\nSaved Changes\n")
+        else:
+            TreatmentFunc.createTreatment(treatment)
+
         print("Create treatment button pressed")
         renderPopUpModal(self, "Treatment added successfully","Successful", "Success")
         #self.newWindow.destroy()
@@ -110,7 +122,44 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
 
             self.warning_label.configure(text=f"{len(current_text)}/{TREATMENT_DESCRIPTION_CHARACTER_LIMIT}", text_color="green")
 
-    def __init__(self, parent, controller, conditionID, conditionModel):
+    def populateTimeFields(self, datetime_string):
+        try:
+            # Parse the datetime string into a datetime object
+            dt = datetime.strptime(datetime_string, "%Y-%m-%d %H:%M:%S")
+            
+            # Convert 24-hour format to 12-hour format
+            hour_24 = dt.hour
+            minute = dt.minute
+
+            if hour_24 == 0:
+                hour_12 = 12
+                am_pm = "AM"
+            elif hour_24 == 12:
+                hour_12 = 12
+                am_pm = "PM"
+            elif hour_24 > 12:
+                hour_12 = hour_24 - 12
+                am_pm = "PM"
+            else:
+                hour_12 = hour_24
+                am_pm = "AM"
+
+            # Populate the fields
+            self.hour_entry.delete(0, "end")
+            self.hour_entry.insert(0, str(hour_12).zfill(2))
+
+            self.minute_entry.delete(0, "end")
+            self.minute_entry.insert(0, str(minute).zfill(2))
+
+            self.am_pm_dropdown.set(am_pm)
+
+        except ValueError:
+            print("Invalid datetime format. Expected: 'YYYY-MM-DD HH:MM:SS'")
+            
+    def deleteRecord(self):
+        print("Remove record")
+
+    def __init__(self, parent, controller, conditionID, conditionModel, isEditMode=False):
         super().__init__(parent)
         self.controller = controller
         self.grid_columnconfigure(0, weight=1)
@@ -131,6 +180,31 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             }
         #self.selected_level = customtkinter.StringVar(value=self.optionLevel[0])
 
+        #Get data and prepopulate fields if is in edit mode
+        if isEditMode:
+            print("-------------------: ")
+            print("IS IN EDIT MODE NOW")
+            print("")
+            print("self.controller.getTreatmentID(): ", self.controller.getTreatmentID())
+            if self.controller.getTreatmentID() is not None:
+                #Get the treatment data model
+                self.treatmentModel = TreatmentFunc.getTreatmentByID(treatmentID=self.controller.getTreatmentID())
+               
+                print("Treatment model: ", self.treatmentModel)
+                self.selected_levels = {
+                    dbCol.treatmentPainLevel:customtkinter.StringVar(value=self.treatmentModel.painLevel), 
+                    dbCol.treatmentNumbLevel:customtkinter.StringVar(value=self.treatmentModel.numbLevel),
+                    dbCol.treatmentSoreLevel:customtkinter.StringVar(value=self.treatmentModel.soreLevel),
+                    dbCol.treatmentTenseLevel:customtkinter.StringVar(value=self.treatmentModel.tenseLevel)
+                }
+
+                self.treatmentDescription = self.treatmentModel.treatmentDescription
+                print("treatment id: ", self.treatmentModel.treatmentID)
+                print("condition id: ", self.treatmentModel.conditionID)
+                print("condition id param, ", conditionID)
+                print("")
+                print("")
+
         self.entryGridFrame = customtkinter.CTkFrame(self, width=500, fg_color="transparent", bg_color="transparent")
         self.entryGridFrame.grid_columnconfigure(0, weight=2)
         self.entryGridFrame.grid_columnconfigure(1, weight=1)
@@ -150,6 +224,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
                 treatmentDescFrame.grid(row=idx+1, column=2, sticky='w')
 
                 entry = customtkinter.CTkTextbox(treatmentDescFrame, width=STANDARD_TEXT_BOX_WIDTH)
+                entry.insert("0.0", self.treatmentDescription if isEditMode else "")
                 entry.bind("<KeyRelease>", self.on_text_change)
                 entry.bind("<<Paste>>", lambda e: self.after(1, self.on_text_change))
                 
@@ -207,6 +282,8 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         self.am_pm_label.grid(row=0, column=0, sticky="w")
         self.am_pm_dropdown.grid(row=0, column=1, sticky="w", padx=(20, 0))
 
+        #2025-05-05 13:17:10
+
         # Add frame for buttons
         self.actionButtonsFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent", bg_color="transparent")
         self.actionButtonsFrame.grid(row=index+3, column=0)
@@ -214,6 +291,15 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         self.actionButtonsFrame.grid_columnconfigure(1, minsize=50)
         self.actionButtonsFrame.grid_columnconfigure(2, weight=1)
     
-        customtkinter.CTkButton(self.actionButtonsFrame, text="Add Treatment", command=lambda: self.createTreatment(conditionID, self.entryFields)).grid(row=0, column=0)
+        
+
+
+        if isEditMode:
+            self.populateTimeFields(self.treatmentModel.treatmentDate)
+
+            customtkinter.CTkButton(self.actionButtonsFrame, text="Save", command=lambda: self.createTreatment(conditionID, self.entryFields, saveMode=True)).grid(row=0, column=0)
+            customtkinter.CTkButton(self.actionButtonsFrame, text="Delete", fg_color="red", text_color="white", hover_color="darkred", command=lambda: self.deleteRecord).grid(row=0, column=1, padx=(10,0))
+        else:
+            customtkinter.CTkButton(self.actionButtonsFrame, text="Add Treatment", command=lambda: self.createTreatment(conditionID, self.entryFields)).grid(row=0, column=0)
 
         self.toggle_time_fields()

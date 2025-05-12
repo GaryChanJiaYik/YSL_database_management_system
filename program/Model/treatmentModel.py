@@ -1,6 +1,7 @@
 from Constant.generatorFunctions import generateUUID
 class TreatmentModel:
     def __init__(self, 
+                 pTreatmentId="",
                 pConditionId="", 
                 pTreatmentDescription="", 
                 pTreatmentDate="",
@@ -11,7 +12,7 @@ class TreatmentModel:
                  ):
           # Placeholder for treatment ID, if needed
         self.conditionID = pConditionId
-        self.treatmentID = generateUUID()
+        self.treatmentID = pTreatmentId if not "" else generateUUID()
         self.treatmentDescription = pTreatmentDescription
         self.painLevel = pPainLevel
         self.tenseLevel = pTenseLevel

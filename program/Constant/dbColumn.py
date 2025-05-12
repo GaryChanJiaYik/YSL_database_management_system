@@ -45,7 +45,7 @@ treatmentTenseLevel = "treatmentTenseLevel"
 treatmentSoreLevel = "treatmentSoreLevel"
 treatmentNumbLevel = "treatmentNumbLevel"
 treatmentDate = "treatmentDate"
-
+treatmentId = "treatmentId"
 
 # For condition db
 customerIdConditionDb = "customerId"
