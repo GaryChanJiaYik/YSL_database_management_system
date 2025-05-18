@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_ADD_TREATMENT,WINDOW_EDIT_TREATMENT
+from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_ADD_TREATMENT,WINDOW_EDIT_TREATMENT,WINDOW_TREATMENT_DETAIL
 from Components.customFields import createDetailField
 from Constant.converterFunctions import formatDateTime
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
@@ -75,7 +75,12 @@ class ConditionDetailsView(ctk.CTkFrame):
             print(filePath)
 
 
-
+    def navigateToTreatmentDetailView(self, model):
+        self.controller.setTreatmentID(model.treatmentID)
+        self.controller.setCustomerID(self.conditionModel.customerId)
+        self.controller.setConditionModel(self.conditionModel)
+        self.controller.setConditionID(self.conditionModel.conditionId)
+        self.controller.switch_frame(WINDOW_TREATMENT_DETAIL)
 
     def __init__(self, parent, controller, customerId, conditionModel):
         # !!!!!!!! customerId is formattted
@@ -196,6 +201,6 @@ class ConditionDetailsView(ctk.CTkFrame):
             self.scrollableTreatmentListContainer.grid_columnconfigure(0, weight=1)
             self.scrollableTreatmentListContainer.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=5)
             for idx, treatment in enumerate(self.treatmentList):
-                renderTreatmentSummaryBlockFunctionRevamp(self.scrollableTreatmentListContainer,treatment,self.handleTreatmentBlockEditClick).grid(row=idx, column=0, sticky="w")
+                renderTreatmentSummaryBlockFunctionRevamp(self.scrollableTreatmentListContainer,treatment,hideButtons=False,on_click_view= self.navigateToTreatmentDetailView, on_click=self.handleTreatmentBlockEditClick).grid(row=idx, column=0, sticky="w")
                 
             

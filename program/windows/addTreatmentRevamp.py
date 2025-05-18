@@ -2,7 +2,7 @@ import customtkinter
 from Constant.appConstant import STANDARD_WINDOW_SIZE, STANDARD_TEXT_BOX_WIDTH, TREATMENT_DESCRIPTION_CHARACTER_LIMIT,WINDOW_CONDITION_DETAIL
 import datetime
 import Constant.dbColumn as dbCol
-from Constant.converterFunctions import formatDateTime
+from Constant.converterFunctions import formatDateTime, getFormattedDateTime
 import Constant.treatmentDatabaseFunctions as TreatmentFunc
 import Model.treatmentModel as TM
 from datetime import datetime
@@ -64,6 +64,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         if saveMode:
             params["pTreatmentId"] = self.treatmentModel.treatmentID
             params["pTreatmentId"] = self.treatmentModel.treatmentID
+            params["pAmendmentDate"] = getFormattedDateTime(dateOnly=True)
 
         treatment = TM.TreatmentModel(**params)
 

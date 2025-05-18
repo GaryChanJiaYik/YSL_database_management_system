@@ -63,7 +63,7 @@ def renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel, on_clic
 
 
 
-def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, on_click=None, showEditButton=False):
+def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, hideButtons=False, on_click_view=None, on_click=None, showEditButton=False,):
     # Margin container
     marginContainer = ctk.CTkFrame(master=parentContainer, height=90, width=500, corner_radius=10, fg_color="transparent")
 
@@ -116,40 +116,51 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, o
     create_level_cell_revamp(treatmentLevelsContainer, 0, 1, "Sore", treatmentModel.soreLevel)
     create_level_cell_revamp(treatmentLevelsContainer, 1, 1, "Numb", treatmentModel.numbLevel)
 
+    if not hideButtons:
+        # Edit treatment button
+        editButtonFrame = ctk.CTkFrame(master=wrapperContainer,  width=250, height=50, fg_color="transparent")
+        editButtonFrame.grid(row=0, column=3,  rowspan=2, columnspan=1, sticky="nsew", pady=5, padx=4)
+        editButtonFrame.grid_propagate(False)
 
-    # Edit treatment button
-    editButtonFrame = ctk.CTkFrame(master=wrapperContainer,  width=100, height=50, fg_color="transparent")
-    editButtonFrame.grid(row=0, column=3,  rowspan=2, columnspan=1, sticky="nsew", pady=5, padx=4)
-    editButtonFrame.grid_propagate(False)
-    
 
-    #Get the image
-    try:
-        image_path = "program\\asset\icons\edit.png"
-        button_image = Image.open(image_path)
-        resized_image = button_image.resize((20, 20)) # Resize if needed
-        ctk_button_image = ctk.CTkImage(light_image=resized_image, dark_image=resized_image)
-    except FileNotFoundError:
-        print(f"Error: Image file not found at {image_path}")
-        ctk_button_image = None # Handle the case where the image is not found
+        #Get the image
+        try:
+            image_path = "program\\asset\icons\edit.png"
+            button_image = Image.open(image_path)
+            resized_image = button_image.resize((20, 20)) # Resize if needed
+            ctk_button_image = ctk.CTkImage(light_image=resized_image, dark_image=resized_image)
+        except FileNotFoundError:
+            print(f"Error: Image file not found at {image_path}")
+            ctk_button_image = None # Handle the case where the image is not found
 
-    if ctk_button_image:
-        button = ctk.CTkButton(master=editButtonFrame,
+        if ctk_button_image:
+            button = ctk.CTkButton(master=editButtonFrame,
+                        width=100,
+                        text="Edit",
+                        image=ctk_button_image,
+                        compound="right",  # Display image to the left of the text
+                        command=lambda: on_click(treatmentModel))
+            button.place(relx=0.25, rely=0.5, anchor=ctk.CENTER)
+
+        else:
+            # Create a button without an image if the image loading failed
+            button = ctk.CTkButton(
+                    master=editButtonFrame,
                     width=100,
                     text="Edit",
-                    image=ctk_button_image,
-                    compound="right",  # Display image to the left of the text
                     command=lambda: on_click(treatmentModel))
-        button.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
+            button.place(relx=0.25, rely=0.5, anchor=ctk.CENTER)
 
-    else:
-        # Create a button without an image if the image loading failed
-        button = ctk.CTkButton(
-                master=editButtonFrame,
-                width=100,
-                text="Edit",
-                command=lambda: on_click(treatmentModel))
-        button.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
+        viewButton = ctk.CTkButton(
+                    master=editButtonFrame,
+                    width=80,
+                    text="View",
+                    fg_color='green',
+                    command=lambda: on_click_view(treatmentModel))
+        viewButton.place(relx=0.65, rely=0.5, anchor=ctk.CENTER)
+
+        #viewButtonFrame.grid_propagate(False)
+
 
     # Click binding
     if on_click:

@@ -4,6 +4,7 @@ from windows.landing import LandingWindow
 from windows.customerDetailsRevamp import CustomerDetailsViewRevamp
 from windows.conditionDetailsView import ConditionDetailsView
 from windows.addTreatmentRevamp import AddTreatmentViewRevamp
+from windows.treatmentDetails import TreatmentDetailView
 from Components.previousWindowButton import PreviousWindowButton
 from windows.signIn import SignInWindow
 
@@ -132,7 +133,7 @@ class App:
             self.current_frame = ConditionDetailsView(self.container, self, self.currentCustomerID, self.currentConditionModel)
              
         elif frameClass == WINDOW_TREATMENT_DETAIL:
-            self.current_frame = ConditionDetailsView(self.container, self, self.currentCustomerID, self.currentConditionModel)
+            self.current_frame =  TreatmentDetailView(self.container, self, self.currentTreatmentID)
             
         elif frameClass == WINDOW_ADD_TREATMENT:
             self.current_frame = AddTreatmentViewRevamp(self.container, self, self.currentCustomerID, self.currentConditionModel)

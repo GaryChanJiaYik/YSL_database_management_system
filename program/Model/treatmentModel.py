@@ -8,7 +8,8 @@ class TreatmentModel:
                 pPainLevel = 0,
                 pTenseLevel = 0,
                 pSoreLevel = 0,
-                pNumbLevel = 0 
+                pNumbLevel = 0,
+                pAmendmentDate = None
                  ):
           # Placeholder for treatment ID, if needed
         self.conditionID = pConditionId
@@ -20,4 +21,4 @@ class TreatmentModel:
         self.numbLevel = pNumbLevel
         self.treatmentDate = pTreatmentDate
         self.version = 0
-        self.amendmentDate = None
+        self.amendmentDate = pAmendmentDate

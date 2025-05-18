@@ -2,9 +2,12 @@ import csv
 from csv import writer
 import Constant.dbColumn as dbCol
 from Model.treatmentModel import TreatmentModel
+from Constant.converterFunctions import getFormattedDateTime
+from Constant.generatorFunctions import generateUUID
 import os
 
 DB_PATH = './data/treatmentDb.csv'
+TREATMENT_REVISION_PATH = './data/treatmentRevisionHistory.csv'
 
 def getAllTreatmentByCustomerId(customerId):
    
@@ -136,6 +139,11 @@ def updateTreatmentByID(newTreatmentModel):
                 continue
 
             if row[1].strip() == treatmentId:
+                row[0] = generateUUID()
+                if row[len(row)-1] == 0:
+                    row[len(row)-1] = getFormattedDateTime(dateOnly=True)
+
+                addToTreatmentRevisionTable(row)
                 new_row = [value for _, value in vars(newTreatmentModel).items()]
                 writer.writerow(new_row)
                 updated = True
@@ -150,3 +158,43 @@ def updateTreatmentByID(newTreatmentModel):
         os.remove(temp_file_path)
 
     return updated
+
+def addToTreatmentRevisionTable(data):
+    with open(TREATMENT_REVISION_PATH, mode='a', encoding='utf-8', newline='\n') as file:
+        # Ensure there's a newline before writing if needed
+        file.write("\n")  
+        writer_object = writer(file)
+        writer_object.writerow(data)
+
+def getAllTreatmentRevisionByID(treatmentID):
+    with open(TREATMENT_REVISION_PATH, mode='r', encoding='utf-8') as file:
+        csvFile = csv.reader(file)
+        header = next(csvFile)    
+
+        treatment_id_index = header.index(dbCol.treatmentId)
+        treatment_description = header.index(dbCol.treatmentDescription)
+        treatment_date = header.index(dbCol.treatmentDate)    
+        pain_lvl = header.index(dbCol.treatmentPainLevel)
+        tense_lvl = header.index(dbCol.treatmentTenseLevel)
+        sore_lvl = header.index(dbCol.treatmentSoreLevel)
+        numb_lvl = header.index(dbCol.treatmentNumbLevel)
+        ammendDate = header.index(dbCol.amendmentDate)
+        result = []
+
+        for line in csvFile:
+            if line != []:
+                if line[treatment_id_index] == treatmentID:
+                    treatment = TreatmentModel(
+                        pConditionId=line[0],
+                        pTreatmentId=line[treatment_id_index],
+                        pTreatmentDescription= line[treatment_description],
+                        pTreatmentDate=line[treatment_date],
+                        pNumbLevel=line[numb_lvl],
+                        pPainLevel=line[pain_lvl],
+                        pSoreLevel=line[sore_lvl],
+                        pTenseLevel=line[tense_lvl],
+                        pAmendmentDate= line[ammendDate]
+                    )
+                    result.append(treatment)
+        
+        return result
