@@ -324,7 +324,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         self.addConditionFrame = None
         
         #Conditions list 
-        self.ConditionListContainer = customtkinter.CTkFrame(master=self.conditionFrame, bg_color="transparent")
+        self.ConditionListContainer = customtkinter.CTkFrame(master=self.conditionFrame, bg_color="transparent", fg_color='transparent')
         self.ConditionListContainer.grid(row=1, column=0, sticky="w", padx=(10, 5), pady=5)
         self.ConditionListContainer.grid_columnconfigure(0, weight=1)
 

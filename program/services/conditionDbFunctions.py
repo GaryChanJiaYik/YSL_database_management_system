@@ -1,5 +1,6 @@
 import csv
 import Model.conditionModel as CM
+from datetime import datetime
 
 DB_PATH = './data/conditionDb.csv'
 
@@ -32,8 +33,17 @@ def getAllConditionsByCustomerId(customerId):
                         conditionDate=line[condition_date]
                     )
                     result.append(condition)
-        
-        return result
+        sorted_result = sorted(result, key=lambda x: parse_date_safe(x.conditionDate), reverse=True)  # Sort by conditionDate in descending order
+        return sorted_result
+
+
+def parse_date_safe(date_str):
+    try:
+        return datetime.strptime(date_str, '%Y-%m-%d %H:%M')
+    except (ValueError, TypeError):
+        return datetime.min  # or datetime.max if sorting descending
+
+
 
 def insertConditionToDb( conditionModel):
     with open(DB_PATH, mode='a', encoding='utf-8', newline='\n') as file:
