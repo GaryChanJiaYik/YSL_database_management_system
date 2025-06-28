@@ -4,7 +4,7 @@ import datetime
 import Constant.dbColumn as dbCol
 from Constant.converterFunctions import formatDateTime, getFormattedDateTime
 import Constant.treatmentDatabaseFunctions as TreatmentFunc
-import Model.treatmentModel as TM
+from Model.treatmentModel import TreatmentModel
 from datetime import datetime
 from tkinter import ttk
 from Components.popupModal import renderPopUpModal
@@ -63,10 +63,9 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
 
         if saveMode:
             params["pTreatmentId"] = self.treatmentModel.treatmentID
-            params["pTreatmentId"] = self.treatmentModel.treatmentID
             params["pAmendmentDate"] = getFormattedDateTime(dateOnly=True)
 
-        treatment = TM.TreatmentModel(**params)
+        treatment = TreatmentModel(**params)
 
         if saveMode:
             res = TreatmentFunc.updateTreatmentByID(treatment)
@@ -86,9 +85,11 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         self.controller.setCustomerID(self.conditionModel.customerId)
         self.controller.setConditionModel(self.conditionModel)
 
+        # Clean up the current frame from stack
+        if len(self.controller.window_stack) > 0:
+            self.controller.window_stack.pop()
 
-
-        self.controller.switch_frame(WINDOW_CONDITION_DETAIL)
+        self.controller.switch_frame(WINDOW_CONDITION_DETAIL, isFromBackButton=True)
 
     def toggle_time_fields(self):
         if self.auto_time_var.get():       

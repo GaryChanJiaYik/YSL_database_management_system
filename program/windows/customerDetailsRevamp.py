@@ -123,6 +123,11 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             conditionDate= getFormattedDateTime()  # Placeholder date, replace with actual date if needed
         )
         insertConditionToDb(conditionModel)
+
+        # Re-render the UI
+        self.conditionList = getAllConditionsByCustomerId(self.customerId)
+        self.renderConditionList()
+        
         self.closeAddConditionFrame()  # Close the frame after submission
 
     def openAddConditionWindow(self):
@@ -170,6 +175,23 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             self.addConditionFrame.destroy()  # remove the frame from the screen
             self.addConditionFrame = None     # reset state
 
+    def renderConditionList(self):
+        # Clear the existing widgets inside the container
+        if hasattr(self, "ConditionListContainer") and self.ConditionListContainer.winfo_children():
+            for widget in self.ConditionListContainer.winfo_children():
+                widget.destroy()
+        
+        #Conditions list 
+        self.ConditionListContainer = customtkinter.CTkFrame(master=self.conditionFrame, bg_color="transparent", fg_color='transparent')
+        self.ConditionListContainer.grid(row=1, column=0, sticky="w", padx=(10, 5), pady=5)
+        self.ConditionListContainer.grid_columnconfigure(0, weight=1)
+
+
+        for idx, condition in enumerate(self.conditionList):
+            # Create a new condition model block for each condition
+            instantiateConditionModelBlock(
+                self.ConditionListContainer, condition, 0, idx, self.openConditionDetailsWindowCallback
+            )
 
     def openConditionDetailsWindowCallback(self, cm):
         self.controller.setCustomerID(self.customerId)
@@ -265,9 +287,6 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
         columnOneRowIndex = 1
         columnTwoRowIndex = 1
-        
-        print("iaidjwaidawd")
-        print(self.customerModel)
 
         for key, value in vars(self.customerModel).items():
             # Get field name and value
@@ -323,17 +342,8 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
         self.addConditionFrame = None
         
-        #Conditions list 
-        self.ConditionListContainer = customtkinter.CTkFrame(master=self.conditionFrame, bg_color="transparent", fg_color='transparent')
-        self.ConditionListContainer.grid(row=1, column=0, sticky="w", padx=(10, 5), pady=5)
-        self.ConditionListContainer.grid_columnconfigure(0, weight=1)
-
-
-        for idx, condition in enumerate(self.conditionList):
-            # Create a new condition model block for each condition
-            instantiateConditionModelBlock(
-                self.ConditionListContainer, condition, 0, idx, self.openConditionDetailsWindowCallback
-            )
+        #Conditions list
+        self.renderConditionList()
 
 
 

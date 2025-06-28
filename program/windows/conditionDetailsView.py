@@ -16,6 +16,7 @@ class ConditionDetailsView(ctk.CTkFrame):
 
     def OpenAddTreatmentWindow(self):
         self.controller.setCustomerID(self.conditionModel.customerId)
+        self.controller.setConditionID(self.conditionModel.conditionId);
         self.controller.setConditionModel(self.conditionModel)
         self.controller.switch_frame(WINDOW_ADD_TREATMENT)
 

@@ -57,7 +57,7 @@ def createTreatment(treatmentModel):
 def getAllTreatmentByConditionID(conditionId):
    
    #!!!!!!!!!!!! customerId --> converted format
-   with open(DB_PATH, mode='r', encoding='utf-8') as file:
+   with open(DB_PATH, mode='r', encoding='utf-8', newline='') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)           
         customer_id_index = header.index(dbCol.conditionId)
@@ -118,32 +118,46 @@ def getTreatmentByID(treatmentID):
                     return treatment
         
         return result
-   
+
 def updateTreatmentByID(newTreatmentModel):
     print("UPDATING condition")
-    print("condition id, ", newTreatmentModel.conditionID)
+    print("condition id: ", newTreatmentModel.conditionID)
     print("treatment id: ", newTreatmentModel.treatmentID)
+
     treatmentId = newTreatmentModel.treatmentID
     temp_file_path = DB_PATH + ".tmp"
     updated = False
-    print("received treatmentId: ", treatmentId)
+
     with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
          open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
 
         reader = csv.reader(infile)
+        header = next(reader)
         writer = csv.writer(outfile)
+        writer.writerow(header)
+
+        # Get column indexes using header names
+        condition_id_idx = header.index('conditionId')
+        treatment_id_idx = header.index('treatmentId')
+        amendment_idx = header.index('amendmentDate')
 
         for row in reader:
             # Skip completely empty rows
             if not row or all(cell.strip() == '' for cell in row):
                 continue
 
-            if row[1].strip() == treatmentId:
-                row[0] = generateUUID()
-                if row[len(row)-1] == 0:
-                    row[len(row)-1] = getFormattedDateTime(dateOnly=True)
+            if row[treatment_id_idx].strip() == treatmentId:
+                # Update condition ID to new UUID
+                row[condition_id_idx] = generateUUID()
 
+                # If amendmentDate is '0', replace it with a timestamp
+                if row[amendment_idx].strip() == '0':
+                    row[amendment_idx] = getFormattedDateTime(dateOnly=True)
+
+                # Save old version to revisions table
                 addToTreatmentRevisionTable(row)
+
+                # Write updated treatment from model
                 new_row = [value for _, value in vars(newTreatmentModel).items()]
                 writer.writerow(new_row)
                 updated = True

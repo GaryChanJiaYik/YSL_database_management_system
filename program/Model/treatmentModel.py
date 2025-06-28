@@ -13,7 +13,7 @@ class TreatmentModel:
                  ):
           # Placeholder for treatment ID, if needed
         self.conditionID = pConditionId
-        self.treatmentID = pTreatmentId if not "" else generateUUID()
+        self.treatmentID = pTreatmentId if pTreatmentId else generateUUID()
         self.treatmentDescription = pTreatmentDescription
         self.painLevel = pPainLevel
         self.tenseLevel = pTenseLevel

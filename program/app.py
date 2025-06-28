@@ -107,6 +107,9 @@ class App:
 
       
         self.appRoot.mainloop()
+        
+        # Debug Window stack
+        # self.print_window_stack()
 
     def back_window(self):
         if len(self.window_stack) > 1:
@@ -136,13 +139,16 @@ class App:
             self.current_frame =  TreatmentDetailView(self.container, self, self.currentTreatmentID)
             
         elif frameClass == WINDOW_ADD_TREATMENT:
-            self.current_frame = AddTreatmentViewRevamp(self.container, self, self.currentCustomerID, self.currentConditionModel)
+            self.current_frame = AddTreatmentViewRevamp(self.container, self, self.currentConditionID, self.currentConditionModel)
         elif frameClass == WINDOW_EDIT_TREATMENT:
             self.current_frame = AddTreatmentViewRevamp(self.container, self, self.currentConditionID, self.currentConditionModel, isEditMode=True)
 
         self.current_frame.pack(fill="both", expand=True)
     
         self.set_header()
+        
+        # Debug Window stack
+        # self.print_window_stack()
 
 
     def set_header(self):
@@ -161,3 +167,12 @@ class App:
         # This should open a new window for admin sign-in
         print("Sign In logic goes here")
         SignInWindow(self, self.appRoot)
+        
+    def print_window_stack(self):
+        print("===== Window Stack =====")
+        for i, frame in enumerate(self.window_stack):
+            if hasattr(frame, '__name__'):
+                print(f"{i + 1}: {frame.__name__}")
+            else:
+                print(f"{i + 1}: {str(frame)}")
+        print("========================")

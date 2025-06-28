@@ -26,8 +26,7 @@ def customerHasConsentForm(customer_id):
     customer_folder_path = os.path.join(attachment_path, customer_id)
     consent_form_filename = CONSENT_FORM_KEYWORD
     consent_form_path = os.path.join(customer_folder_path, f'{consent_form_filename}.pdf')
-    print("consent_form_path")
-    print(consent_form_path)
+    print(f"consent_form_path: {consent_form_path}")
     # Check if the customer's ID folder exists
     if os.path.isdir(customer_folder_path):
         # If the folder exists, check if the consentForm file exists inside it
