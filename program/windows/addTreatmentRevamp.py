@@ -12,7 +12,7 @@ from Constant.inputValidations import checkLengthOfInput
 
 class AddTreatmentViewRevamp(customtkinter.CTkFrame):
 
-    entryFieldList = [ dbCol.treatmentDescription, dbCol.treatmentPainLevel, dbCol.treatmentNumbLevel, dbCol.treatmentSoreLevel, dbCol.treatmentTenseLevel]
+    entryFieldList = [ dbCol.treatmentDescription, dbCol.treatmentCost, dbCol.treatmentPainLevel, dbCol.treatmentNumbLevel, dbCol.treatmentSoreLevel, dbCol.treatmentTenseLevel]
     def createLabelWithInputfield(self, root, label, entryFields,selectedLevelVar, isSelectBox=False, ):
 
         frame = customtkinter.CTkFrame(root)
@@ -59,6 +59,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             "pSoreLevel": self.selected_levels[dbCol.treatmentSoreLevel].get(),
             "pTenseLevel": self.selected_levels[dbCol.treatmentTenseLevel].get(),
             "pTreatmentDate": final_time_string,
+            "pTreatmentCost": float(entryFields[dbCol.treatmentCost].get().strip() or 0)
         }
 
         if saveMode:
@@ -119,10 +120,10 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             # Truncate extra characters
             self.entryFields[dbCol.treatmentDescription].delete("1.0", "end")
             self.entryFields[dbCol.treatmentDescription].insert("1.0", current_text[:TREATMENT_DESCRIPTION_CHARACTER_LIMIT])
-            self.warning_label.configure(text=f"Maximum {TREATMENT_DESCRIPTION_CHARACTER_LIMIT} characters reached!", text_color="red")
+            self.desc_warning_label.configure(text=f"Maximum {TREATMENT_DESCRIPTION_CHARACTER_LIMIT} characters reached!", text_color="red")
         else:
 
-            self.warning_label.configure(text=f"{len(current_text)}/{TREATMENT_DESCRIPTION_CHARACTER_LIMIT}", text_color="green")
+            self.desc_warning_label.configure(text=f"{len(current_text)}/{TREATMENT_DESCRIPTION_CHARACTER_LIMIT}", text_color="green")
 
     def populateTimeFields(self, datetime_string):
         try:
@@ -160,6 +161,23 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             
     def deleteRecord(self):
         print("Remove record")
+        
+    def validate_numeric_input(self, entry_widget):
+        value = entry_widget.get()
+
+        # Check if the input is a valid number (allowing only 1 dot)
+        if not value.replace('.', '', 1).isdigit():
+            # Remove invalid characters
+            cleaned = ''.join([c for c in value if c.isdigit() or c == '.'])
+            entry_widget.delete(0, 'end')
+            entry_widget.insert(0, cleaned)
+
+            # Show warning
+            self.cost_warning_label.configure(text="Only numbers allowed")
+        else:
+            # Clear warning if input is valid
+            self.cost_warning_label.configure(text="")
+
 
     def __init__(self, parent, controller, conditionID, conditionModel, isEditMode=False):
         super().__init__(parent)
@@ -201,6 +219,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
                 }
 
                 self.treatmentDescription = self.treatmentModel.treatmentDescription
+                self.treatmentCost = self.treatmentModel.treatmentCost
                 print("treatment id: ", self.treatmentModel.treatmentID)
                 print("condition id: ", self.treatmentModel.conditionID)
                 print("condition id param, ", conditionID)
@@ -218,7 +237,9 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             #render text
             customtkinter.CTkLabel(self.entryGridFrame, text =dbCol.TreatmentModelAttributeToField[field], pady=1).grid(row=idx+1, column=0, sticky='nw', pady=10)
             customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(row=idx+1, column=1, sticky='nw')
-
+            
+            # entry = None
+            
             #render entry
             if field is dbCol.treatmentDescription:
                 #create enty text 
@@ -232,10 +253,23 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
                 
                 entry.grid(row=0, column=0, sticky='w')
 
-                self.warning_label = customtkinter.CTkLabel(treatmentDescFrame, text="", text_color="red")
-                self.warning_label.grid(row=1, column=0, sticky='e')
+                self.desc_warning_label = customtkinter.CTkLabel(treatmentDescFrame, text="", text_color="red")
+                self.desc_warning_label.grid(row=1, column=0, sticky='e')
 
                 #self.createLabelWithInputfield(self.newWindow, field, self.entryFields, None, False).grid(row=idx+1, column=0, sticky='w')
+            elif field is dbCol.treatmentCost:
+                treatmentCostContainer = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent", bg_color="transparent")
+                treatmentCostContainer.grid(row=idx+1, column=2, sticky='w')
+
+                entry = customtkinter.CTkEntry(treatmentCostContainer, width=100)
+                entry.grid(row=0, column=1, sticky="w")
+                entry.insert(0, self.treatmentCost if isEditMode else "")
+                entry.bind("<KeyRelease>", lambda e: self.validate_numeric_input(entry))
+                
+                entry.grid(row=0, column=0, sticky='w')
+
+                self.cost_warning_label = customtkinter.CTkLabel(treatmentCostContainer, text="", text_color="red")
+                self.cost_warning_label.grid(row=1, column=0, sticky='e')
             else:
                 #create select box
                 entry = customtkinter.CTkOptionMenu(

@@ -25,14 +25,15 @@ class TreatmentDetailView(ctk.CTkFrame):
 
 
     def renderTreatmentDetails(self):
-        createDetailField(self.treatmentDetailFrame, "Created Date", self.treatmentModel.treatmentDate, row=2, column=0,)    
+        createDetailField(self.treatmentDetailFrame, "Created Date", self.treatmentModel.treatmentDate, row=2, column=0)    
         createDetailField(self.treatmentDetailFrame, "Description", self.treatmentModel.treatmentDescription, 3,0)
+        createDetailField(self.treatmentDetailFrame, "Cost", f"RM {self.treatmentModel.treatmentCost}", 4,0)
 
         #Levels
-        createDetailField(self.treatmentDetailFrame, "Pain", self.treatmentModel.painLevel,4,0)
-        createDetailField(self.treatmentDetailFrame, "Tense", self.treatmentModel.tenseLevel,5,0)    
-        createDetailField(self.treatmentDetailFrame, "Sore", self.treatmentModel.soreLevel,6,0)
-        createDetailField(self.treatmentDetailFrame, "Numb", self.treatmentModel.numbLevel,7,0)    
+        createDetailField(self.treatmentDetailFrame, "Pain", self.treatmentModel.painLevel,5,0)
+        createDetailField(self.treatmentDetailFrame, "Tense", self.treatmentModel.tenseLevel,6,0)    
+        createDetailField(self.treatmentDetailFrame, "Sore", self.treatmentModel.soreLevel,7,0)
+        createDetailField(self.treatmentDetailFrame, "Numb", self.treatmentModel.numbLevel,8,0)    
         
 
     def __init__(self, parent, controller, treatmentID):

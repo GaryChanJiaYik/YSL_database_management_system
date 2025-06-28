@@ -100,6 +100,13 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
     treatmentDescriptionLabel.grid(row=1, column=0, sticky="w")
 
 
+    treatmentDescriptionCost = ctk.CTkLabel(
+        master=treatmentDetailContainer,
+        text=f"Cost: RM {treatmentModel.treatmentCost}",
+        anchor="w"
+    )
+    treatmentDescriptionCost.grid(row=2, column=0, sticky="w")
+
     #Space
     ctk.CTkLabel(
         master=wrapperContainer,

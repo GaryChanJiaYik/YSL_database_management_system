@@ -17,6 +17,7 @@ def getAllTreatmentByCustomerId(customerId):
         header = next(csvFile)           
         customer_id_index = header.index(dbCol.customerIdTreatment)
         treatment_description = header.index(dbCol.treatmentDescription)
+        treatment_cost = header.index(dbCol.treatmentCost)
         treatment_date = header.index(dbCol.treatmentDate)    
         pain_lvl = header.index(dbCol.treatmentPainLevel)
         tense_lvl = header.index(dbCol.treatmentTenseLevel)
@@ -31,6 +32,7 @@ def getAllTreatmentByCustomerId(customerId):
                         pCustomerId=customerId,
                         pTreatmentDescription= line[treatment_description],
                         pTreatmentDate=line[treatment_date],
+                        pTreatmentCost=line[treatment_cost],
                         pNumbLevel=line[numb_lvl],
                         pPainLevel=line[pain_lvl],
                         pSoreLevel=line[sore_lvl],
@@ -63,6 +65,7 @@ def getAllTreatmentByConditionID(conditionId):
         customer_id_index = header.index(dbCol.conditionId)
         treatment_id_index = header.index(dbCol.treatmentId)
         treatment_description = header.index(dbCol.treatmentDescription)
+        treatment_cost = header.index(dbCol.treatmentCost)
         treatment_date = header.index(dbCol.treatmentDate)    
         pain_lvl = header.index(dbCol.treatmentPainLevel)
         tense_lvl = header.index(dbCol.treatmentTenseLevel)
@@ -77,6 +80,7 @@ def getAllTreatmentByConditionID(conditionId):
                         pConditionId=conditionId,
                         pTreatmentId=line[treatment_id_index],
                         pTreatmentDescription= line[treatment_description],
+                        pTreatmentCost=line[treatment_cost],
                         pTreatmentDate=line[treatment_date],
                         pNumbLevel=line[numb_lvl],
                         pPainLevel=line[pain_lvl],
@@ -95,6 +99,7 @@ def getTreatmentByID(treatmentID):
         condition_id_index = header.index(dbCol.conditionId)
         treatment_id_index = header.index(dbCol.treatmentId)
         treatment_description = header.index(dbCol.treatmentDescription)
+        treatment_cost = header.index(dbCol.treatmentCost)
         treatment_date = header.index(dbCol.treatmentDate)    
         pain_lvl = header.index(dbCol.treatmentPainLevel)
         tense_lvl = header.index(dbCol.treatmentTenseLevel)
@@ -109,6 +114,7 @@ def getTreatmentByID(treatmentID):
                         pConditionId=line[condition_id_index],
                         pTreatmentId=treatmentID,
                         pTreatmentDescription= line[treatment_description],
+                        pTreatmentCost=line[treatment_cost],
                         pTreatmentDate=line[treatment_date],
                         pNumbLevel=line[numb_lvl],
                         pPainLevel=line[pain_lvl],
@@ -187,6 +193,7 @@ def getAllTreatmentRevisionByID(treatmentID):
 
         treatment_id_index = header.index(dbCol.treatmentId)
         treatment_description = header.index(dbCol.treatmentDescription)
+        treatment_cost = header.index(dbCol.treatmentCost)
         treatment_date = header.index(dbCol.treatmentDate)    
         pain_lvl = header.index(dbCol.treatmentPainLevel)
         tense_lvl = header.index(dbCol.treatmentTenseLevel)
@@ -202,6 +209,7 @@ def getAllTreatmentRevisionByID(treatmentID):
                         pConditionId=line[0],
                         pTreatmentId=line[treatment_id_index],
                         pTreatmentDescription= line[treatment_description],
+                        pTreatmentCost=line[treatment_cost],
                         pTreatmentDate=line[treatment_date],
                         pNumbLevel=line[numb_lvl],
                         pPainLevel=line[pain_lvl],

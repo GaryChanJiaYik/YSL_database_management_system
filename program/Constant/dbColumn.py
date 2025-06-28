@@ -31,7 +31,8 @@ TreatmentModelAttributeToField = {
     'treatmentTenseLevel': "Tense Level",
     'treatmentSoreLevel': "Sore Level",
     'treatmentNumbLevel': "Numb Level",
-    'treatmentDate': "Treatment Date"
+    'treatmentDate': "Treatment Date",
+    'treatmentCost': "Treatment Cost"
 }
 
 
@@ -47,6 +48,7 @@ treatmentNumbLevel = "treatmentNumbLevel"
 treatmentDate = "treatmentDate"
 treatmentId = "treatmentId"
 amendmentDate = "amendmentDate"
+treatmentCost = "treatmentCost"
 # For condition db
 customerIdConditionDb = "customerId"
 conditionId = "conditionId"
