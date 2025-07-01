@@ -1,7 +1,7 @@
 import customtkinter
 from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CONDITION_DETAIL
 from Constant.databaseManipulationFunctions import searchForSingleUser, addOldCustomerID
-from Constant.dbColumn import customerModelAttributeToField, oldCustomerId
+from Constant.dbColumn import customerModelAttributeToField, oldCustomerId, name
 from Constant.converterFunctions import convertTimeStampToId
 from services.conditionDbFunctions import insertConditionToDb, getAllConditionsByCustomerId
 from Model.conditionModel import ConditionModel
@@ -42,6 +42,10 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
                 anchor="w",
                 justify="left",
             ).grid(row=row, column=column + 1, rowspan=rowspan, sticky="w", padx=(5, 10), pady=5)
+            
+            # if fieldName == name and content != "":
+            if name.startswith(fieldName) and content != "":
+                self.controller.setCustomerName(content)
 
     def renderAddOldCustomerIdButton(self, root, row, column, rowspan=1):
         if self.oldCustomerIdInputFieldContainer is not None:

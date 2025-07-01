@@ -11,6 +11,7 @@ from windows.signIn import SignInWindow
 class App:
 
     currentCustomerID = None
+    currentCustomerName = None
     currentTreatmentID = None
     currentConditionID = None
     currentConditionModel = None
@@ -20,6 +21,9 @@ class App:
 
     def setCustomerID(self, customerID):
         self.currentCustomerID = customerID
+        
+    def setCustomerName(self, customerName):
+        self.currentCustomerName = customerName
     
     def setTreatmentID(self, treatmentID):
         self.currentTreatmentID = treatmentID
@@ -29,6 +33,9 @@ class App:
 
     def getCustomerID(self):
         return self.currentCustomerID
+    
+    def getCustomerName(self):
+        return self.currentCustomerName
     
     def getTreatmentID(self):
         return self.currentTreatmentID

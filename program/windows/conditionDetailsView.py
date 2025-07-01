@@ -100,7 +100,7 @@ class ConditionDetailsView(ctk.CTkFrame):
         self.customerInfoFrame.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=5)
         
         createDetailField(root=self.customerInfoFrame, fieldName="Customer ID", content=self.customerId, row=0, column=0)
-        createDetailField(root=self.customerInfoFrame, fieldName="Customer Name", content="William", row=1, column=0)
+        createDetailField(root=self.customerInfoFrame, fieldName="Customer Name", content=self.controller.getCustomerName(), row=1, column=0)
 
         #Condition details
 
