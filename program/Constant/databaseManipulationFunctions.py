@@ -92,7 +92,7 @@ def addOldCustomerID(customerID, oldCustomerId):
 
         if updated:
             # Write the updated rows back to the file
-            with open(file_path, mode='w', encoding='utf-8', newline='') as file:
+            with open(DB_PATH, mode='w', encoding='utf-8', newline='') as file:
                 csv_writer = csv.writer(file)
                 csv_writer.writerows(rows)
             print("Added old customer ID successfully.")
