@@ -68,7 +68,7 @@ class ConditionDetailsView(ctk.CTkFrame):
         
         if filePath is not None:
             #manipulate the file path to the condition picture path            
-            result = uploadCustomerFile(self.customerId,filePath, self.root,  self.conditionModel.conditionId)
+            result = uploadCustomerFile(self.customerId,filePath, self._root,  self.conditionModel.conditionId)
             if result == SUCCESS:
                 self.uploadConditionPictureBtn.destroy()
                 self.renderConditionPicture(self.conditionPictureContainer, filePath)

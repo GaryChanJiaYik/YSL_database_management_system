@@ -69,10 +69,10 @@ def uploadCustomerFile(customer_id, filePath, root, fileName):
     #Save the file in the folder with the name consentForm
     try:
         shutil.copyfile(filePath, new_file_path)  # Copy the selected file to the target location
-        renderPopUpModal(root, "File uploaded successfully", "Upload", "Success")
+        renderPopUpModal(root(), "File uploaded successfully", "Upload", "Success")
         return SUCCESS
     except Exception as e:
-        renderPopUpModal(root, "Error uploading file", "Upload", "Error")
+        renderPopUpModal(root(), "Error uploading file", "Upload", "Error")
 
         print(f"Error copying file: {e}")
         return ERROR
