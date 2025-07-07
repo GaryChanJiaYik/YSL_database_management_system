@@ -160,7 +160,10 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             print("Invalid datetime format. Expected: 'YYYY-MM-DD HH:MM:SS'")
             
     def deleteRecord(self):
-        print("Remove record")
+        TreatmentFunc.deleteTreatmentByID(self.treatmentModel.treatmentID)
+        renderPopUpModal(self, "Treatment removed successfully","Successful", "Success")
+        #Go back previous window
+        self.backToPreviousWindow()
         
     def validate_numeric_input(self, entry_widget):
         value = entry_widget.get()
@@ -334,7 +337,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             self.populateTimeFields(self.treatmentModel.treatmentDate)
 
             customtkinter.CTkButton(self.actionButtonsFrame, text="Save", command=lambda: self.createTreatment(conditionID, self.entryFields, saveMode=True)).grid(row=0, column=0)
-            customtkinter.CTkButton(self.actionButtonsFrame, text="Delete", fg_color="red", text_color="white", hover_color="darkred", command=lambda: self.deleteRecord).grid(row=0, column=1, padx=(10,0))
+            customtkinter.CTkButton(self.actionButtonsFrame, text="Delete", fg_color="red", text_color="white", hover_color="darkred", command=lambda: self.deleteRecord()).grid(row=0, column=1, padx=(10,0))
         else:
             customtkinter.CTkButton(self.actionButtonsFrame, text="Add Treatment", command=lambda: self.createTreatment(conditionID, self.entryFields)).grid(row=0, column=0)
 

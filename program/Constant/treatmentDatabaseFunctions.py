@@ -220,3 +220,74 @@ def getAllTreatmentRevisionByID(treatmentID):
                     result.append(treatment)
         
         return result
+
+def deleteTreatmentByID(treatmentID):
+    print("DELETING treatment")
+    print("treatment id: ", treatmentID)
+
+    temp_file_path = DB_PATH + ".tmp"
+    deleted = False
+
+    # Step 1: Delete from main treatment CSV
+    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+         open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
+
+        reader = csv.reader(infile)
+        header = next(reader)
+        writer = csv.writer(outfile)
+        writer.writerow(header)
+
+        treatment_id_idx = header.index('treatmentId')
+
+        for row in reader:
+            if not row or all(cell.strip() == '' for cell in row):
+                continue
+
+            if row[treatment_id_idx].strip() == treatmentID:
+                deleted = True  # Skip writing this row
+            else:
+                writer.writerow(row)
+
+    if deleted:
+        os.replace(temp_file_path, DB_PATH)
+        print("TREATMENT DELETED FROM MAIN FILE")
+        # Now also delete from revisions
+        __deleteTreatmentRevisionsByID(treatmentID)
+    else:
+        os.remove(temp_file_path)
+        print("TREATMENT NOT FOUND")
+
+    return deleted
+
+
+def __deleteTreatmentRevisionsByID(treatmentID):
+    print("DELETING RELATED TREATMENT REVISIONS")
+    
+    revision_temp_path = TREATMENT_REVISION_PATH + ".tmp"
+    deleted_any = False
+
+    with open(TREATMENT_REVISION_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+         open(revision_temp_path, mode='w', encoding='utf-8', newline='') as outfile:
+
+        reader = csv.reader(infile)
+        header = next(reader)
+        writer = csv.writer(outfile)
+        writer.writerow(header)
+
+        treatment_id_idx = header.index('treatmentId')
+
+        for row in reader:
+            if not row or all(cell.strip() == '' for cell in row):
+                continue
+
+            if row[treatment_id_idx].strip() == treatmentID:
+                deleted_any = True  # Skip this revision
+            else:
+                writer.writerow(row)
+
+    if deleted_any:
+        os.replace(revision_temp_path, TREATMENT_REVISION_PATH)
+        print("RELATED REVISIONS DELETED")
+    else:
+        os.remove(revision_temp_path)
+        print("NO RELATED REVISIONS FOUND")
