@@ -6,7 +6,7 @@ from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
 from windows.addTreatmentRevamp import AddTreatmentViewRevamp
 from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunctionRevamp
 from services.customerFilesServices import getConditionPicturePath,renderFilePicker, uploadCustomerFile
-from PIL import Image, ImageTk
+from PIL import Image
 from Constant.errorCode import SUCCESS
 
 class ConditionDetailsView(ctk.CTkFrame):
@@ -52,11 +52,13 @@ class ConditionDetailsView(ctk.CTkFrame):
         #resize
         image = image.resize((250, 250))  # Resize the image to fit the label
         # Convert for Tkinter
-        photo = ImageTk.PhotoImage(image)
+        # photo = ImageTk.PhotoImage(image)
+        photo = ctk.CTkImage(light_image=image, dark_image=image, size=(250, 250))
 
 
         # Display in CTkLabel
         label = ctk.CTkLabel(root, image=photo, text="")    #     # If no picture, render button to upload a picture
+        label.image = photo
         label.grid(row=0, column=0, sticky="nsew")
 
 
