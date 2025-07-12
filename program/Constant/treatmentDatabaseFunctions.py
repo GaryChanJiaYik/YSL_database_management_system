@@ -291,3 +291,25 @@ def __deleteTreatmentRevisionsByID(treatmentID):
     else:
         os.remove(revision_temp_path)
         print("NO RELATED REVISIONS FOUND")
+        
+        
+def getConditionTotalCost(conditionId):
+    total_cost = 0.0
+
+    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as file:
+        csvFile = csv.reader(file)
+        header = next(csvFile)
+        
+        # Get the index of relevant columns
+        condition_id_index = header.index(dbCol.conditionId)
+        treatment_cost_index = header.index(dbCol.treatmentCost)
+
+        # Loop through the CSV lines
+        for line in csvFile:
+            if line and line[condition_id_index] == conditionId:
+                try:
+                    total_cost += float(line[treatment_cost_index])
+                except ValueError:
+                    print(f"Invalid cost value: {line[treatment_cost_index]}")
+    
+    return total_cost
