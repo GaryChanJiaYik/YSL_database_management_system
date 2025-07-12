@@ -2,6 +2,7 @@ import csv
 import customtkinter as ctk
 import Constant.dbColumn as dbCol
 from windows.conditionDetailsView import ConditionDetailsView
+from services.conditionDbFunctions import getTreatmentStatus
 
 DB_PATH = './data/treatmentDb.csv'
 
@@ -25,12 +26,14 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
         anchor="w"
     ).grid(row=0, column=0, sticky="w", padx=(20, 10), pady=5)
 
+    conditionModel.undergoingTreatment = not getTreatmentStatus(conditionModel.customerId, conditionModel.conditionId)
     ctk.CTkLabel(
         conditionFrame,
-        text="Undergoing Treatment" if conditionModel.undergoingTreatment else "",
+        text="Undergoing Treatment" if conditionModel.undergoingTreatment else "",#"" if is_treated else "Undergoing Treatment",
         bg_color='transparent',
         font=('Arial', 16),
-        anchor="e"
+        anchor="e",
+        width=180
     ).grid(row=0, column=1, sticky="e", padx=(10, 20), pady=5)
 
     conditionSubFrame = ctk.CTkFrame(master=conditionFrame, bg_color="transparent", fg_color="transparent")

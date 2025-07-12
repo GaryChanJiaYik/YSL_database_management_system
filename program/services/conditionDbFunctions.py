@@ -1,4 +1,5 @@
 import csv
+import os
 import Model.conditionModel as CM
 from datetime import datetime
 
@@ -45,7 +46,7 @@ def parse_date_safe(date_str):
 
 
 
-def insertConditionToDb( conditionModel):
+def insertConditionToDb(conditionModel):
     with open(DB_PATH, mode='a', encoding='utf-8', newline='\n') as file:
         # Ensure there's a newline before writing if needed
         file.write("\n")  
@@ -53,3 +54,60 @@ def insertConditionToDb( conditionModel):
         writer_object = csv.writer(file)
         data = [value for key, value in vars(conditionModel).items()]
         writer_object.writerow(data)
+
+    
+def updateTreatmentStatus(customer_id, condition_id, is_treated):
+    print(f"Updating treatment status for customer {customer_id}, condition {condition_id}")
+    temp_file_path = DB_PATH + ".tmp"
+    updated = False
+
+    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+         open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
+
+        reader = csv.reader(infile)
+        writer = csv.writer(outfile)
+
+        header = next(reader)
+        writer.writerow(header)
+
+        customer_idx = header.index("customerId")
+        condition_idx = header.index("conditionId")
+        treatment_status_idx = header.index("undergoingTreatment")
+
+        for row in reader:
+            if not row or all(cell.strip() == '' for cell in row):
+                continue
+
+            if row[customer_idx] == str(customer_id) and row[condition_idx] == condition_id:
+                row[treatment_status_idx] = "False" if is_treated else "True"
+                updated = True
+
+            writer.writerow(row)
+
+    if updated:
+        os.replace(temp_file_path, DB_PATH)
+        print("Treatment status updated successfully.")
+    else:
+        os.remove(temp_file_path)
+        print("No matching treatment found. Status not updated.")
+
+    return updated
+        
+
+def getTreatmentStatus(customer_id, condition_id):
+    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as file:
+        csvFile = csv.reader(file)
+        header = next(csvFile)
+
+        customer_idx = header.index("customerId")
+        condition_idx = header.index("conditionId")
+        treatment_status_idx = header.index("undergoingTreatment")
+
+        for row in csvFile:
+            if not row or all(cell.strip() == '' for cell in row):
+                continue
+
+            if row[customer_idx] == str(customer_id) and row[condition_idx] == condition_id:
+                return row[treatment_status_idx] == "False"  # "False" = treated
+
+    return False  # Default to not treated if no match found

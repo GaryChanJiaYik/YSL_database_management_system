@@ -3,6 +3,7 @@ from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_ADD_TREATMENT,WINDO
 from Components.customFields import createDetailField
 from Constant.converterFunctions import formatDateTime
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
+from services.conditionDbFunctions import updateTreatmentStatus, getTreatmentStatus
 from windows.addTreatmentRevamp import AddTreatmentViewRevamp
 from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunctionRevamp
 from services.customerFilesServices import getConditionPicturePath,renderFilePicker, uploadCustomerFile
@@ -12,7 +13,17 @@ from Constant.errorCode import SUCCESS
 class ConditionDetailsView(ctk.CTkFrame):
 
     def treatmentChecked(self):
-        print("Checked pressed: ", self.treatedCheck.get())
+        is_treated = self.treatedCheck.get()
+        new_status = "Treated" if is_treated else "Undergoing Treatment"
+        
+        self.statusLabel.configure(text=new_status)
+        updateTreatmentStatus(self.customerId, self.conditionModel.conditionId, is_treated)
+        
+    def LoadTreatmentStatus(self):
+        is_treated = getTreatmentStatus(self.customerId, self.conditionModel.conditionId)
+
+        self.treatedCheck.set(is_treated)
+        self.statusLabel.configure(text="Treated" if is_treated else "Undergoing Treatment")
 
     def OpenAddTreatmentWindow(self):
         self.controller.setCustomerID(self.conditionModel.customerId)
@@ -143,7 +154,7 @@ class ConditionDetailsView(ctk.CTkFrame):
         ctk.CTkCheckBox(
             self.conditionDetailSubFrame,
             text="Mark as treated",
-            command=self.treatmentChecked(),
+            command=self.treatmentChecked,
             checkbox_height=16,
             checkbox_width=16,
             border_width=2,
@@ -153,8 +164,8 @@ class ConditionDetailsView(ctk.CTkFrame):
 
         createDetailField(root=self.conditionDetailsField, fieldName="Description", content=conditionModel.conditionDescription, row=1, column=0)
         createDetailField(root=self.conditionDetailsField, fieldName="Added Date", content=conditionModel.conditionDate, row=2, column=0)
-        createDetailField(root=self.conditionDetailsField, fieldName="Status", content="Undergoing Treatement" if conditionModel.undergoingTreatment else "Treated", row=3, column=0)
-
+        self.statusLabel = createDetailField(root=self.conditionDetailsField, fieldName="Status", content="Undergoing Treatement" if conditionModel.undergoingTreatment else "Treated", row=3, column=0)
+        self.LoadTreatmentStatus()
 
         #conditionPicture
         self.conditionPictureContainer = ctk.CTkFrame(
