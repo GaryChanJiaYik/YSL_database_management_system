@@ -82,7 +82,6 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
        
     def backToPreviousWindow(self):
         print("back to previous window")
-        from windows.conditionDetailsView import ConditionDetailsView
         self.controller.setCustomerID(self.conditionModel.customerId)
         self.controller.setConditionModel(self.conditionModel)
 

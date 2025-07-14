@@ -1,12 +1,16 @@
 import csv
 import customtkinter as ctk
 import Constant.dbColumn as dbCol
+from PIL import Image
 from windows.conditionDetailsView import ConditionDetailsView
 from services.conditionDbFunctions import getTreatmentStatus
 from Constant.treatmentDatabaseFunctions import getConditionTotalCost
 
 
-def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, openConditionDetailsWindowCallback):
+def handleConditionBlockEditClick(controller):
+        print("Edit CondtionBlock")
+
+def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, openConditionDetailsWindowCallback, openEditConditionDetailsWindowCallback):
     # Invisible parent frame to add vertical margin
     wrapperFrame = ctk.CTkFrame(master=parentFrame, bg_color="transparent", fg_color="transparent")
     wrapperFrame.grid(column=column, row=row, sticky="ew", pady=10)  # Use sticky="ew" here
@@ -51,10 +55,11 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
 
     detailSubFrame = ctk.CTkFrame(master=conditionFrame, bg_color="transparent", fg_color="transparent")
     detailSubFrame.grid(row=2, column=0, columnspan=2, sticky="ew", padx=(10, 5), pady=5)
-    detailSubFrame.grid_columnconfigure(0, weight=2)
-    detailSubFrame.grid_columnconfigure(1, weight=2)
+    detailSubFrame.grid_columnconfigure(0, weight=1)
+    detailSubFrame.grid_columnconfigure(1, weight=0)
     detailSubFrame.grid_columnconfigure(2, weight=0)
     
+    # Total Label
     ctk.CTkLabel(
         master=detailSubFrame,
         text=f"Total: RM{getConditionTotalCost(conditionModel.conditionId):.2f}",
@@ -63,8 +68,31 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
         anchor="w"
     ).grid(row=0, column=0, sticky="w", padx=(0, 5), pady=5)
     
+    buttonFrame = ctk.CTkFrame(master=detailSubFrame, bg_color="transparent", fg_color="transparent")
+    buttonFrame.grid(row=0, column=2, sticky="e", padx=(0, 5), pady=5)
+    
+    # Edit condition button
+    try:
+        image_path = "program\\asset\\icons\\edit.png"
+        button_image = Image.open(image_path)
+        resized_image = button_image.resize((15, 15)) # Resize if needed
+        ctk_button_image = ctk.CTkImage(light_image=resized_image, dark_image=resized_image)
+    except FileNotFoundError:
+        print(f"Error: Image file not found at {image_path}")
+        ctk_button_image = None # Handle the case where the image is not found
+        
     ctk.CTkButton(
-        detailSubFrame,
+        buttonFrame,
+        text="",
+        image=ctk_button_image,
+        width=28,
+        height=28,
+        command=lambda: openEditConditionDetailsWindowCallback(cm=conditionModel),
+    ).grid(row=0, column=0, padx=(0, 5))
+    
+    # View Details Button
+    ctk.CTkButton(
+        buttonFrame,
         text="View Details",
         command=lambda: openConditionDetailsWindowCallback(cm=conditionModel),
-    ).grid(row=0, column=2, sticky="e", padx=(0, 5), pady=5)
+    ).grid(row=0, column=1)

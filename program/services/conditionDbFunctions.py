@@ -45,7 +45,6 @@ def parse_date_safe(date_str):
         return datetime.min  # or datetime.max if sorting descending
 
 
-
 def insertConditionToDb(conditionModel):
     with open(DB_PATH, mode='a', encoding='utf-8', newline='\n') as file:
         # Ensure there's a newline before writing if needed
@@ -111,3 +110,70 @@ def getTreatmentStatus(customer_id, condition_id):
                 return row[treatment_status_idx] == "False"  # "False" = treated
 
     return False  # Default to not treated if no match found
+
+
+def updateConditionDescription(condition_id, new_description):
+    temp_file_path = DB_PATH + ".tmp"
+    updated = False
+
+    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+         open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
+
+        reader = csv.reader(infile)
+        writer = csv.writer(outfile)
+        header = next(reader)
+        writer.writerow(header)
+
+        condition_id_idx = header.index('conditionId')
+        description_idx = header.index('conditionDescription')
+
+        for row in reader:
+            if not row or all(cell.strip() == '' for cell in row):
+                continue
+
+            if row[condition_id_idx].strip() == condition_id:
+                print("Updating condition:", condition_id)
+                row[description_idx] = new_description
+                updated = True
+
+            writer.writerow(row)
+
+    if updated:
+        os.replace(temp_file_path, DB_PATH)
+    else:
+        os.remove(temp_file_path)
+
+    return updated
+
+
+def deleteCondition(condition_id):
+    temp_file_path = DB_PATH + ".tmp"
+    deleted = False
+
+    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+         open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
+
+        reader = csv.reader(infile)
+        writer = csv.writer(outfile)
+        header = next(reader)
+        writer.writerow(header)
+
+        condition_id_idx = header.index('conditionId')
+
+        for row in reader:
+            if not row or all(cell.strip() == '' for cell in row):
+                continue
+
+            if row[condition_id_idx].strip() == condition_id:
+                print("Deleting condition:", condition_id)
+                deleted = True
+                continue  # skip writing this row (deleting it)
+
+            writer.writerow(row)
+
+    if deleted:
+        os.replace(temp_file_path, DB_PATH)
+    else:
+        os.remove(temp_file_path)
+
+    return deleted

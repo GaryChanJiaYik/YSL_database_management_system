@@ -1,5 +1,5 @@
 import customtkinter
-from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CONDITION_DETAIL
+from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CONDITION_DETAIL,WINDOW_EDIT_CONDITION
 from Constant.databaseManipulationFunctions import searchForSingleUser, addOldCustomerID
 from Constant.dbColumn import customerModelAttributeToField, oldCustomerId, name
 from Constant.converterFunctions import convertTimeStampToId
@@ -194,7 +194,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         for idx, condition in enumerate(self.conditionList):
             # Create a new condition model block for each condition
             instantiateConditionModelBlock(
-                self.ConditionListContainer, condition, 0, idx, self.openConditionDetailsWindowCallback
+                self.ConditionListContainer, condition, 0, idx, self.openConditionDetailsWindowCallback, self.openEditConditionDetailsWindowCallback
             )
 
     def openConditionDetailsWindowCallback(self, cm):
@@ -206,6 +206,14 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         self.controller.switch_frame(WINDOW_CONDITION_DETAIL)
         #ConditionDetailsView(self.root, self.customerId, cm )
         print("Clicked condition details for:", cm.conditionId)
+        
+    def openEditConditionDetailsWindowCallback(self, cm):
+        self.controller.setCustomerID(self.customerId)
+
+        self.controller.setConditionModel(cm)
+
+        self.controller.switch_frame(WINDOW_EDIT_CONDITION)
+        print("Clicked Edit Condition:", cm.conditionId)
 
     def renderConsentFormOptionButton(self, row, column):
         

@@ -35,7 +35,9 @@ TreatmentModelAttributeToField = {
     'treatmentCost': "Treatment Cost"
 }
 
-
+ConditionModelAttributeToField = {
+  'conditionDescription': "Condition Description"
+}
 
 
 # FOR TREATMENT DB
