@@ -7,7 +7,7 @@ import Constant.dbColumn as dbCol
 import csv
 from Components.selectableRowTable import Table
 from windows.customerDetails import CustomerDetailsPage
-from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CUSTOMER_DETAIL
+from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_CUSTOMER
 from tkinter.filedialog import askopenfilename
 from windows.customerDetailsRevamp import CustomerDetailsViewRevamp
 import shutil
@@ -39,6 +39,11 @@ class LandingWindow(ctk.CTkFrame):
         tk.Button(
             self.Entryframe, text="Update CSV", command=self.selectAndUpdateCsv
         ).grid(column=2, row=0)
+        self.Entryframe.grid(column=0, row=0)
+        
+        tk.Button(
+            self.Entryframe, text="Add Customer", command=self.addNewCustomer
+        ).grid(column=3, row=0, padx=(5, 0))
         self.Entryframe.grid(column=0, row=0)
 
 
@@ -77,5 +82,8 @@ class LandingWindow(ctk.CTkFrame):
         self.controller.setCustomerID(customerId) 
         self.controller.switch_frame(WINDOW_CUSTOMER_DETAIL)
         #CustomerDetailsViewRevamp(self.root, customerId)
+        
+    def addNewCustomer(self):
+        self.controller.switch_frame(WINDOW_ADD_CUSTOMER)
        
 

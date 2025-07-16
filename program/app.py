@@ -6,6 +6,7 @@ from windows.conditionDetailsView import ConditionDetailsView
 from windows.addTreatmentRevamp import AddTreatmentViewRevamp
 from windows.treatmentDetails import TreatmentDetailView
 from windows.editCondition import EditConditionView
+from windows.addCustomerView import AddCustomerView
 from Components.previousWindowButton import PreviousWindowButton
 from windows.signIn import SignInWindow
 
@@ -152,6 +153,8 @@ class App:
             self.current_frame = AddTreatmentViewRevamp(self.container, self, self.currentConditionID, self.currentConditionModel, isEditMode=True)
         elif frameClass == WINDOW_EDIT_CONDITION:
             self.current_frame = EditConditionView(self.container, self, self.currentCustomerID, self.currentConditionModel)
+        elif frameClass == WINDOW_ADD_CUSTOMER:
+            self.current_frame = AddCustomerView(self.container, self)
 
         self.current_frame.pack(fill="both", expand=True)
     
