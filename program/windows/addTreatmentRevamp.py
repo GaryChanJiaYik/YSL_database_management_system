@@ -46,9 +46,21 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         if self.auto_time_var.get():
             combined_datetime = now
         else:
-            combined_datetime = formatDateTime(
-                self,
-                self.hour_entry.get(), self.minute_entry.get(), self.am_pm_dropdown.get())
+            day = self.day_entry.get()
+            month = self.month_entry.get()
+            year = self.year_entry.get()
+
+            hour = self.hour_entry.get()
+            minute = self.minute_entry.get()
+            am_pm = self.am_pm_dropdown.get()
+
+            # Convert to 24-hour format
+            if am_pm == "PM" and hour != "12":
+                hour = str(int(hour) + 12)
+            elif am_pm == "AM" and hour == "12":
+                hour = "00"
+        
+            combined_datetime = datetime.strptime(f"{year}-{month}-{day} {hour}:{minute}:00", "%Y-%m-%d %H:%M:%S")
         final_time_string = combined_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
         params = {
@@ -90,28 +102,19 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             self.controller.window_stack.pop()
 
         self.controller.switch_frame(WINDOW_CONDITION_DETAIL, isFromBackButton=True)
-
+    
     def toggle_time_fields(self):
-        if self.auto_time_var.get():       
-            self.manualTimeDesc.grid_remove()
-            self.hour_label.grid_remove()
-            self.hour_entry.grid_remove()
-            self.minute_label.grid_remove()
-            self.minute_entry.grid_remove()
-            self.am_pm_label.grid_remove()
-            self.am_pm_dropdown.grid_remove()
+        if self.auto_time_var.get():
+            self.manualTimeContainer.grid_remove()
         else:
-            self.manualTimeDesc.grid(row=0, column=0, sticky="w")
+            self.manualTimeContainer.grid()
+            self.manualTimeDesc.grid(row=0, column=0, sticky="w", columnspan=3, pady=(0, 5))
             self.hourContainer.grid(row=1, column=0, sticky="w")
-            self.minuteContainer.grid(row=1, column=1, sticky="w")  
-            self.amPmContainer.grid(row=1, column=2, sticky="w")
-
-            self.hour_entry.grid(row=0, column=1, sticky="w", padx=(20, 0))
-            self.minute_label.grid(row=0, column=0, sticky="w")
-            self.minute_entry.grid(row=0, column=1, sticky="w", padx=(20, 0))
-            self.am_pm_label.grid(row=0, column=0, sticky="w")
-            self.am_pm_dropdown.grid(row=0, column=1, sticky="w", padx=(20, 0))
-
+            self.minuteContainer.grid(row=1, column=1, sticky="w")
+            self.amPmContainer.grid(row=1, column=2, sticky="w")  
+            self.dayContainer.grid(row=2, column=0, sticky="w")
+            self.monthContainer.grid(row=2, column=1, sticky="w")
+            self.yearContainer.grid(row=2, column=2, sticky="w")
     
     def on_text_change(self, event=None):
         current_text = self.entryFields[dbCol.treatmentDescription].get("1.0", "end-1c")
@@ -154,6 +157,15 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             self.minute_entry.insert(0, str(minute).zfill(2))
 
             self.am_pm_dropdown.set(am_pm)
+            
+            self.day_entry.delete(0, "end")
+            self.day_entry.insert(0, str(dt.day).zfill(2))
+
+            self.month_entry.delete(0, "end")
+            self.month_entry.insert(0, str(dt.month).zfill(2))
+
+            self.year_entry.delete(0, "end")
+            self.year_entry.insert(0, str(dt.year))
 
         except ValueError:
             print("Invalid datetime format. Expected: 'YYYY-MM-DD HH:MM:SS'")
@@ -287,7 +299,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             
             index+=1
         
-        self.auto_time_var = customtkinter.BooleanVar()
+        self.auto_time_var = customtkinter.BooleanVar(value=True)
         self.manual_time_check = customtkinter.CTkCheckBox(self.entryGridFrame, text="Auto current time date", variable=self.auto_time_var, command=self.toggle_time_fields)
         self.manual_time_check.grid(row=index+1, column=0,sticky="w")
         
@@ -300,7 +312,6 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         
         self.manualTimeDesc = customtkinter.CTkLabel(self.manualTimeContainer, text="Enter time of treatment:")
        
-
         # Time entry fields (initially hidden)
         self.hourContainer = customtkinter.CTkFrame(self.manualTimeContainer, fg_color="transparent", bg_color="transparent")
         self.hour_label = customtkinter.CTkLabel(self.hourContainer, text="Hour:")
@@ -320,7 +331,29 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         self.am_pm_label.grid(row=0, column=0, sticky="w")
         self.am_pm_dropdown.grid(row=0, column=1, sticky="w", padx=(20, 0))
 
-        #2025-05-05 13:17:10
+        # Day
+        self.dayContainer = customtkinter.CTkFrame(self.manualTimeContainer, fg_color="transparent", bg_color="transparent")
+        self.day_label = customtkinter.CTkLabel(self.dayContainer, text="Day:")
+        self.day_label.grid(row=0, column=0, sticky="w")
+        self.day_entry = customtkinter.CTkEntry(self.dayContainer, width=50)
+        self.day_entry.grid(row=0, column=1, sticky="w", padx=(20, 0), pady=(10, 0))
+        self.dayContainer.grid(row=2, column=0, sticky="w")
+
+        # Month
+        self.monthContainer = customtkinter.CTkFrame(self.manualTimeContainer, fg_color="transparent", bg_color="transparent")
+        self.month_label = customtkinter.CTkLabel(self.monthContainer, text="Month:")
+        self.month_label.grid(row=0, column=0, sticky="w")
+        self.month_entry = customtkinter.CTkEntry(self.monthContainer, width=50)
+        self.month_entry.grid(row=0, column=1, sticky="w", padx=(20, 0), pady=(10, 0))
+        self.monthContainer.grid(row=2, column=1, sticky="w")
+
+        # Year
+        self.yearContainer = customtkinter.CTkFrame(self.manualTimeContainer, fg_color="transparent", bg_color="transparent")
+        self.year_label = customtkinter.CTkLabel(self.yearContainer, text="Year:")
+        self.year_label.grid(row=0, column=0, sticky="w")
+        self.year_entry = customtkinter.CTkEntry(self.yearContainer, width=70)
+        self.year_entry.grid(row=0, column=1, sticky="w", padx=(20, 0), pady=(10, 0))
+        self.yearContainer.grid(row=2, column=2, sticky="w")
 
         # Add frame for buttons
         self.actionButtonsFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent", bg_color="transparent")
@@ -335,9 +368,9 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         if isEditMode:
             self.populateTimeFields(self.treatmentModel.treatmentDate)
 
-            customtkinter.CTkButton(self.actionButtonsFrame, text="Save", command=lambda: self.createTreatment(conditionID, self.entryFields, saveMode=True)).grid(row=0, column=0)
-            customtkinter.CTkButton(self.actionButtonsFrame, text="Delete", fg_color="red", text_color="white", hover_color="darkred", command=lambda: self.deleteRecord()).grid(row=0, column=1, padx=(10,0))
+            customtkinter.CTkButton(self.actionButtonsFrame, text="Save", command=lambda: self.createTreatment(conditionID, self.entryFields, saveMode=True)).grid(row=0, column=0, pady=(20, 0))
+            customtkinter.CTkButton(self.actionButtonsFrame, text="Delete", fg_color="red", text_color="white", hover_color="darkred", command=lambda: self.deleteRecord()).grid(row=0, column=1, padx=(10,0), pady=(20, 0))
         else:
-            customtkinter.CTkButton(self.actionButtonsFrame, text="Add Treatment", command=lambda: self.createTreatment(conditionID, self.entryFields)).grid(row=0, column=0)
+            customtkinter.CTkButton(self.actionButtonsFrame, text="Add Treatment", command=lambda: self.createTreatment(conditionID, self.entryFields)).grid(row=0, column=0, pady=(20, 0))
 
         self.toggle_time_fields()
