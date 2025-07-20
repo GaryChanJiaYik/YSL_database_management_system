@@ -22,13 +22,14 @@ customerModelAttributeToField = {
   'ic': "IC",
   'customerName': "Name",
   'email': "Email",
-  'gender': "gender",
+  'gender': "Gender",
   'race': "Race",
   'address': "Address",
-  'handphone': "Handphone Number",
+  'handphone': "Contact",
   'instagram': "Instagram",
   'howDidYouFindUs': "How did get know our centre?",
   "oldCustomerId": "Old Customer ID",
+  "consent": "Consent"
 }
 
 

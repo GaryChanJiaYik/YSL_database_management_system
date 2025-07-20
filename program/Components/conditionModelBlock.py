@@ -1,10 +1,9 @@
-import csv
 import customtkinter as ctk
-import Constant.dbColumn as dbCol
 from PIL import Image
 from windows.conditionDetailsView import ConditionDetailsView
 from services.conditionDbFunctions import getTreatmentStatus
 from Constant.treatmentDatabaseFunctions import getConditionTotalCost
+from Constant.appConstant import GREEN, RED
 
 
 def handleConditionBlockEditClick(controller):
@@ -31,11 +30,19 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
     ).grid(row=0, column=0, sticky="w", padx=(20, 10), pady=5)
 
     conditionModel.undergoingTreatment = not getTreatmentStatus(conditionModel.customerId, conditionModel.conditionId)
+    if conditionModel.undergoingTreatment:
+        textColor = RED
+        font = ("Arial", 16, "bold")
+    else:
+        textColor = GREEN
+        font = ("Arial", 16)
+
     ctk.CTkLabel(
         conditionFrame,
-        text="Undergoing Treatment" if conditionModel.undergoingTreatment else "",#"" if is_treated else "Undergoing Treatment",
+        text="Undergoing Treatment" if conditionModel.undergoingTreatment else "Treated",
         bg_color='transparent',
-        font=('Arial', 16),
+        text_color=textColor,
+        font=font,
         anchor="e",
         width=180
     ).grid(row=0, column=1, sticky="e", padx=(10, 20), pady=5)

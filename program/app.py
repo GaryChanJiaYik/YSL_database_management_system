@@ -81,7 +81,7 @@ class App:
 
     def __init__(self):        
         self.appRoot = ctk.CTk()
-        self.appRoot.title("YSL DB Management")
+        self.appRoot.title(APP_NAME)
         self.appRoot.geometry("1100x600")  # Replace with your STANDARD_WINDOW_SIZE
 
         self.appCommonHeaderContainer = ctk.CTkFrame(self.appRoot, bg_color="transparent", fg_color="transparent", height=50)
@@ -91,7 +91,7 @@ class App:
         self.appCommonHeaderContainer.grid_columnconfigure(1, weight=1)  
         self.appCommonHeaderContainer.grid_columnconfigure(2, weight=1)  
 
-        ctk.CTkLabel(self.appCommonHeaderContainer, text="(ADMIN) YSL DB Management" if self.adminAccess else "YSL DB Management", font=ctk.CTkFont(size=20, weight="bold"), text_color="white").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        ctk.CTkLabel(self.appCommonHeaderContainer, text="(ADMIN) " + APP_NAME if self.adminAccess else APP_NAME, font=ctk.CTkFont(size=20, weight="bold"), text_color="white").grid(row=0, column=0, padx=10, pady=5, sticky="w")
 
         self.buttonContainer = ctk.CTkFrame(self.appCommonHeaderContainer, fg_color="transparent", bg_color="transparent", height=50)
         self.buttonContainer.grid(row=0, column=2, padx=0, pady=0)

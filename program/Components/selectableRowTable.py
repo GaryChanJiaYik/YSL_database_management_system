@@ -1,6 +1,6 @@
 import tkinter as tk
 from Constant.converterFunctions import convertTimeStampToId
-from Constant.appConstant import STANDARD_WINDOW_WIDTH, WINDOW_EDIT_CUSTOMER
+from Constant.appConstant import STANDARD_WINDOW_WIDTH, WINDOW_EDIT_CUSTOMER, BLUE
 from PIL import Image, ImageTk
 
 class Table:
@@ -59,7 +59,7 @@ class Table:
                     image=self.edit_icon,
                     command=lambda row=i: self.modify_row(row),
                     relief="flat",
-                    bg="#1f6aa5", #if i % 2 == 0 else "lightgray",
+                    bg=BLUE, #if i % 2 == 0 else "lightgray",
                     activebackground="lightgray"
                 )
                 edit_btn.grid(row=i + 1, column=self.total_columns * 2, sticky="nsew", padx=(5, 0), pady=(5, 0))

@@ -295,12 +295,16 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
         index = 0
        # Set of fields to go into column 2 (column index 3)
-        columnTwoKeys = {'address', 'handphone', 'instagram', 'howDidYouFindUs'}
+        columnTwoKeys = {'address', 'handphone', 'instagram', 'howDidYouFindUs', 'consent'}
 
         columnOneRowIndex = 1
         columnTwoRowIndex = 1
 
         for key, value in vars(self.customerModel).items():
+            # Skip customerId
+            if key == 'customerId':
+                continue
+            
             # Get field name and value
             field_name = customerModelAttributeToField.get(key, key)
             display_value = convertTimeStampToId(value) if key == 'customerId' else value
