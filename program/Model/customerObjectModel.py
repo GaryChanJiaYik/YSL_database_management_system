@@ -11,6 +11,7 @@ class CustomerModel():
                 pHandphoneNum="-",
                 pInstagram="-",
                 pHowDidYouFindUs= "-",
+                pConsent="-"
                 ):
         self.customerId = pCustomerId
         self.oldCustomerId = pOldCustomerId
@@ -23,6 +24,7 @@ class CustomerModel():
         self.handphone = pHandphoneNum
         self.instagram = pInstagram
         self.howDidYouFindUs = pHowDidYouFindUs
+        self.consent = pConsent
         
 
 

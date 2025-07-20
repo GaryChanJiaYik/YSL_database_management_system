@@ -1,24 +1,40 @@
 import tkinter as tk
 from Constant.converterFunctions import convertTimeStampToId
-from Constant.appConstant import STANDARD_WINDOW_WIDTH
+from Constant.appConstant import STANDARD_WINDOW_WIDTH, WINDOW_EDIT_CUSTOMER
+from PIL import Image, ImageTk
+
 class Table:
-    def __init__(self, root, data, onRowClickCallback=None):
+    def __init__(self, root, controller, data, onRowClickCallback=None):
         self.root = root
+        self.controller = controller
         self.data = data
         self.total_rows = len(data)
         self.total_columns = len(data[0]) if data else 0
         self.selected_row = None  # Track selected row
         self.entries = []  # Store label widgets
         self.onRowClickCallback =onRowClickCallback
+        
+        # Load icon
+        try:
+            image_path = "program\\asset\\icons\\edit.png"
+            edit_image_raw = Image.open(image_path).convert("RGBA").resize((15, 15))
+            self.edit_icon = ImageTk.PhotoImage(edit_image_raw)
+        except FileNotFoundError:
+            print(f"Error: Image file not found at {image_path}")
+            self.edit_icon = None # Handle the case where the image is not found
+    
         self.createTable()
+
 
     def createTable(self):
         """Creates the table only if there is data"""
         if not self.data:
             return  # Prevent creating empty table
-
+        
         for i in range(self.total_rows):
             row_labels = []
+            is_header = i == 0  # First row is header
+             
             offset = 0
             for j in range(self.total_columns):
                 text = ""
@@ -27,13 +43,28 @@ class Table:
                 else:
                     text = self.data[i][j]
 
-                lbl = tk.Label(self.root, text=text, width=20, fg='black', 
+                lbl = tk.Label(self.root, text=text, width=25, fg='black', 
                                font=('Arial', 12), borderwidth=2, padx=0, pady=5, 
                                bg="white" if i % 2 == 0 else "lightgray")
-                lbl.grid(row=i + 1, column=j + offset, columnspan=2, sticky="nsew")
-                lbl.bind("<Button-1>", lambda event, row=i: self.select_row(row))  # Bind click event
+                lbl.grid(row=i + 1, column=j, sticky="nsew")
+                if not is_header:
+                    lbl.bind("<Button-1>", lambda event, row=i: self.select_row(row))  # Bind click event
                 row_labels.append(lbl)
                 offset += 2
+
+            if not is_header:
+                # Add delete button in the last column
+                edit_btn = tk.Button(
+                    self.root,
+                    image=self.edit_icon,
+                    command=lambda row=i: self.modify_row(row),
+                    relief="flat",
+                    bg="#1f6aa5", #if i % 2 == 0 else "lightgray",
+                    activebackground="lightgray"
+                )
+                edit_btn.grid(row=i + 1, column=self.total_columns * 2, sticky="nsew", padx=(5, 0), pady=(5, 0))
+                row_labels.append(edit_btn)
+            
             self.entries.append([i, row_labels])
 
     def select_row(self, row):
@@ -67,4 +98,12 @@ class Table:
 
         if self.total_rows > 0:
             self.createTable()  # Recreate the table only if new data exists
+            
+    def modify_row(self, row):
+        if row == 0:
+            return  # Skip header row
+
+        customerID = self.data[row][0]
+        self.controller.setCustomerID(customerID)
+        self.controller.switch_frame(WINDOW_EDIT_CUSTOMER)
        

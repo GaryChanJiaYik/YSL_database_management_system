@@ -23,7 +23,7 @@ class LandingWindow(ctk.CTkFrame):
         
 
 
-        self.table = Table(self.root, [], onRowClickCallback=self.openNewWindow)
+        self.table = Table(self.root, self.controller, [], onRowClickCallback=self.openNewWindow)
         # Create a result frame
         self.resultFrame = tk.Frame(self.root)   
         self.resultFrame.grid(column=0, columnspan=3, row=1, rowspan=5)

@@ -1,4 +1,5 @@
 import csv
+import os
 import Constant.errorCode as errorCode
 import Constant.dbColumn as dbCol
 from Model.customerObjectModel import CustomerModel
@@ -25,6 +26,7 @@ def searchForSingleUser( userId):
             knowUsMethod_index = header.index(dbCol.knowUsMethod)
             race_index = header.index(dbCol.race)  
             old_cus_id_index = header.index(dbCol.oldCustomerId)
+            consent = header.index(dbCol.consent)
           
             for lines in csvFile:
                 if convertTimeStampToId(lines[customer_id]) == userId:
@@ -41,7 +43,8 @@ def searchForSingleUser( userId):
                         pAddress=lines[address_index],
                         pInstagram=lines[insta_index],
                         pHowDidYouFindUs= lines[knowUsMethod_index],
-                        pRace=lines[race_index]
+                        pRace=lines[race_index],
+                        pConsent=lines[consent]
                     )
                     return customer          
         else:
@@ -102,4 +105,101 @@ def addOldCustomerID(customerID, oldCustomerId):
     else:
         print("Required columns not found.")
         return errorCode.NO_USER_FOUND
+
+def addCustomer(getFormDataFunc):
+    header, row, customerId = getFormDataFunc()
+
+    file_exists = os.path.exists(DB_PATH)
+    try:
+        with open(DB_PATH, mode='a', encoding='utf-8', newline='') as file:
+            writer = csv.writer(file)
+            if not file_exists:
+                writer.writerow(header)
+            writer.writerow(row)
+        print(f"Customer added: {customerId}")
+    except Exception as e:
+        print(f"Error saving new customer: {e}")
+
+def saveCustomerChanges(getFormDataFunc, customer_id_value):
+    header, updated_row, customerId = getFormDataFunc(customer_id_value)
+    temp_file_path = DB_PATH + ".tmp"
+    updated = False
+
+    try:
+        with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+             open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
+
+            reader = csv.reader(infile)
+            writer = csv.writer(outfile)
+            file_header = next(reader)
+            writer.writerow(file_header)
+
+            try:
+                customer_id_idx = file_header.index(dbCol.customerId)
+            except ValueError:
+                raise Exception("Customer ID column not found in CSV header")
+
+            for row in reader:
+                if not row or all(cell.strip() == '' for cell in row):
+                    continue
+                if row[customer_id_idx] == customerId:
+                    writer.writerow(updated_row)
+                    updated = True
+                else:
+                    writer.writerow(row)
+
+        if updated:
+            os.replace(temp_file_path, DB_PATH)
+            print(f"Customer updated: {customerId}")
+        else:
+            os.remove(temp_file_path)
+            print("Customer ID not found, no update done.")
+
+    except FileNotFoundError:
+        with open(DB_PATH, mode='w', encoding='utf-8', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(header)
+            writer.writerow(updated_row)
+        print(f"CSV file not found. Created new and saved customer: {customerId}")
+    except Exception as e:
+        print(f"Error updating customer: {e}")
+
+def deleteCustomerById(customerId):
+    temp_file_path = DB_PATH + ".tmp"
+    deleted = False
+
+    try:
+        with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+             open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
+
+            reader = csv.reader(infile)
+            writer = csv.writer(outfile)
+
+            header = next(reader)
+            writer.writerow(header)
+
+            try:
+                customer_id_idx = header.index(dbCol.customerId)
+            except ValueError:
+                print("Customer ID column not found in header.")
+                return
+
+            for row in reader:
+                if not row or all(cell.strip() == '' for cell in row):
+                    continue
+                if row[customer_id_idx].strip() == customerId:
+                    print(f"Deleting customer: {customerId}")
+                    deleted = True
+                    continue
+                writer.writerow(row)
+
+        if deleted:
+            os.replace(temp_file_path, DB_PATH)
+            print("Customer deleted successfully.")
+        else:
+            os.remove(temp_file_path)
+            print("Customer not found; nothing deleted.")
+
+    except Exception as e:
+        print(f"Error deleting customer: {e}")
         

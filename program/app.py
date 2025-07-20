@@ -82,7 +82,7 @@ class App:
     def __init__(self):        
         self.appRoot = ctk.CTk()
         self.appRoot.title("YSL DB Management")
-        self.appRoot.geometry("800x600")  # Replace with your STANDARD_WINDOW_SIZE
+        self.appRoot.geometry("1100x600")  # Replace with your STANDARD_WINDOW_SIZE
 
         self.appCommonHeaderContainer = ctk.CTkFrame(self.appRoot, bg_color="transparent", fg_color="transparent", height=50)
         self.appCommonHeaderContainer.grid_rowconfigure(0, weight=1)
@@ -154,7 +154,10 @@ class App:
         elif frameClass == WINDOW_EDIT_CONDITION:
             self.current_frame = EditConditionView(self.container, self, self.currentCustomerID, self.currentConditionModel)
         elif frameClass == WINDOW_ADD_CUSTOMER:
-            self.current_frame = AddCustomerView(self.container, self)
+            self.current_frame = AddCustomerView(self.container, self, isEditMode=False)
+        elif frameClass == WINDOW_EDIT_CUSTOMER:
+            customerId = self.getCustomerID()
+            self.current_frame = AddCustomerView(self.container, self, isEditMode=True, customerId=customerId)
 
         self.current_frame.pack(fill="both", expand=True)
     
