@@ -22,6 +22,9 @@ class TreatmentModel:
       self.soreLevel = pSoreLevel
       self.numbLevel = pNumbLevel
       self.treatmentDate = pTreatmentDate
-      self.treatmentCost = pTreatmentCost
+      try:
+        self.treatmentCost = float(pTreatmentCost)
+      except (ValueError, TypeError):
+          self.treatmentCost = 0.0
       self.version = 0
       self.amendmentDate = pAmendmentDate
