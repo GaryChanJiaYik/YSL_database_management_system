@@ -23,6 +23,9 @@ class App:
 
     def setCustomerID(self, customerID):
         self.currentCustomerID = customerID
+
+    def setCustomerIC(self, customerIC):
+        self.currentCustomerIC = customerIC
         
     def setCustomerName(self, customerName):
         self.currentCustomerName = customerName
@@ -35,6 +38,9 @@ class App:
 
     def getCustomerID(self):
         return self.currentCustomerID
+
+    def getCustomerIC(self):
+        return self.currentCustomerIC
     
     def getCustomerName(self):
         return self.currentCustomerName

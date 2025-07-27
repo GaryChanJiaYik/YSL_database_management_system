@@ -112,8 +112,8 @@ class ConditionDetailsView(ctk.CTkFrame):
         )
         self.customerInfoFrame.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=5)
         
-        createDetailField(root=self.customerInfoFrame, fieldName="Customer ID", content=self.customerId, row=0, column=0)
-        createDetailField(root=self.customerInfoFrame, fieldName="Customer Name", content=self.controller.getCustomerName(), row=1, column=0)
+        createDetailField(root=self.customerInfoFrame, fieldName="Customer Name", content=self.controller.getCustomerName(), row=0, column=0)
+        createDetailField(root=self.customerInfoFrame, fieldName="IC", content=self.controller.getCustomerIC(), row=1, column=0)
 
         #Condition details
 
@@ -205,16 +205,38 @@ class ConditionDetailsView(ctk.CTkFrame):
             ctk.CTkLabel(self.treatmentListFrame, text="No treatment found", font=('Arial', 12)).grid(row=1, column=0, sticky="w", padx=(10, 5), pady=5)
             return
         else:
-            self.scrollableTreatmentListContainer = ctk.CTkScrollableFrame(
+            # # treatment list with scroll
+            # self.scrollableTreatmentListContainer = ctk.CTkScrollableFrame(
+            #     self.treatmentListFrame,
+            #     bg_color='transparent',
+            #     fg_color='transparent',
+            #     width=500,
+            #     height=250
+            # )
+            # self.scrollableTreatmentListContainer.grid_columnconfigure(0, weight=1)
+            # self.scrollableTreatmentListContainer.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=5)
+            # for idx, treatment in enumerate(self.treatmentList):
+            #     renderTreatmentSummaryBlockFunctionRevamp(
+            #         self.scrollableTreatmentListContainer,treatment,hideButtons=False,
+            #         on_click_view= self.navigateToTreatmentDetailView, 
+            #         on_click=self.handleTreatmentBlockEditClick
+            #     ).grid(row=idx, column=0, sticky="w")
+            
+            # treatment list without scroll
+            self.treatmentListContainer = ctk.CTkFrame(
                 self.treatmentListFrame,
                 bg_color='transparent',
-                fg_color='transparent',
-                width=500,
-                height=250
+                fg_color='transparent'
             )
-            self.scrollableTreatmentListContainer.grid_columnconfigure(0, weight=1)
-            self.scrollableTreatmentListContainer.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=5)
+            self.treatmentListContainer.grid_columnconfigure(0, weight=1)
+            self.treatmentListContainer.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=5)
             for idx, treatment in enumerate(self.treatmentList):
-                renderTreatmentSummaryBlockFunctionRevamp(self.scrollableTreatmentListContainer,treatment,hideButtons=False,on_click_view= self.navigateToTreatmentDetailView, on_click=self.handleTreatmentBlockEditClick).grid(row=idx, column=0, sticky="w")
+                renderTreatmentSummaryBlockFunctionRevamp(
+                    self.treatmentListContainer,
+                    treatment,
+                    hideButtons=False,
+                    on_click_view=self.navigateToTreatmentDetailView,
+                    on_click=self.handleTreatmentBlockEditClick
+                ).grid(row=idx, column=0, sticky="w")
                 
             

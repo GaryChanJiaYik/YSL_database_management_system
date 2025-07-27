@@ -5,6 +5,7 @@ from Model.treatmentModel import TreatmentModel
 from Constant.converterFunctions import getFormattedDateTime
 from Constant.generatorFunctions import generateUUID
 import os
+from datetime import datetime
 
 DB_PATH = './data/treatmentDb.csv'
 TREATMENT_REVISION_PATH = './data/treatmentRevisionHistory.csv'
@@ -57,7 +58,6 @@ def createTreatment(treatmentModel):
 
 
 def getAllTreatmentByConditionID(conditionId):
-   
    #!!!!!!!!!!!! customerId --> converted format
    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as file:
         csvFile = csv.reader(file)
@@ -89,6 +89,8 @@ def getAllTreatmentByConditionID(conditionId):
                     )
                     result.append(treatment)
         
+        # Sort by treatmentDate
+        result.sort(key=lambda x: datetime.strptime(x.treatmentDate, "%Y-%m-%d %H:%M:%S"), reverse=True)
         return result
 
 def getTreatmentByID(treatmentID):
