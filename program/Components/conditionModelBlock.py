@@ -90,8 +90,8 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
         
     ctk.CTkButton(
         buttonFrame,
-        text="",
-        image=ctk_button_image,
+        text="Edit",
+        #image=ctk_button_image,
         width=28,
         height=28,
         command=lambda: openEditConditionDetailsWindowCallback(cm=conditionModel),

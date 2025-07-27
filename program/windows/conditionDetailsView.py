@@ -196,7 +196,7 @@ class ConditionDetailsView(ctk.CTkFrame):
 
 
         ctk.CTkLabel(self.treatmentListSubFrame, text="Treatments",font=('Arial', 16)).grid(row=0, column=0, sticky="w")
-        ctk.CTkButton(self.treatmentListSubFrame, text="Add Treatment", command=self.OpenAddTreatmentWindow).grid(row=0, column=1, sticky="e")
+        ctk.CTkButton(self.treatmentListSubFrame, text="New Treatment", command=self.OpenAddTreatmentWindow).grid(row=0, column=1, sticky="e")
 
         #treatment
         self.treatmentList = getAllTreatmentByConditionID(self.conditionModel.conditionId)
