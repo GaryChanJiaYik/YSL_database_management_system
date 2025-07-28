@@ -143,23 +143,38 @@ class ConditionDetailsView(ctk.CTkFrame):
         self.conditionDetailSubFrame.grid_columnconfigure(0, weight=2)
         self.conditionDetailSubFrame.grid_columnconfigure(1, weight=1)
         self.conditionDetailSubFrame.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=5)
+        
+        
+        self.conditionHighlightFrame = ctk.CTkFrame(
+            self.conditionDetailSubFrame,
+            corner_radius=10,
+            border_width=2,
+            border_color=["#2563eb", "#3b82f6"],  # light / dark mode
+            fg_color=["#f0f0f0", "#2a2a2a"]
+        )
+        self.conditionHighlightFrame.grid(row=0, column=0, columnspan=2, sticky="nsew", pady=(5, 10), padx=(0, 0))
+        self.conditionHighlightFrame.grid_columnconfigure(0, weight=2)
+        self.conditionHighlightFrame.grid_columnconfigure(1, weight=1)
 
         ctk.CTkLabel(
-             self.conditionDetailSubFrame,
-             text="Condition Info",
-            font=('Arial', 16)
-        ).grid(row=0, column=0, sticky="w", pady=5)
+            self.conditionHighlightFrame,
+            text="Condition Info",
+            font=('Arial', 16),
+            #font=('Arial', 16, 'bold'),
+            text_color=["#000000", "#FFFFFF"]  # optional
+        ).grid(row=0, column=0, sticky="w", pady=5, padx=10)
 
         self.treatedCheck = ctk.BooleanVar()
         ctk.CTkCheckBox(
-            self.conditionDetailSubFrame,
+            self.conditionHighlightFrame,
             text="Mark as treated",
             command=self.treatmentChecked,
             checkbox_height=16,
             checkbox_width=16,
             border_width=2,
             variable=self.treatedCheck
-        ).grid(row=0, column=1, sticky="e", padx=(10, 5), pady=5)
+            #font=("Arial", 13, "bold")
+        ).grid(row=0, column=1, sticky="e", padx=10, pady=5)
         
 
         createDetailField(root=self.conditionDetailsField, fieldName="Description", content=conditionModel.conditionDescription, row=1, column=0)
@@ -236,7 +251,8 @@ class ConditionDetailsView(ctk.CTkFrame):
                     treatment,
                     hideButtons=False,
                     on_click_view=self.navigateToTreatmentDetailView,
-                    on_click=self.handleTreatmentBlockEditClick
+                    on_click=self.handleTreatmentBlockEditClick,
+                    row_index=idx
                 ).grid(row=idx, column=0, sticky="w")
                 
             

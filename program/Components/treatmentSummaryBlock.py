@@ -62,7 +62,11 @@ def renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel, on_clic
 
 
 
-def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, hideButtons=False, on_click_view=None, on_click=None, showEditButton=False,):
+def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, hideButtons=False, on_click_view=None, on_click=None, showEditButton=False,row_index=0):
+    row_bg_color = (
+        ["#f1f5f9", "#1f2937"] if row_index % 2 == 0 else ["#ffffff", "#111827"]
+    )
+    
     # Margin container
     marginContainer = ctk.CTkFrame(master=parentContainer, height=90, width=500, corner_radius=10, fg_color="transparent")
 
@@ -70,6 +74,7 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
     wrapperContainer = ctk.CTkFrame(
         master=marginContainer,
         height=80, width=500, corner_radius=10,
+        fg_color=row_bg_color
     )
     wrapperContainer.grid(sticky="ew", padx=10, pady=5)
     wrapperContainer.grid_columnconfigure(0, weight=2)

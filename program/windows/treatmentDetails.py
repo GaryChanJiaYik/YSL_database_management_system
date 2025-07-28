@@ -94,7 +94,7 @@ class TreatmentDetailView(ctk.CTkFrame):
             self.scrollableTreatmentListContainer.grid_columnconfigure(0, weight=1)
             self.scrollableTreatmentListContainer.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=5)
             for idx, treatment in enumerate(self.treatmentRevisionList):
-                renderTreatmentSummaryBlockFunctionRevamp(self.scrollableTreatmentListContainer,treatment,hideButtons=True).grid(row=idx, column=0, sticky="w")
+                renderTreatmentSummaryBlockFunctionRevamp(self.scrollableTreatmentListContainer,treatment,hideButtons=True,row_index=idx).grid(row=idx, column=0, sticky="w")
                 
             
 
