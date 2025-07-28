@@ -7,7 +7,7 @@ from services.conditionDbFunctions import insertConditionToDb, getAllConditionsB
 from Model.conditionModel import ConditionModel
 from Constant.generatorFunctions import generateUUID
 from Constant.converterFunctions import convertTimeStampToId, getFormattedDateTime
-import datetime
+from datetime import datetime
 from Components.conditionModelBlock import instantiateConditionModelBlock
 from windows.conditionDetailsView import ConditionDetailsView
 from services.customerFilesServices import customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile
@@ -189,17 +189,22 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             for widget in self.ConditionListContainer.winfo_children():
                 widget.destroy()
         
+        self.conditionList.sort(
+            key=lambda c: datetime.strptime(c.conditionDate, "%Y-%m-%d %H:%M"), 
+            reverse=True
+        )
+        
         #Conditions list 
         self.ConditionListContainer = customtkinter.CTkFrame(master=self.conditionFrame, bg_color="transparent", fg_color='transparent')
         self.ConditionListContainer.grid(row=1, column=0, sticky="w", padx=(10, 5), pady=5)
         self.ConditionListContainer.grid_columnconfigure(0, weight=1)
-
 
         for idx, condition in enumerate(self.conditionList):
             # Create a new condition model block for each condition
             instantiateConditionModelBlock(
                 self.ConditionListContainer, condition, 0, idx, self.openConditionDetailsWindowCallback, self.openEditConditionDetailsWindowCallback
             )
+
 
     def openConditionDetailsWindowCallback(self, cm):
         self.controller.setCustomerID(self.customerId)
