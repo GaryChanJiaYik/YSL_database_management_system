@@ -6,7 +6,6 @@ from Constant.converterFunctions import formatDateTime, getFormattedDateTime
 import Constant.treatmentDatabaseFunctions as TreatmentFunc
 from Model.treatmentModel import TreatmentModel
 from datetime import datetime
-from tktimepicker import constants
 from Components.popupModal import renderPopUpModal
 from Constant.inputValidations import checkLengthOfInput
 from Components.datePickerModal import DatePickerModal
@@ -167,29 +166,31 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
 
 
     def openDatePicker(self):
-        current_text = self.date_value.get()
-        try:
-            current_date = datetime.strptime(current_text, "%Y-%m-%d").date()
-        except ValueError:
-            current_date = datetime.today().date()
+        DatePickerModal.open_date_picker(
+            parent=self,
+            current_date_str=self.date_value.get(),
+            on_selected=lambda date_str: self._set_date_value(date_str)
+        )
 
-        def on_selected(date_str):
-            self.date_value.configure(state="normal")
-            self.date_value.delete(0, "end")
-            self.date_value.insert(0, date_str)
-            self.date_value.configure(state="disabled")
+    def _set_date_value(self, date_str):
+        self.date_value.configure(state="normal")
+        self.date_value.delete(0, "end")
+        self.date_value.insert(0, date_str)
+        self.date_value.configure(state="disabled")
 
-        DatePickerModal.open(self, current_date=current_date, on_date_selected=on_selected)
-
+    
     def openTimePicker(self):
-        def on_selected(tstr):
-            self.time_value.configure(state="normal")
-            self.time_value.delete(0, "end")
-            self.time_value.insert(0, tstr)
-            self.time_value.configure(state="disabled")
+        TimePickerModal.open_time_picker(
+            parent=self,
+            current_time_str=self.time_value.get().strip(),
+            on_selected=lambda time_str: self._set_time_value(time_str)
+        )
 
-        current_time = self.time_value.get().strip()
-        TimePickerModal.open(self, default_type=constants.HOURS12, on_time_selected=on_selected, initial_time=current_time)
+    def _set_time_value(self, time_str):
+        self.time_value.configure(state="normal")
+        self.time_value.delete(0, "end")
+        self.time_value.insert(0, time_str)
+        self.time_value.configure(state="disabled")
 
 
 

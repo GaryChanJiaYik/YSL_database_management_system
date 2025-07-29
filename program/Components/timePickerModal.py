@@ -1,25 +1,17 @@
 import customtkinter as ctk
 from tktimepicker import AnalogPicker, AnalogThemes, constants
-import platform
-from Constant.appConstant import BLUE
 from datetime import datetime
-import re
 
-def is_windows_dark_theme():
-    if platform.system() == "Windows":
-        try:
-            import winreg
-            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
-                                 r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize")
-            # 0 = dark mode, 1 = light mode
-            value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
-            winreg.CloseKey(key)
-            return value == 0
-        except Exception:
-            return False
-    return False
 
 class TimePickerModal:
+    def open_time_picker(parent, current_time_str, on_selected):
+
+        def handle_selection(tstr):
+            on_selected(tstr)
+
+        TimePickerModal.open(parent, default_type=constants.HOURS12, on_time_selected=handle_selection, initial_time=current_time_str)
+    
+    
     def open(master, default_type=constants.HOURS12, on_time_selected=None, initial_time=None):
         popup = ctk.CTkToplevel(master)
         popup.title("Select Time")

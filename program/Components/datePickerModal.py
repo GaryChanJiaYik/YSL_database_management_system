@@ -1,8 +1,20 @@
 import customtkinter as ctk
 from tkcalendar import DateEntry
-from datetime import datetime
+from datetime import datetime, date
 
 class DatePickerModal:
+    def open_date_picker(parent, current_date_str, on_selected):
+        try:
+            current_date = datetime.strptime(current_date_str, "%Y-%m-%d").date()
+        except ValueError:
+            current_date = date.today()
+
+        def handle_selection(date_str):
+            on_selected(date_str)
+
+        DatePickerModal.open(parent, current_date=current_date, on_date_selected=handle_selection)
+        
+    
     def open(master, current_date=None, on_date_selected=None):
         popup = ctk.CTkToplevel(master)  # use CTkToplevel for auto theming
         popup.title("Select Date")

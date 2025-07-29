@@ -112,7 +112,7 @@ def getTreatmentStatus(customer_id, condition_id):
     return False  # Default to not treated if no match found
 
 
-def updateConditionDescription(condition_id, new_description):
+def updateConditionByID(condition_id, new_description, new_datetime):
     temp_file_path = DB_PATH + ".tmp"
     updated = False
 
@@ -126,6 +126,7 @@ def updateConditionDescription(condition_id, new_description):
 
         condition_id_idx = header.index('conditionId')
         description_idx = header.index('conditionDescription')
+        datetime_idx = header.index('conditionDate')  # Make sure this column exists
 
         for row in reader:
             if not row or all(cell.strip() == '' for cell in row):
@@ -134,6 +135,7 @@ def updateConditionDescription(condition_id, new_description):
             if row[condition_id_idx].strip() == condition_id:
                 print("Updating condition:", condition_id)
                 row[description_idx] = new_description
+                row[datetime_idx] = new_datetime
                 updated = True
 
             writer.writerow(row)
