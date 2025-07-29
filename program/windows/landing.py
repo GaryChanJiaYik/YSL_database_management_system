@@ -11,7 +11,7 @@ from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CUSTOMER_DETAIL, WI
 from tkinter.filedialog import askopenfilename
 from windows.customerDetailsRevamp import CustomerDetailsViewRevamp
 import shutil
-from Constant.databaseManipulationFunctions import searchForUserBasedOn_ID_IC_Name_Email
+from Constant.databaseManipulationFunctions import searchForUserBasedOn_ID_IC_Name_Contact_oldCustomerId
 
 import customtkinter as ctk
 
@@ -64,14 +64,14 @@ class LandingWindow(ctk.CTkFrame):
             return
 
         # Based on user input, search for results
-        searchResult = searchForUserBasedOn_ID_IC_Name_Email(text)
+        searchResult = searchForUserBasedOn_ID_IC_Name_Contact_oldCustomerId(text)
 
         if searchResult == errorCode.NO_USER_FOUND:
             searchResult = []
             yourTextPanel = tk.Label(self.resultFrame, text=errorCode.NO_USER_FOUND, fg="red") 
             yourTextPanel.grid(column=1, row=1)
         else:
-            searchResult.insert(0, [dbCol.customerId,dbCol.ic, dbCol.name, dbCol.email])  # Add headers
+            searchResult.insert(0, [dbCol.customerId, dbCol.ic, dbCol.name, "Contact No.联系号", "ID"])  # Add headers
             self.table.update_table(searchResult)  
 
 

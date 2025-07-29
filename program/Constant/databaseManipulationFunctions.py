@@ -50,21 +50,22 @@ def searchForSingleUser( userId):
         else:
             return errorCode.NO_USER_FOUND
 
-def searchForUserBasedOn_ID_IC_Name_Email(userId):
+def searchForUserBasedOn_ID_IC_Name_Contact_oldCustomerId(userId):
     with open(DB_PATH, mode='r', encoding='utf-8') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)           
         res = []
         if dbCol.ic in header and dbCol.name in header:
-            customer_id, ic_index, name_index, email_index = header.index(dbCol.customerId), header.index(dbCol.ic), header.index(dbCol.name), header.index(dbCol.email)
+            customer_id, ic_index, name_index, contact_index, oldCustomerId_index = header.index(dbCol.customerId), header.index(dbCol.ic), header.index(dbCol.name), header.index(dbCol.handPhoneNumber), header.index(dbCol.oldCustomerId)
             for lines in csvFile:
                 if (
                     userId.lower() in lines[ic_index].lower() or
                     userId.lower() in lines[customer_id].lower() or
                     userId.lower() in lines[name_index].lower() or
-                    userId.lower() in lines[email_index].lower()
+                    userId.lower() in lines[contact_index].lower() or
+                    userId.lower() in lines[oldCustomerId_index].lower()
                 ):
-                    res.append([lines[customer_id], lines[ic_index], lines[name_index], lines[email_index]])
+                    res.append([lines[customer_id], lines[ic_index], lines[name_index], lines[contact_index], lines[oldCustomerId_index]])
             return res
         else:
             return errorCode.NO_USER_FOUND

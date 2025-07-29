@@ -37,6 +37,9 @@ class Table:
              
             offset = 0
             for j in range(self.total_columns):
+                if j == 0:
+                    continue  # Skip customerId, don't render it
+    
                 text = ""
                 if j == 0:
                     text = convertTimeStampToId(self.data[i][0])
@@ -46,7 +49,7 @@ class Table:
                 lbl = tk.Label(self.root, text=text, width=25, fg='black', 
                                font=('Arial', 12), borderwidth=2, padx=0, pady=5, 
                                bg="white" if i % 2 == 0 else "lightgray")
-                lbl.grid(row=i + 1, column=j, sticky="nsew")
+                lbl.grid(row=i + 1, column=j - 1, sticky="nsew")
                 if not is_header:
                     lbl.bind("<Button-1>", lambda event, row=i: self.select_row(row))  # Bind click event
                 row_labels.append(lbl)

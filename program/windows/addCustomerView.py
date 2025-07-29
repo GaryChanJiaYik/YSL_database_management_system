@@ -3,7 +3,7 @@ import csv
 import customtkinter as ctk
 import Constant.dbColumn as dbCol
 from datetime import datetime
-from Constant.appConstant import STANDARD_TEXT_BOX_WIDTH, STANDARD_TEXT_BOX_HEIGHT, WINDOW_LANDING
+from Constant.appConstant import STANDARD_TEXT_BOX_WIDTH, STANDARD_TEXT_BOX_HEIGHT, WINDOW_LANDING, WINDOW_CUSTOMER_DETAIL
 from Constant.databaseManipulationFunctions import searchForSingleUser, addCustomer, saveCustomerChanges, deleteCustomerById
 from Constant.converterFunctions import convertTimeStampToId
 
@@ -217,8 +217,15 @@ class AddCustomerView(ctk.CTkFrame):
         return header, row, customer_id
     
     def submitForm(self):
-        addCustomer(self.getFormData)
-        self.backToPreviousWindow()
+        header, row, customer_id = self.getFormData()
+        
+        addCustomer(lambda: (header, row, customer_id))
+        self.controller.setCustomerID(customer_id)
+        
+        if len(self.controller.window_stack) > 0:
+            self.controller.window_stack.pop()
+
+        self.controller.switch_frame(WINDOW_CUSTOMER_DETAIL, isFromBackButton=False)
     
     def saveCustomer(self):
         saveCustomerChanges(self.getFormData, self.customerModel.customerId)
