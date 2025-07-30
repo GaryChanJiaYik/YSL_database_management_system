@@ -1,5 +1,3 @@
-import os
-import csv
 import customtkinter as ctk
 import Constant.dbColumn as dbCol
 from datetime import datetime

@@ -4,8 +4,9 @@ import Constant.errorCode as errorCode
 import Constant.dbColumn as dbCol
 from Model.customerObjectModel import CustomerModel
 from Constant.converterFunctions import convertTimeStampToId
+from utils import resource_path
 
-DB_PATH = './data/db.csv'
+DB_PATH = resource_path('./data/db.csv')
 
 def searchForSingleUser( userId):
     print("from searching constant function")

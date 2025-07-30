@@ -10,6 +10,7 @@ from Components.popupModal import renderPopUpModal
 from Constant.inputValidations import checkLengthOfInput
 from Components.datePickerModal import DatePickerModal
 from Components.timePickerModal import TimePickerModal
+from utils import set_entry_value  # adjust the path if needed
 
 class AddTreatmentViewRevamp(customtkinter.CTkFrame):
 
@@ -169,29 +170,16 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         DatePickerModal.open_date_picker(
             parent=self,
             current_date_str=self.date_value.get(),
-            on_selected=lambda date_str: self._set_date_value(date_str)
+            on_selected=lambda date_str: set_entry_value(self.date_value, date_str)
         )
-
-    def _set_date_value(self, date_str):
-        self.date_value.configure(state="normal")
-        self.date_value.delete(0, "end")
-        self.date_value.insert(0, date_str)
-        self.date_value.configure(state="disabled")
 
     
     def openTimePicker(self):
         TimePickerModal.open_time_picker(
             parent=self,
             current_time_str=self.time_value.get().strip(),
-            on_selected=lambda time_str: self._set_time_value(time_str)
+            on_selected=lambda time_str: set_entry_value(self.time_value, time_str)
         )
-
-    def _set_time_value(self, time_str):
-        self.time_value.configure(state="normal")
-        self.time_value.delete(0, "end")
-        self.time_value.insert(0, time_str)
-        self.time_value.configure(state="disabled")
-
 
 
     def __init__(self, parent, controller, conditionID, conditionModel, isEditMode=False):

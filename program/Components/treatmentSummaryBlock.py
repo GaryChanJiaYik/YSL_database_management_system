@@ -2,6 +2,7 @@ import tkinter as tk
 import customtkinter as ctk
 from Constant.converterFunctions import getDatefromTimeStamp
 from PIL import Image
+from utils import resource_path
 
 def create_level_cell(parent, row, col, label_text, value_text):
     container = tk.Frame(parent, padx=5, pady=5)
@@ -136,7 +137,7 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
 
         #Get the image
         try:
-            image_path = "program\\asset\\icons\\edit.png"
+            image_path = resource_path("program\\asset\\icons\\edit.png")
             button_image = Image.open(image_path)
             resized_image = button_image.resize((20, 20)) # Resize if needed
             ctk_button_image = ctk.CTkImage(light_image=resized_image, dark_image=resized_image)

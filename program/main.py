@@ -1,5 +1,6 @@
 from windows import landing
 import app
 
-#Entry point of app
-app.App()
+if __name__ == "__main__":
+    #Entry point of app
+    app.App()

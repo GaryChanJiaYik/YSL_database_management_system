@@ -4,6 +4,7 @@ from windows.conditionDetailsView import ConditionDetailsView
 from services.conditionDbFunctions import getTreatmentStatus
 from Constant.treatmentDatabaseFunctions import getConditionTotalCost
 from Constant.appConstant import GREEN, RED
+from utils import resource_path
 
 
 def handleConditionBlockEditClick(controller):
@@ -80,7 +81,7 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
     
     # Edit condition button
     try:
-        image_path = "program\\asset\\icons\\edit.png"
+        image_path = resource_path("program\\asset\\icons\\edit.png")
         button_image = Image.open(image_path)
         resized_image = button_image.resize((15, 15)) # Resize if needed
         ctk_button_image = ctk.CTkImage(light_image=resized_image, dark_image=resized_image)

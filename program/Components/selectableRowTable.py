@@ -2,6 +2,7 @@ import tkinter as tk
 from Constant.converterFunctions import convertTimeStampToId
 from Constant.appConstant import STANDARD_WINDOW_WIDTH, WINDOW_EDIT_CUSTOMER, BLUE
 from PIL import Image, ImageTk
+from utils import resource_path
 
 class Table:
     def __init__(self, root, controller, data, onRowClickCallback=None):
@@ -16,7 +17,7 @@ class Table:
         
         # Load icon
         try:
-            image_path = "program\\asset\\icons\\edit.png"
+            image_path = resource_path("program\\asset\\icons\\edit.png")
             edit_image_raw = Image.open(image_path).convert("RGBA").resize((15, 15))
             self.edit_icon = ImageTk.PhotoImage(edit_image_raw)
         except FileNotFoundError:

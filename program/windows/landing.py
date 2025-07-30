@@ -4,12 +4,9 @@ from Components.clickablePanel import ClickablePanel as cPanel
 from Model.searchModel import searchModel as sm
 import Constant.errorCode as errorCode
 import Constant.dbColumn as dbCol
-import csv
 from Components.selectableRowTable import Table
-from windows.customerDetails import CustomerDetailsPage
 from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_CUSTOMER
 from tkinter.filedialog import askopenfilename
-from windows.customerDetailsRevamp import CustomerDetailsViewRevamp
 import shutil
 from Constant.databaseManipulationFunctions import searchForUserBasedOn_ID_IC_Name_Contact_oldCustomerId
 
