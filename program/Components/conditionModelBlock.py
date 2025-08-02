@@ -4,10 +4,11 @@ from windows.conditionDetailsView import ConditionDetailsView
 from services.conditionDbFunctions import getTreatmentStatus
 from Constant.treatmentDatabaseFunctions import getConditionTotalCost
 from Constant.appConstant import GREEN, RED
+from datetime import datetime
 from utils import resource_path
 
 
-def handleConditionBlockEditClick(controller):
+def handleConditionBlockEditClick():
         print("Edit CondtionBlock")
 
 def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, openConditionDetailsWindowCallback, openEditConditionDetailsWindowCallback):
@@ -22,11 +23,12 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
     conditionFrame.grid_columnconfigure(0, weight=2)
     conditionFrame.grid_columnconfigure(1, weight=1)
 
+    dateOnly = datetime.strptime(conditionModel.conditionDate, "%Y-%m-%d %H:%M").strftime("%Y-%m-%d")
     ctk.CTkLabel(
         conditionFrame,
-        text=conditionModel.conditionDate,
+        text=dateOnly,
         bg_color='transparent',
-        font=('Arial', 16),
+        font=('Arial', 16, "bold"),
         anchor="w"
     ).grid(row=0, column=0, sticky="w", padx=(20, 10), pady=5)
 
@@ -72,9 +74,9 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
         master=detailSubFrame,
         text=f"Total: RM{getConditionTotalCost(conditionModel.conditionId):.2f}",
         bg_color='transparent',
-        font=('Arial', 16),
+        font=('Arial', 16, 'bold'),
         anchor="w"
-    ).grid(row=0, column=0, sticky="w", padx=(0, 5), pady=5)
+    ).grid(row=0, column=0, sticky="w", padx=(0, 10), pady=5)
     
     buttonFrame = ctk.CTkFrame(master=detailSubFrame, bg_color="transparent", fg_color="transparent")
     buttonFrame.grid(row=0, column=2, sticky="e", padx=(0, 5), pady=5)
@@ -96,7 +98,7 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
         width=28,
         height=28,
         command=lambda: openEditConditionDetailsWindowCallback(cm=conditionModel),
-    ).grid(row=0, column=0, padx=(0, 5))
+    ).grid(row=0, column=0, padx=(10, 5))
     
     # View Details Button
     ctk.CTkButton(

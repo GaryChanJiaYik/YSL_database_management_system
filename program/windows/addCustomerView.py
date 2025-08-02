@@ -7,11 +7,12 @@ from Constant.converterFunctions import convertTimeStampToId
 
 class AddCustomerView(ctk.CTkFrame):
         
-    def __init__(self, parent, controller, isEditMode=False, customerId=None):
+    def __init__(self, parent, controller, isEditMode=False, customerId=None, previousWindow=None):
         super().__init__(parent)
         self.controller = controller
         self.isEditMode = isEditMode
         self.customerId = customerId
+        self.previousWindow = previousWindow
         
         self.fields = {}
         self.race_vars = {}
@@ -235,12 +236,16 @@ class AddCustomerView(ctk.CTkFrame):
         # if not confirm:
         #     return
         deleteCustomerById(self.customerModel.customerId)
-        self.backToPreviousWindow()
+        self.controller.window_stack.clear()
+        self.controller.switch_frame(WINDOW_LANDING)
         
     
     def backToPreviousWindow(self):
         # Clean up the current frame from stack
         if len(self.controller.window_stack) > 0:
             self.controller.window_stack.pop()
-
-        self.controller.switch_frame(WINDOW_LANDING, isFromBackButton=True)
+            
+        if self.previousWindow == WINDOW_LANDING:
+            self.controller.switch_frame(WINDOW_LANDING, isFromBackButton=True)
+        elif self.previousWindow == WINDOW_CUSTOMER_DETAIL:
+            self.controller.switch_frame(WINDOW_CUSTOMER_DETAIL, isFromBackButton=True)

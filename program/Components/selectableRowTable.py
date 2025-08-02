@@ -1,6 +1,9 @@
 import tkinter as tk
 from Constant.converterFunctions import convertTimeStampToId
-from Constant.appConstant import STANDARD_WINDOW_WIDTH, WINDOW_EDIT_CUSTOMER, BLUE
+from Constant.appConstant import (
+    STANDARD_WINDOW_WIDTH, WINDOW_EDIT_CUSTOMER, WINDOW_LANDING, BLUE,
+    FONT
+)
 from PIL import Image, ImageTk
 from utils import resource_path
 
@@ -47,9 +50,14 @@ class Table:
                 else:
                     text = self.data[i][j]
 
-                lbl = tk.Label(self.root, text=text, width=25, fg='black', 
-                               font=('Arial', 12), borderwidth=2, padx=0, pady=5, 
-                               bg="white" if i % 2 == 0 else "lightgray")
+                if is_header:
+                    lbl = tk.Label(self.root, text=text, width=25, fg='black', 
+                                font=FONT["LABEL"], borderwidth=2, padx=0, pady=5, 
+                                bg="white" if i % 2 == 0 else "lightgray")
+                else:
+                    lbl = tk.Label(self.root, text=text, width=25, fg='black', 
+                                font=FONT["CONTENT"], borderwidth=2, padx=0, pady=5, 
+                                bg="white" if i % 2 == 0 else "lightgray")
                 lbl.grid(row=i + 1, column=j - 1, sticky="nsew")
                 if not is_header:
                     lbl.bind("<Button-1>", lambda event, row=i: self.select_row(row))  # Bind click event
@@ -109,5 +117,5 @@ class Table:
 
         customerID = self.data[row][0]
         self.controller.setCustomerID(customerID)
-        self.controller.switch_frame(WINDOW_EDIT_CUSTOMER)
+        self.controller.switch_frame(WINDOW_EDIT_CUSTOMER, previousWindow=WINDOW_LANDING)
        

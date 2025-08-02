@@ -132,7 +132,7 @@ class App:
 
         self.switch_frame(self.window_stack[-1], isFromBackButton=True)
 
-    def switch_frame(self, frameClass, isFromBackButton=False):
+    def switch_frame(self, frameClass, isFromBackButton=False, **kwargs):
         if not isFromBackButton:
             self.window_stack.append(frameClass)
 
@@ -163,7 +163,8 @@ class App:
             self.current_frame = AddCustomerView(self.container, self, isEditMode=False)
         elif frameClass == WINDOW_EDIT_CUSTOMER:
             customerId = self.getCustomerID()
-            self.current_frame = AddCustomerView(self.container, self, isEditMode=True, customerId=customerId)
+            previousWindow = kwargs.get("previousWindow")
+            self.current_frame = AddCustomerView(self.container, self, isEditMode=True, customerId=customerId, previousWindow=previousWindow)
 
         self.current_frame.pack(fill="both", expand=True)
     

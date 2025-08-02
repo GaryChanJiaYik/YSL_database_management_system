@@ -1,5 +1,8 @@
 import customtkinter as ctk
-from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_ADD_TREATMENT,WINDOW_EDIT_TREATMENT,WINDOW_TREATMENT_DETAIL
+from Constant.appConstant import (
+    STANDARD_WINDOW_SIZE, WINDOW_ADD_TREATMENT, WINDOW_EDIT_TREATMENT, WINDOW_TREATMENT_DETAIL,
+    FONT
+    )
 from Components.customFields import createDetailField
 from Constant.converterFunctions import formatDateTime
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
@@ -210,7 +213,7 @@ class ConditionDetailsView(ctk.CTkFrame):
         self.treatmentListSubFrame.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=5)
 
 
-        ctk.CTkLabel(self.treatmentListSubFrame, text="Existing Treatments",font=('Arial', 16)).grid(row=0, column=0, sticky="w")
+        ctk.CTkLabel(self.treatmentListSubFrame, text="Existing Treatments", font=FONT["HEADER"]).grid(row=0, column=0, sticky="w")
         ctk.CTkButton(self.treatmentListSubFrame, text="New Treatment", command=self.OpenAddTreatmentWindow).grid(row=0, column=1, sticky="e")
 
         #treatment

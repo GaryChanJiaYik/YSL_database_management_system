@@ -1,5 +1,8 @@
 import customtkinter
-from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CONDITION_DETAIL,WINDOW_EDIT_CONDITION
+from Constant.appConstant import (
+    STANDARD_WINDOW_SIZE, WINDOW_CONDITION_DETAIL, WINDOW_EDIT_CONDITION, WINDOW_EDIT_CUSTOMER, 
+    WINDOW_CUSTOMER_DETAIL, FONT
+) 
 from Constant.databaseManipulationFunctions import searchForSingleUser, addOldCustomerID
 from Constant.dbColumn import customerModelAttributeToField, oldCustomerId, name, ic
 from Constant.converterFunctions import convertTimeStampToId
@@ -9,12 +12,10 @@ from Constant.generatorFunctions import generateUUID
 from Constant.converterFunctions import convertTimeStampToId, getFormattedDateTime
 from datetime import datetime
 from Components.conditionModelBlock import instantiateConditionModelBlock
-from windows.conditionDetailsView import ConditionDetailsView
 from services.customerFilesServices import customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile
 from tkinter.filedialog import askopenfilename
 from Components.popupModal import renderPopUpModal
 from Constant.fileKeywords import CONSENT_FORM_KEYWORD
-import shutil
 
 class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
@@ -23,6 +24,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         customtkinter.CTkLabel(
             root,
             text=fieldName,
+            font=FONT["LABEL"],
             bg_color='transparent',
             anchor="w"
         ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
@@ -37,6 +39,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             customtkinter.CTkLabel(
                 root,
                 text=content if content != "" else "---", 
+                font=FONT["CONTENT"],
                 bg_color='transparent',
                 wraplength=200,
                 anchor="w",
@@ -260,7 +263,11 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
     def viewConsentForm(self):
         viewCustomerFilePDF(self.customerId)
-
+        
+        
+    def editCustomerDetails(self):
+        self.controller.setCustomerID(self.customerId)
+        self.controller.switch_frame(WINDOW_EDIT_CUSTOMER, previousWindow=WINDOW_CUSTOMER_DETAIL)
 
 
     def __init__(self, parent, controller, customerId):
@@ -288,18 +295,27 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         self.customerDetailFrame.grid_columnconfigure(2, minsize=80)
         self.customerDetailFrame.grid_columnconfigure(3, weight=1)
         self.customerDetailFrame.grid_columnconfigure(4, weight=2)
-        self.customerDetailFrame.grid(column=0, row=0, sticky="nsew")
+        self.customerDetailFrame.grid(column=0, row=0, sticky="nsew", pady=(0,5))
+
+        customerHeaderFrame = customtkinter.CTkFrame(master=self.customerDetailFrame, bg_color="transparent", fg_color="transparent")
+        customerHeaderFrame.grid(row=0, column=0, columnspan=2, sticky="w", padx=(10, 5), pady=5)
+        customerHeaderFrame.grid_columnconfigure(0, weight=0)
+        customerHeaderFrame.grid_columnconfigure(1, weight=0)
 
         customtkinter.CTkLabel(
-            self.customerDetailFrame,
+            customerHeaderFrame,
             text="Customer Details",
-            bg_color='transparent',  # Make the label background transparent
-            font=('Arial', 16),
-            anchor="w"  # Align text inside label to left
-        ).grid(row=0, column=0, sticky="w", padx=(10, 5), pady=5)
+            font=FONT["HEADER"],
+            anchor="w",
+            bg_color='transparent',
+        ).grid(row=0, column=0, sticky="w", padx=(0, 10), pady=0)
 
-
-
+        customtkinter.CTkButton(
+            customerHeaderFrame,
+            text="Edit",
+            width=60,
+            command=self.editCustomerDetails
+        ).grid(row=0, column=1, sticky="w")
 
 
         index = 0
@@ -347,31 +363,29 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         self.conditionFrame.grid_columnconfigure(0, weight=1)
         self.conditionFrame.grid(column=0, row=1, sticky="nsew")
 
+        # Create a frame to hold label and button together in the same row
+        conditionHeaderFrame = customtkinter.CTkFrame(master=self.conditionFrame, bg_color="transparent", fg_color="transparent")
+        conditionHeaderFrame.grid(row=0, column=0, columnspan=2, sticky="w", padx=(10, 5), pady=5)
+        conditionHeaderFrame.grid_columnconfigure(0, weight=0)
+        conditionHeaderFrame.grid_columnconfigure(1, weight=0)
+
         customtkinter.CTkLabel(
-            self.conditionFrame,
+            master=conditionHeaderFrame,
             text="Conditions",
-            bg_color='transparent', # Make the label background transparent
-            font=('Arial', 16),
-            anchor="w"  # Align text inside label to left
-        ).grid(row=0, column=0, sticky="w", padx=(10, 5), pady=5)
-
-        # Add conditions
+            font=FONT["HEADER"],
+            anchor="w",
+            bg_color='transparent',
+        ).grid(row=0, column=0, sticky="w", padx=(0, 10), pady=0)
+        
         self.addConditionButton = customtkinter.CTkButton(
-            master=self.conditionFrame,
+            master=conditionHeaderFrame,
             text="New Condition",
-            command=lambda: self.openAddConditionWindow(),
-
+            command=self.openAddConditionWindow,
+            width=120,
         )
-        self.addConditionButton.grid(row=0, column=1, sticky="w", padx=(10, 5), pady=5)
-
+        self.addConditionButton.grid(row=0, column=1, sticky="w")
 
         self.addConditionFrame = None
         
         #Conditions list
         self.renderConditionList()
-
-
-
-
-
-

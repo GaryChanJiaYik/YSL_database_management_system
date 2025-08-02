@@ -1,17 +1,20 @@
 import customtkinter
+from Constant.appConstant import FONT
 
 def createDetailField(root, fieldName, content, row, column, rowspan=1):
     # Field name label
     customtkinter.CTkLabel(
         root,
         text=fieldName,
+        font=FONT["LABEL"],
         bg_color='transparent',
         anchor="w"
     ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
     # Content label (support rowspan)
     contentLabel  = customtkinter.CTkLabel(
         root,
-        text=content if content != "" else "---", 
+        text=content if content != "" else "---",
+        font=FONT["CONTENT"],
         bg_color='transparent',
         wraplength=200,
         anchor="w",

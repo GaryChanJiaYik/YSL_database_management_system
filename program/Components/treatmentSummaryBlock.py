@@ -92,6 +92,7 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
     treatmentDateLabel = ctk.CTkLabel(
         master=treatmentDetailContainer,
         text=getDatefromTimeStamp(treatmentModel.treatmentDate),
+        font=('Arial', 13, "bold"),
         anchor="w"
     )
     treatmentDateLabel.grid(row=0, column=0, sticky="w")
@@ -100,6 +101,7 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
     treatmentDescriptionLabel = ctk.CTkLabel(
         master=treatmentDetailContainer,
         text=treatmentModel.treatmentDescription,
+        font=('Arial', 13),
         anchor="w"
     )
     treatmentDescriptionLabel.grid(row=1, column=0, sticky="w")
@@ -108,6 +110,7 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
     treatmentDescriptionCost = ctk.CTkLabel(
         master=treatmentDetailContainer,
         text=f"Cost: RM {treatmentModel.treatmentCost:.2f}",
+        font=('Arial', 13, "bold"),
         anchor="w"
     )
     treatmentDescriptionCost.grid(row=2, column=0, sticky="w")

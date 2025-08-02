@@ -1,6 +1,5 @@
 APP_NAME = "Patient Care Patient Good"
 
-
 STANDARD_WINDOW_WIDTH = 900
 STANDARD_WINDOW_HEIGHT = 600
 STANDARD_WINDOW_SIZE = f'{STANDARD_WINDOW_WIDTH}x{STANDARD_WINDOW_HEIGHT}' #widthxheight
@@ -25,3 +24,11 @@ WINDOW_EDIT_CUSTOMER = "EditCustomerWindow"
 BLUE = "#1f6aa5"
 RED = "#E74C3C"
 GREEN = "#27AE60"
+
+#font design
+FONT_FAMILY = 'Arial'
+FONT = {
+    "HEADER": (FONT_FAMILY, 18, 'bold'),
+    "LABEL": (FONT_FAMILY, 13, 'bold'),
+    "CONTENT": (FONT_FAMILY, 13)
+}

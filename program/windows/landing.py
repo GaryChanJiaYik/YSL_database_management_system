@@ -73,9 +73,6 @@ class LandingWindow(ctk.CTkFrame):
             self.table.update_table(searchResult)  
 
 
-
-
-
     def openNewWindow(self, customerId):
         self.controller.setCustomerID(customerId) 
         self.controller.switch_frame(WINDOW_CUSTOMER_DETAIL)
