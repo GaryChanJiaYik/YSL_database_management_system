@@ -32,16 +32,17 @@ class LandingWindow(ctk.CTkFrame):
         )
         self.searchCustomerField.grid(column=0, row=0)
         tk.Frame(self.Entryframe, width=40).grid(column=1, row=0)  
-
-        tk.Button(
-            self.Entryframe, text="Update CSV", command=self.selectAndUpdateCsv
-        ).grid(column=2, row=0)
-        self.Entryframe.grid(column=0, row=0)
         
         tk.Button(
             self.Entryframe, text="Add Customer", command=self.addNewCustomer
-        ).grid(column=3, row=0, padx=(5, 0))
+        ).grid(column=2, row=0, padx=(5, 0))
         self.Entryframe.grid(column=0, row=0)
+
+        # # Hide this button as it is not used at the moment
+        # tk.Button(
+        #     self.Entryframe, text="Update CSV", command=self.selectAndUpdateCsv
+        # ).grid(column=3, row=0)
+        # self.Entryframe.grid(column=0, row=0)
 
 
     def selectAndUpdateCsv(self):

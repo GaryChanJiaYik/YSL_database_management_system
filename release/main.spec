@@ -12,7 +12,7 @@ a = Analysis(
         ('../data/treatmentDb.csv', 'data'),
         ('../data/treatmentRevisionHistory.csv', 'data'),
         ('../data/attachment', 'data/attachment'),
-        ('../program/asset/icons', 'program/assets/icons'),
+        ('../program/asset/icons', 'program/asset/icons'),
     ],
     hiddenimports=[],
     hookspath=[],

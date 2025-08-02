@@ -40,7 +40,7 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
 
     ctk.CTkLabel(
         conditionFrame,
-        text="Undergoing Treatment" if conditionModel.undergoingTreatment else "Treated",
+        text="Undergoing" if conditionModel.undergoingTreatment else "Treated",
         bg_color='transparent',
         text_color=textColor,
         font=font,

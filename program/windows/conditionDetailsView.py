@@ -14,7 +14,7 @@ class ConditionDetailsView(ctk.CTkFrame):
 
     def treatmentChecked(self):
         is_treated = self.treatedCheck.get()
-        new_status = "Treated" if is_treated else "Undergoing Treatment"
+        new_status = "Treated" if is_treated else "Undergoing"
         
         self.statusLabel.configure(text=new_status)
         updateTreatmentStatus(self.customerId, self.conditionModel.conditionId, is_treated)
@@ -23,7 +23,7 @@ class ConditionDetailsView(ctk.CTkFrame):
         is_treated = getTreatmentStatus(self.customerId, self.conditionModel.conditionId)
 
         self.treatedCheck.set(is_treated)
-        self.statusLabel.configure(text="Treated" if is_treated else "Undergoing Treatment")
+        self.statusLabel.configure(text="Treated" if is_treated else "Undergoing")
 
     def OpenAddTreatmentWindow(self):
         self.controller.setCustomerID(self.conditionModel.customerId)

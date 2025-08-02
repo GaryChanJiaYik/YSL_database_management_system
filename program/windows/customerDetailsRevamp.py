@@ -164,7 +164,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         # Add condition button
         customtkinter.CTkButton(
             master=self.addConditionFrame,
-            text="Submit",
+            text="Add",
             command=lambda: self.addConditionToDb(),
         ).grid(row=1, column=0, sticky="w", padx=(10, 5), pady=5)
 
@@ -358,7 +358,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         # Add conditions
         self.addConditionButton = customtkinter.CTkButton(
             master=self.conditionFrame,
-            text="Add New Condition",
+            text="New Condition",
             command=lambda: self.openAddConditionWindow(),
 
         )
