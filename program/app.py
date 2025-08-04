@@ -88,7 +88,8 @@ class App:
     def __init__(self):        
         self.appRoot = ctk.CTk()
         self.appRoot.title(APP_NAME)
-        self.appRoot.geometry("1100x600")  # Replace with your STANDARD_WINDOW_SIZE
+        #self.appRoot.geometry("1100x600")  # Replace with your STANDARD_WINDOW_SIZE
+        self.center_window(1100, 600)
 
         self.appCommonHeaderContainer = ctk.CTkFrame(self.appRoot, bg_color="transparent", fg_color="transparent", height=50)
         self.appCommonHeaderContainer.grid_rowconfigure(0, weight=1)
@@ -136,25 +137,22 @@ class App:
         if not isFromBackButton:
             self.window_stack.append(frameClass)
 
+        previousWindow = kwargs.get("previousWindow")
+        
         # Destroy current frame if exists
         if self.current_frame is not None:
             self.current_frame.destroy()
 
         if frameClass == WINDOW_LANDING:
             self.current_frame = LandingWindow(self.container, self)
-            
         elif frameClass == WINDOW_CUSTOMER_DETAIL:
             self.current_frame = CustomerDetailsViewRevamp(self.container, self, self.getCustomerID())
-
-            
         elif frameClass == WINDOW_CONDITION_DETAIL:
             self.current_frame = ConditionDetailsView(self.container, self, self.currentCustomerID, self.currentConditionModel)
-             
         elif frameClass == WINDOW_TREATMENT_DETAIL:
             self.current_frame =  TreatmentDetailView(self.container, self, self.currentTreatmentID)
-            
         elif frameClass == WINDOW_ADD_TREATMENT:
-            self.current_frame = AddTreatmentViewRevamp(self.container, self, self.currentConditionID, self.currentConditionModel)
+            self.current_frame = AddTreatmentViewRevamp(self.container, self, self.currentConditionID, self.currentConditionModel, isEditMode=False, previousWindow=previousWindow)
         elif frameClass == WINDOW_EDIT_TREATMENT:
             self.current_frame = AddTreatmentViewRevamp(self.container, self, self.currentConditionID, self.currentConditionModel, isEditMode=True)
         elif frameClass == WINDOW_EDIT_CONDITION:
@@ -163,7 +161,6 @@ class App:
             self.current_frame = AddCustomerView(self.container, self, isEditMode=False)
         elif frameClass == WINDOW_EDIT_CUSTOMER:
             customerId = self.getCustomerID()
-            previousWindow = kwargs.get("previousWindow")
             self.current_frame = AddCustomerView(self.container, self, isEditMode=True, customerId=customerId, previousWindow=previousWindow)
 
         self.current_frame.pack(fill="both", expand=True)
@@ -172,7 +169,6 @@ class App:
         
         # Debug Window stack
         # self.print_window_stack()
-
 
     def set_header(self):
         if len(self.window_stack) > 1:
@@ -184,7 +180,16 @@ class App:
             for widget in self.backButtonContainer.winfo_children():
                 if isinstance(widget, ctk.CTkButton):
                     widget.destroy()
-            
+    
+    def center_window(self, width, height):
+        screen_width = self.appRoot.winfo_screenwidth()
+        screen_height = self.appRoot.winfo_screenheight()
+
+        x = int((screen_width / 2) - (width / 2))
+        y = int((screen_height / 2) - (height / 2))
+
+        self.appRoot.geometry(f"{width}x{height}+{x}+{y}")
+    
     def signInWindow(self):
         # Placeholder for sign-in logic
         # This should open a new window for admin sign-in

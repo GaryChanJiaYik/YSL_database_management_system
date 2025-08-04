@@ -1,6 +1,5 @@
 import customtkinter as ctk
 from PIL import Image
-from windows.conditionDetailsView import ConditionDetailsView
 from services.conditionDbFunctions import getTreatmentStatus
 from Constant.treatmentDatabaseFunctions import getConditionTotalCost
 from Constant.appConstant import GREEN, RED
@@ -8,18 +7,29 @@ from datetime import datetime
 from utils import resource_path
 
 
-def handleConditionBlockEditClick():
-        print("Edit CondtionBlock")
 
-def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, openConditionDetailsWindowCallback, openEditConditionDetailsWindowCallback):
+def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, openConditionDetailsWindowCallback, openEditConditionDetailsWindowCallback, openAddTreatmentCallback):
+    def _on_enter(event):
+        conditionFrame.configure(border_width=2)  # Show border
+
+    def _on_leave(event):
+        conditionFrame.configure(border_width=0)  # Hide border
+    
     # Invisible parent frame to add vertical margin
     wrapperFrame = ctk.CTkFrame(master=parentFrame, bg_color="transparent", fg_color="transparent")
     wrapperFrame.grid(column=column, row=row, sticky="ew", pady=10)  # Use sticky="ew" here
     wrapperFrame.grid_columnconfigure(0, weight=1)  # Make column expandable
 
     # Actual condition block inside the wrapper
-    conditionFrame = ctk.CTkFrame(master=wrapperFrame, bg_color="transparent", corner_radius=10)
+    conditionFrame = ctk.CTkFrame(
+        master=wrapperFrame, bg_color="transparent", corner_radius=10, 
+        border_width=0
+        )
     conditionFrame.grid(row=0, column=0, sticky="ew")  # Expand to full width of wrapper
+    #conditionFrame.bind("<Button-1>", lambda event: openConditionDetailsWindowCallback(conditionModel)) 
+
+    # Change the cursor to indicate it's clickable
+    conditionFrame.configure(cursor="hand2")
     conditionFrame.grid_columnconfigure(0, weight=2)
     conditionFrame.grid_columnconfigure(1, weight=1)
 
@@ -78,6 +88,10 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
         anchor="w"
     ).grid(row=0, column=0, sticky="w", padx=(0, 10), pady=5)
     
+    # Apply event to the entire condition model frame expect the buttons
+    bind_click_event_recursively(conditionFrame, lambda event: openConditionDetailsWindowCallback(conditionModel))
+    bind_hover_event_recursively(conditionFrame, _on_enter, _on_leave)
+    
     buttonFrame = ctk.CTkFrame(master=detailSubFrame, bg_color="transparent", fg_color="transparent")
     buttonFrame.grid(row=0, column=2, sticky="e", padx=(0, 5), pady=5)
     
@@ -90,7 +104,7 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
     except FileNotFoundError:
         print(f"Error: Image file not found at {image_path}")
         ctk_button_image = None # Handle the case where the image is not found
-        
+    
     ctk.CTkButton(
         buttonFrame,
         text="Edit",
@@ -100,9 +114,27 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
         command=lambda: openEditConditionDetailsWindowCallback(cm=conditionModel),
     ).grid(row=0, column=0, padx=(10, 5))
     
-    # View Details Button
+    # Add Treatment Button
     ctk.CTkButton(
         buttonFrame,
-        text="View Details",
-        command=lambda: openConditionDetailsWindowCallback(cm=conditionModel),
+        text="Add Treatment",
+        command=lambda: openAddTreatmentCallback(cm=conditionModel),
     ).grid(row=0, column=1)
+    
+
+def bind_click_event_recursively(widget, callback, cursor="hand2"):
+    # Only bind if it's not a button
+    if not isinstance(widget, ctk.CTkButton):
+        widget.bind("<Button-1>", callback)
+        widget.configure(cursor=cursor)
+    
+    for child in widget.winfo_children():
+        bind_click_event_recursively(child, callback, cursor)
+
+
+def bind_hover_event_recursively(widget, _on_enter, _on_leave):
+    widget.bind("<Enter>", _on_enter)
+    widget.bind("<Leave>", _on_leave)
+
+    for child in widget.winfo_children():
+        bind_hover_event_recursively(child, _on_enter, _on_leave)

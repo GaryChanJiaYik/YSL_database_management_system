@@ -1,7 +1,7 @@
 import customtkinter
 from Constant.appConstant import (
     STANDARD_WINDOW_SIZE, WINDOW_CONDITION_DETAIL, WINDOW_EDIT_CONDITION, WINDOW_EDIT_CUSTOMER, 
-    WINDOW_CUSTOMER_DETAIL, FONT
+    WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_TREATMENT, FONT
 ) 
 from Constant.databaseManipulationFunctions import searchForSingleUser, addOldCustomerID
 from Constant.dbColumn import customerModelAttributeToField, oldCustomerId, name, ic
@@ -205,30 +205,33 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         for idx, condition in enumerate(self.conditionList):
             # Create a new condition model block for each condition
             instantiateConditionModelBlock(
-                self.ConditionListContainer, condition, 0, idx, self.openConditionDetailsWindowCallback, self.openEditConditionDetailsWindowCallback
+                self.ConditionListContainer, condition, 0, idx, self.openConditionDetailsWindowCallback, 
+                self.openEditConditionDetailsWindowCallback, self.OpenAddTreatmentWindow
             )
 
 
     def openConditionDetailsWindowCallback(self, cm):
         self.controller.setCustomerID(self.customerId)
-
         self.controller.setConditionModel(cm)
-
-
         self.controller.switch_frame(WINDOW_CONDITION_DETAIL)
-        #ConditionDetailsView(self.root, self.customerId, cm )
         print("Clicked condition details for:", cm.conditionId)
+        
         
     def openEditConditionDetailsWindowCallback(self, cm):
         self.controller.setCustomerID(self.customerId)
-
         self.controller.setConditionModel(cm)
-
         self.controller.switch_frame(WINDOW_EDIT_CONDITION)
         print("Clicked Edit Condition:", cm.conditionId)
+        
+        
+    def OpenAddTreatmentWindow(self, cm):
+        self.controller.setCustomerID(cm.customerId)
+        self.controller.setConditionID(cm.conditionId);
+        self.controller.setConditionModel(cm)
+        self.controller.switch_frame(WINDOW_ADD_TREATMENT, previousWindow=WINDOW_CUSTOMER_DETAIL)
+
 
     def renderConsentFormOptionButton(self, row, column):
-        
         customerHasConsentFormVar = customerHasConsentForm(self.customerId)
         print("")
         print("Customer has consent form: ", customerHasConsentFormVar)

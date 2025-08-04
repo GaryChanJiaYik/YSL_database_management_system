@@ -1,5 +1,8 @@
 import customtkinter
-from Constant.appConstant import STANDARD_WINDOW_SIZE, STANDARD_TEXT_BOX_WIDTH, TREATMENT_DESCRIPTION_CHARACTER_LIMIT,WINDOW_CONDITION_DETAIL
+from Constant.appConstant import (
+    STANDARD_WINDOW_SIZE, STANDARD_TEXT_BOX_WIDTH, TREATMENT_DESCRIPTION_CHARACTER_LIMIT,
+    WINDOW_CONDITION_DETAIL, WINDOW_CUSTOMER_DETAIL
+)
 import datetime
 import Constant.dbColumn as dbCol
 from Constant.converterFunctions import formatDateTime, getFormattedDateTime
@@ -106,7 +109,10 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         if len(self.controller.window_stack) > 0:
             self.controller.window_stack.pop()
 
-        self.controller.switch_frame(WINDOW_CONDITION_DETAIL, isFromBackButton=True)
+        if self.previouWindow == WINDOW_CUSTOMER_DETAIL:
+            self.controller.switch_frame(WINDOW_CUSTOMER_DETAIL, isFromBackButton=True)
+        else:
+            self.controller.switch_frame(WINDOW_CONDITION_DETAIL, isFromBackButton=True)
     
     def on_text_change(self, event=None):
         current_text = self.entryFields[dbCol.treatmentDescription].get("1.0", "end-1c")
@@ -182,11 +188,12 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         )
 
 
-    def __init__(self, parent, controller, conditionID, conditionModel, isEditMode=False):
+    def __init__(self, parent, controller, conditionID, conditionModel, isEditMode=False, previousWindow=None):
         super().__init__(parent)
         self.controller = controller
         self.grid_columnconfigure(0, weight=1)
         self.conditionModel = conditionModel
+        self.previouWindow = previousWindow
     
         self.entryFields = {} #Store the label name(variables) corresponding to the entry field
          
