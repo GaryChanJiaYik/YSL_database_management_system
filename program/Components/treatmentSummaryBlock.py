@@ -2,7 +2,7 @@ import tkinter as tk
 import customtkinter as ctk
 from Constant.converterFunctions import getDatefromTimeStamp
 from PIL import Image
-from utils import resource_path
+from utils import resourcePath, bindClickEventRecursively, bindHoverEventRecursively
 
 def create_level_cell(parent, row, col, label_text, value_text):
     container = tk.Frame(parent, padx=5, pady=5)
@@ -64,6 +64,12 @@ def renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel, on_clic
 
 
 def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, hideButtons=False, on_click_view=None, on_click=None, showEditButton=False,row_index=0):
+    def _on_enter(event):
+        wrapperContainer.configure(border_width=2)  # Show border
+
+    def _on_leave(event):
+        wrapperContainer.configure(border_width=0)  # Hide border
+    
     row_bg_color = (
         ["#f1f5f9", "#1f2937"] if row_index % 2 == 0 else ["#ffffff", "#111827"]
     )
@@ -78,13 +84,15 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
         fg_color=row_bg_color
     )
     wrapperContainer.grid(sticky="ew", padx=10, pady=5)
+    # Change the cursor to indicate it's clickable
+    wrapperContainer.configure(cursor="hand2")
     wrapperContainer.grid_columnconfigure(0, weight=2)
     wrapperContainer.grid_columnconfigure(1, weight=1)
     wrapperContainer.grid_columnconfigure(2, weight=2)
     wrapperContainer.grid_columnconfigure(3, weight=1)
     
-    treatmentDetailContainer = ctk.CTkFrame(master=wrapperContainer, fg_color="transparent", height=80, width=350)
-    treatmentDetailContainer.grid(row=0, column=0, sticky="nw", padx=10)
+    treatmentDetailContainer = ctk.CTkFrame(master=wrapperContainer, fg_color="transparent", height=85, width=350)
+    treatmentDetailContainer.grid(row=0, column=0, sticky="nw", padx=12, pady=5)
     treatmentDetailContainer.grid_propagate(False)
 
 
@@ -130,6 +138,7 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
     create_level_cell_revamp(treatmentLevelsContainer, 1, 0, "Tense", treatmentModel.tenseLevel)
     create_level_cell_revamp(treatmentLevelsContainer, 0, 1, "Sore", treatmentModel.soreLevel)
     create_level_cell_revamp(treatmentLevelsContainer, 1, 1, "Numb", treatmentModel.numbLevel)
+    
 
     if not hideButtons:
         # Edit treatment button
@@ -137,10 +146,12 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
         editButtonFrame.grid(row=0, column=3,  rowspan=2, columnspan=1, sticky="nsew", pady=5, padx=4)
         editButtonFrame.grid_propagate(False)
 
+        bindClickEventRecursively(wrapperContainer, lambda event: on_click_view(treatmentModel))
+        bindHoverEventRecursively(wrapperContainer, _on_enter, _on_leave)
 
         #Get the image
         try:
-            image_path = resource_path("program\\asset\\icons\\edit.png")
+            image_path = resourcePath("program\\asset\\icons\\edit.png")
             button_image = Image.open(image_path)
             resized_image = button_image.resize((20, 20)) # Resize if needed
             ctk_button_image = ctk.CTkImage(light_image=resized_image, dark_image=resized_image)
@@ -176,9 +187,8 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
 
         #viewButtonFrame.grid_propagate(False)
 
-
-    # Click binding
-    if on_click:
-        marginContainer.bind("<Button-1>", lambda e: on_click(treatmentModel))
+    # # Click binding
+    # if on_click:
+    #     marginContainer.bind("<Button-1>", lambda e: on_click(treatmentModel))
 
     return marginContainer 

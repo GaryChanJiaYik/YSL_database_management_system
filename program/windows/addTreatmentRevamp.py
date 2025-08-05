@@ -13,7 +13,7 @@ from Components.popupModal import renderPopUpModal
 from Constant.inputValidations import checkLengthOfInput
 from Components.datePickerModal import DatePickerModal
 from Components.timePickerModal import TimePickerModal
-from utils import set_entry_value  # adjust the path if needed
+from utils import setEntryValue  # adjust the path if needed
 
 class AddTreatmentViewRevamp(customtkinter.CTkFrame):
 
@@ -176,7 +176,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         DatePickerModal.open_date_picker(
             parent=self,
             current_date_str=self.date_value.get(),
-            on_selected=lambda date_str: set_entry_value(self.date_value, date_str)
+            on_selected=lambda date_str: setEntryValue(self.date_value, date_str)
         )
 
     
@@ -184,7 +184,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         TimePickerModal.open_time_picker(
             parent=self,
             current_time_str=self.time_value.get().strip(),
-            on_selected=lambda time_str: set_entry_value(self.time_value, time_str)
+            on_selected=lambda time_str: setEntryValue(self.time_value, time_str)
         )
 
 

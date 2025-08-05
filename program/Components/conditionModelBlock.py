@@ -4,7 +4,7 @@ from services.conditionDbFunctions import getTreatmentStatus
 from Constant.treatmentDatabaseFunctions import getConditionTotalCost
 from Constant.appConstant import GREEN, RED
 from datetime import datetime
-from utils import resource_path
+from utils import resourcePath, bindClickEventRecursively, bindHoverEventRecursively
 
 
 
@@ -25,8 +25,7 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
         master=wrapperFrame, bg_color="transparent", corner_radius=10, 
         border_width=0
         )
-    conditionFrame.grid(row=0, column=0, sticky="ew")  # Expand to full width of wrapper
-    #conditionFrame.bind("<Button-1>", lambda event: openConditionDetailsWindowCallback(conditionModel)) 
+    conditionFrame.grid(row=0, column=0, sticky="ew") 
 
     # Change the cursor to indicate it's clickable
     conditionFrame.configure(cursor="hand2")
@@ -89,15 +88,15 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
     ).grid(row=0, column=0, sticky="w", padx=(0, 10), pady=5)
     
     # Apply event to the entire condition model frame expect the buttons
-    bind_click_event_recursively(conditionFrame, lambda event: openConditionDetailsWindowCallback(conditionModel))
-    bind_hover_event_recursively(conditionFrame, _on_enter, _on_leave)
+    bindClickEventRecursively(conditionFrame, lambda event: openConditionDetailsWindowCallback(conditionModel))
+    bindHoverEventRecursively(conditionFrame, _on_enter, _on_leave)
     
     buttonFrame = ctk.CTkFrame(master=detailSubFrame, bg_color="transparent", fg_color="transparent")
     buttonFrame.grid(row=0, column=2, sticky="e", padx=(0, 5), pady=5)
     
     # Edit condition button
     try:
-        image_path = resource_path("program\\asset\\icons\\edit.png")
+        image_path = resourcePath("program\\asset\\icons\\edit.png")
         button_image = Image.open(image_path)
         resized_image = button_image.resize((15, 15)) # Resize if needed
         ctk_button_image = ctk.CTkImage(light_image=resized_image, dark_image=resized_image)
@@ -120,21 +119,3 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
         text="Add Treatment",
         command=lambda: openAddTreatmentCallback(cm=conditionModel),
     ).grid(row=0, column=1)
-    
-
-def bind_click_event_recursively(widget, callback, cursor="hand2"):
-    # Only bind if it's not a button
-    if not isinstance(widget, ctk.CTkButton):
-        widget.bind("<Button-1>", callback)
-        widget.configure(cursor=cursor)
-    
-    for child in widget.winfo_children():
-        bind_click_event_recursively(child, callback, cursor)
-
-
-def bind_hover_event_recursively(widget, _on_enter, _on_leave):
-    widget.bind("<Enter>", _on_enter)
-    widget.bind("<Leave>", _on_leave)
-
-    for child in widget.winfo_children():
-        bind_hover_event_recursively(child, _on_enter, _on_leave)

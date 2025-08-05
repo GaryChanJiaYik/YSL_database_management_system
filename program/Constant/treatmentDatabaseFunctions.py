@@ -6,10 +6,10 @@ from Constant.converterFunctions import getFormattedDateTime
 from Constant.generatorFunctions import generateUUID
 import os
 from datetime import datetime
-from utils import resource_path
+from utils import resourcePath
 
-DB_PATH = resource_path('./data/treatmentDb.csv')
-TREATMENT_REVISION_PATH = resource_path('./data/treatmentRevisionHistory.csv')
+DB_PATH = resourcePath('./data/treatmentDb.csv')
+TREATMENT_REVISION_PATH = resourcePath('./data/treatmentRevisionHistory.csv')
 
 def getAllTreatmentByCustomerId(customerId):
    

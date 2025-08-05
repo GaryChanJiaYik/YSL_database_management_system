@@ -2,9 +2,9 @@ import csv
 import os
 import Model.conditionModel as CM
 from datetime import datetime
-from utils import resource_path
+from utils import resourcePath
 
-DB_PATH = resource_path('./data/conditionDb.csv')
+DB_PATH = resourcePath('./data/conditionDb.csv')
 
 
 import Constant.dbColumn as dbCol
