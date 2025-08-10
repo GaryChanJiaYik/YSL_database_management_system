@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tktimepicker import AnalogPicker, AnalogThemes, constants
 from datetime import datetime
+from utils import center_popup_window
 
 
 class TimePickerModal:
@@ -20,16 +21,7 @@ class TimePickerModal:
         popup_width, popup_height = 400, 500
 
         # Centering logic:
-        master.update_idletasks()
-        main_x = master.winfo_rootx()
-        main_y = master.winfo_rooty()
-        main_width = master.winfo_width()
-        main_height = master.winfo_height()
-
-        pos_x = main_x + (main_width // 2) - (popup_width // 2)
-        pos_y = main_y + (main_height // 2) - (popup_height // 2)
-
-        popup.geometry(f"{popup_width}x{popup_height}+{pos_x}+{pos_y}")
+        center_popup_window(popup, master, popup_width, popup_height)
         popup.grab_set()
 
         # Initialize AnalogPicker as before

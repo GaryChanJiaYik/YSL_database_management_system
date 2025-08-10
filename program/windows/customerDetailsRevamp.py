@@ -12,7 +12,7 @@ from Constant.generatorFunctions import generateUUID
 from Constant.converterFunctions import convertTimeStampToId, getFormattedDateTime
 from datetime import datetime
 from Components.conditionModelBlock import instantiateConditionModelBlock
-from services.customerFilesServices import customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile
+from services.customerFilesServices import customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile, deleteCustomerFile
 from tkinter.filedialog import askopenfilename
 from Components.popupModal import renderPopUpModal
 from Constant.fileKeywords import CONSENT_FORM_KEYWORD
@@ -240,29 +240,43 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             # Create a button to upload consent form
             customtkinter.CTkButton(
                 master=self.customerDetailFrame,
-                text="Upload Consent Form",
+                text="Upload",
                 command=lambda: self.uploadOrReplaceConsentForm(),
             ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
         else:
             # Create a button to view consent form
             customtkinter.CTkButton(
                 master=self.customerDetailFrame,
-                text="View Consent Form",
+                text="View",
                 command=lambda: self.viewConsentForm(),
             ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
 
-            # Updaet button
+            # Delete button
             customtkinter.CTkButton(
                 master=self.customerDetailFrame,
-                text="Update Consent Form",
-                command=lambda: self.uploadOrReplaceConsentForm(),
-            ).grid(row=row, column=column +1, sticky="w", padx=(10, 5), pady=5)
+                text="Delete",
+                # command=lambda: self.renderCustomerDetailSection(),
+                command=lambda: self.deleteConsentForm(),
+            ).grid(row=row, column=column +1, sticky="w", padx=(0, 5), pady=5)
 
     
     def uploadOrReplaceConsentForm(self):
         filePath = askopenfilename(defaultextension='.pdf', filetypes=[('pdf file', '*.pdf')])
         if filePath:
             uploadCustomerFile(self.customerId, filePath, self.root, CONSENT_FORM_KEYWORD)
+            self.renderCustomerDetailSection()
+    
+    
+    def deleteConsentForm(self):
+        success = deleteCustomerFile(self.customerId, CONSENT_FORM_KEYWORD)
+
+        if success:
+            renderPopUpModal(self.root, "Consent form deleted successfully.", "Delete", "Success")
+        else:
+            renderPopUpModal(self.root, "No consent form found or error occurred.", "Delete", "Error")
+
+        # Refresh the UI
+        self.renderCustomerDetailSection()
 
     def viewConsentForm(self):
         viewCustomerFilePDF(self.customerId)
@@ -273,25 +287,14 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         self.controller.switch_frame(WINDOW_EDIT_CUSTOMER, previousWindow=WINDOW_CUSTOMER_DETAIL)
 
 
-    def __init__(self, parent, controller, customerId):
-        super().__init__(parent)
-        self.controller = controller
-        self.root = self
+    def renderCustomerDetailSection(self):
+        # If already exists (refresh case), destroy it
+        if hasattr(self, "customerDetailFrame") and self.customerDetailFrame:
+            self.customerDetailFrame.destroy()
 
-        self.customerTimeStamp = customerId
-        self.customerId = convertTimeStampToId(customerId) 
+        # Re-fetch customer data
         self.customerModel = searchForSingleUser(self.customerId)
-        print("THIS IS THE CUSTOMER MODEL")
-        print(self.customerModel)
-
-        self.conditionList = getAllConditionsByCustomerId(self.customerId)
-        print("customerId")
-        print(self.customerId)
-
-        print("length of customer conditions")
-        print(len(self.conditionList))
-
-
+        
         self.customerDetailFrame = customtkinter.CTkFrame(master=self.root, bg_color="transparent")
         self.customerDetailFrame.grid_columnconfigure(0, weight=1)
         self.customerDetailFrame.grid_columnconfigure(1, minsize=330)
@@ -337,6 +340,27 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             field_name = customerModelAttributeToField.get(key, key)
             display_value = convertTimeStampToId(value) if key == 'customerId' else value
             # Decide which column to put this field in
+            
+            # for 'consent'
+            if key == 'consent':
+                # Label for "Consent"
+                customtkinter.CTkLabel(
+                    self.customerDetailFrame,
+                    text=field_name,
+                    font=FONT["LABEL"],
+                    anchor="w",
+                    bg_color='transparent',
+                ).grid(row=columnTwoRowIndex, column=3, sticky="w", padx=(10, 10), pady=(0, 5))
+
+                #render consent form option button
+                # Will display upload consent form if DO NOT HAVE consent form
+                # Will display view consent form if HAVE consent form
+                self.renderConsentFormOptionButton(row=columnTwoRowIndex, column=4)
+
+                columnTwoRowIndex += 1
+                continue  # Skip default rendering
+            
+            # for normal data label
             if key in columnTwoKeys:
                  # Address field spans 2 rows
 
@@ -352,14 +376,28 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
                     row=columnOneRowIndex, column=0
                 )
                 columnOneRowIndex += 1
-
-        #render consent form option button
         
 
-        # Will display upload consent form if DO NOT HAVE consent form
-        # Will display view consent form if HAVE consent form
-        self.renderConsentFormOptionButton(row=columnTwoRowIndex, column=3)
+    def __init__(self, parent, controller, customerId):
+        super().__init__(parent)
+        self.controller = controller
+        self.root = self
 
+        self.customerTimeStamp = customerId
+        self.customerId = convertTimeStampToId(customerId) 
+        self.customerModel = searchForSingleUser(self.customerId)
+        print("THIS IS THE CUSTOMER MODEL")
+        print(self.customerModel)
+
+        self.conditionList = getAllConditionsByCustomerId(self.customerId)
+        print("customerId")
+        print(self.customerId)
+
+        print("length of customer conditions")
+        print(len(self.conditionList))
+
+        #For customer details
+        self.renderCustomerDetailSection();
 
         #For condition
         self.conditionFrame = customtkinter.CTkFrame(master=self.root, bg_color="transparent")

@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkcalendar import DateEntry
 from datetime import datetime, date
+from utils import center_popup_window
 
 class DatePickerModal:
     def open_date_picker(parent, current_date_str, on_selected):
@@ -22,15 +23,7 @@ class DatePickerModal:
 
         popup_width, popup_height = 200, 130
 
-        master.update_idletasks()
-        main_x = master.winfo_rootx()
-        main_y = master.winfo_rooty()
-        main_width = master.winfo_width()
-        main_height = master.winfo_height()
-
-        pos_x = main_x + (main_width // 2) - (popup_width // 2)
-        pos_y = main_y + (main_height // 2) - (popup_height // 2)
-        popup.geometry(f"{popup_width}x{popup_height}+{pos_x}+{pos_y}")
+        center_popup_window(popup, master, popup_width, popup_height)
         popup.after(100, lambda: popup.grab_set())
 
         today = datetime.today().date()

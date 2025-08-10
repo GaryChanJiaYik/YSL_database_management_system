@@ -34,3 +34,25 @@ def bindClickEventRecursively(widget, callback, cursor="hand2"):
     
     for child in widget.winfo_children():
         bindClickEventRecursively(child, callback, cursor)
+        
+
+def center_popup_window(popup, master, width, height):
+    """
+    Centers a popup window on top of the master window.
+
+    Args:
+        popup (Toplevel): The popup window to position.
+        master (Widget): The main/root window.
+        width (int): Width of the popup window.
+        height (int): Height of the popup window.
+    """
+    master.update_idletasks()
+    main_x = master.winfo_rootx()
+    main_y = master.winfo_rooty()
+    main_width = master.winfo_width()
+    main_height = master.winfo_height()
+
+    pos_x = main_x + (main_width // 2) - (width // 2)
+    pos_y = main_y + (main_height // 2) - (height // 2)
+
+    popup.geometry(f"{width}x{height}+{pos_x}+{pos_y}")

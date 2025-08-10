@@ -69,10 +69,10 @@ def uploadCustomerFile(customer_id, filePath, root, fileName):
     #Save the file in the folder with the name consentForm
     try:
         shutil.copyfile(filePath, new_file_path)  # Copy the selected file to the target location
-        renderPopUpModal(root(), "File uploaded successfully", "Upload", "Success")
+        renderPopUpModal(root, "File uploaded successfully", "Upload", "Success")
         return SUCCESS
     except Exception as e:
-        renderPopUpModal(root(), "Error uploading file", "Upload", "Error")
+        renderPopUpModal(root, "Error uploading file", "Upload", "Error")
 
         print(f"Error copying file: {e}")
         return ERROR
@@ -105,3 +105,19 @@ def renderFilePicker(pdefaultextension, pfiletypes, ptitle=""):
     """
     file_path = askopenfilename(defaultextension=pdefaultextension, filetypes=pfiletypes, title=ptitle)
     return file_path
+
+
+def deleteCustomerFile(customer_id, file_keyword):
+    possible_extensions = ['.pdf']  # Stick with this if you want future flexibility
+    customer_folder_path = os.path.join(attachment_path, customer_id)
+
+    for ext in possible_extensions:
+        file_path = os.path.join(customer_folder_path, f'{file_keyword}{ext}')
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+                return True
+            except Exception as e:
+                print(f"Error deleting file: {e}")
+                return False
+    return False
