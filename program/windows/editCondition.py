@@ -31,10 +31,10 @@ class EditConditionView(customtkinter.CTkFrame):
         success = updateConditionByID(self.conditionModel.conditionId, updated_desc, final_datetime_str)
 
         if success:
-            renderPopUpModal(self, "Condition updated successfully", "Success", "Success")
+            renderPopUpModal(self.parent, "Condition updated successfully", "Success", "Success")
             print("Condition updated")
         else:
-            renderPopUpModal(self, "Failed to update condition", "Error", "Error")
+            renderPopUpModal(self.parent, "Failed to update condition", "Error", "Error")
             print("Failed to update condition")
         
         self.backToPreviousWindow()
@@ -48,10 +48,10 @@ class EditConditionView(customtkinter.CTkFrame):
         success = deleteCondition(self.conditionModel.conditionId)
 
         if success:
-            renderPopUpModal(self, "Condition deleted successfully", "Deleted", "Success")
+            renderPopUpModal(self.parent, "Condition deleted successfully", "Deleted", "Success")
             print("Condition deleted")
         else:
-            renderPopUpModal(self, "Failed to delete condition", "Error", "Error")
+            renderPopUpModal(self.parent, "Failed to delete condition", "Error", "Error")
             print("Failed to delete condition")
    
         self.backToPreviousWindow()
@@ -117,9 +117,8 @@ class EditConditionView(customtkinter.CTkFrame):
     
     
     def __init__(self, parent, controller, customerId, conditionModel):
-        print("editConditionView")
-        
         super().__init__(parent)
+        self.parent = parent
         self.controller = controller
         self.customerId = customerId
         self.conditionModel = conditionModel

@@ -95,7 +95,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             TreatmentFunc.createTreatment(treatment)
 
         print("Create treatment button pressed")
-        renderPopUpModal(self, "Treatment added successfully","Successful", "Success")
+        renderPopUpModal(self.parent, "Treatment added successfully","Successful", "Success")
         #self.newWindow.destroy()
         #Go back previous window
         self.backToPreviousWindow()
@@ -151,7 +151,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             
     def deleteRecord(self):
         TreatmentFunc.deleteTreatmentByID(self.treatmentModel.treatmentID)
-        renderPopUpModal(self, "Treatment removed successfully","Successful", "Success")
+        renderPopUpModal(self.parent, "Treatment removed successfully","Successful", "Success")
         #Go back previous window
         self.backToPreviousWindow()
         
@@ -191,6 +191,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
     def __init__(self, parent, controller, conditionID, conditionModel, isEditMode=False, previousWindow=None):
         super().__init__(parent)
         self.controller = controller
+        self.parent = parent
         self.grid_columnconfigure(0, weight=1)
         self.conditionModel = conditionModel
         self.previouWindow = previousWindow
