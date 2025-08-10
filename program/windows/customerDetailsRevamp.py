@@ -23,7 +23,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         # Field name label
         customtkinter.CTkLabel(
             root,
-            text=fieldName,
+            text="Customer ID" if fieldName == "Old Customer ID" else fieldName,
             font=FONT["LABEL"],
             bg_color='transparent',
             anchor="w"
@@ -60,7 +60,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             
         self.addOldCustomerIdButton = customtkinter.CTkButton(
                 root,
-                text="Add old ID",
+                text="Add ID",
                 command=lambda: self.renderCustomerOldIDInputField(root,row, column+1, rowspan),
             )
 

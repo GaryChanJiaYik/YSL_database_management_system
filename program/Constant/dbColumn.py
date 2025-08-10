@@ -28,7 +28,7 @@ customerModelAttributeToField = {
   'handphone': "Contact",
   'instagram': "Instagram",
   'howDidYouFindUs': "How did get know our centre?",
-  "oldCustomerId": "Customer ID",
+  "oldCustomerId": "Old Customer ID",
   "consent": "Consent"
 }
 
