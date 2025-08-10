@@ -8,7 +8,10 @@ from Components.selectableRowTable import Table
 from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_CUSTOMER
 from tkinter.filedialog import askopenfilename
 import shutil
-from Constant.databaseManipulationFunctions import searchForUserBasedOn_ID_IC_Name_Contact_oldCustomerId
+from Constant.databaseManipulationFunctions import (
+    searchForUserBasedOn_ID_IC_Name_Contact_oldCustomerId,
+    getCustomerListByLatestTreatmentDate
+)
 
 import customtkinter as ctk
 
@@ -43,6 +46,9 @@ class LandingWindow(ctk.CTkFrame):
         #     self.Entryframe, text="Update CSV", command=self.selectAndUpdateCsv
         # ).grid(column=3, row=0)
         # self.Entryframe.grid(column=0, row=0)
+        
+        # Show default customer list
+        self.showLatestCustomer()
 
 
     def selectAndUpdateCsv(self):
@@ -58,19 +64,30 @@ class LandingWindow(ctk.CTkFrame):
     def print_user_input(self, text):
         """Callback function to handle user input."""
         if text == "":
-            self.table.update_table([])  # Properly clear table
+            # self.table.update_table([])  # Properly clear table
+            self.showLatestCustomer()
             return
 
         # Based on user input, search for results
         searchResult = searchForUserBasedOn_ID_IC_Name_Contact_oldCustomerId(text)
 
+        # Clear previous resultFrame labels if needed
+        for widget in self.resultFrame.winfo_children():
+            widget.destroy()
+
         if searchResult == errorCode.NO_USER_FOUND:
-            searchResult = []
+            self.table.update_table([])  # Clear table
             yourTextPanel = tk.Label(self.resultFrame, text=errorCode.NO_USER_FOUND, fg="red") 
             yourTextPanel.grid(column=1, row=1)
         else:
             searchResult.insert(0, [dbCol.customerId, dbCol.ic, dbCol.name, "Contact No.联系号", "ID"])  # Add headers
             self.table.update_table(searchResult)  
+
+
+    def showLatestCustomer(self):
+        latest_customers = getCustomerListByLatestTreatmentDate(limit=20)
+        latest_customers.insert(0, [dbCol.customerId, dbCol.ic, dbCol.name, "Contact No.联系号", "ID"])
+        self.table.update_table(latest_customers)
 
 
     def openNewWindow(self, customerId):

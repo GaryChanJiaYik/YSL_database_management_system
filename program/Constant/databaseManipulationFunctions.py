@@ -5,8 +5,14 @@ import Constant.dbColumn as dbCol
 from Model.customerObjectModel import CustomerModel
 from Constant.converterFunctions import convertTimeStampToId
 from utils import resourcePath
+from datetime import datetime
+from collections import defaultdict
+
 
 DB_PATH = resourcePath('./data/db.csv')
+TREATMENT_DB_PATH = resourcePath('./data/treatmentDb.csv')
+CONDITION_DB_PATH = resourcePath('./data/conditionDb.csv')
+
 
 def searchForSingleUser( userId):
     print("from searching constant function")
@@ -52,24 +58,67 @@ def searchForSingleUser( userId):
             return errorCode.NO_USER_FOUND
 
 def searchForUserBasedOn_ID_IC_Name_Contact_oldCustomerId(userId):
+    # Step 1: Build treatment mapping (customerId -> latest treatment date)
+    condition_to_customer = {}
+    with open(CONDITION_DB_PATH, mode='r', encoding='utf-8') as condition_file:
+        reader = csv.DictReader(condition_file)
+        for row in reader:
+            condition_id = row.get("conditionId")
+            customer_id = row.get("customerId")
+            if condition_id and customer_id:
+                condition_to_customer[condition_id] = customer_id
+
+    customer_latest_treatment = defaultdict(lambda: datetime.min)
+    with open(TREATMENT_DB_PATH, mode='r', encoding='utf-8') as treatment_file:
+        reader = csv.DictReader(treatment_file)
+        for row in reader:
+            condition_id = row.get("conditionId")
+            treatment_date_str = row.get("treatmentDate")
+            customer_id = condition_to_customer.get(condition_id)
+            if customer_id and treatment_date_str:
+                try:
+                    treatment_date = datetime.strptime(treatment_date_str, "%Y-%m-%d %H:%M:%S")
+                    if treatment_date > customer_latest_treatment[customer_id]:
+                        customer_latest_treatment[customer_id] = treatment_date
+                except ValueError:
+                    continue
+
+    # Step 2: Perform text search
     with open(DB_PATH, mode='r', encoding='utf-8') as file:
         csvFile = csv.reader(file)
-        header = next(csvFile)           
+        header = next(csvFile)
         res = []
         if dbCol.ic in header and dbCol.name in header:
-            customer_id, ic_index, name_index, contact_index, oldCustomerId_index = header.index(dbCol.customerId), header.index(dbCol.ic), header.index(dbCol.name), header.index(dbCol.handPhoneNumber), header.index(dbCol.oldCustomerId)
-            for lines in csvFile:
+            customer_id_idx = header.index(dbCol.customerId)
+            ic_index = header.index(dbCol.ic)
+            name_index = header.index(dbCol.name)
+            contact_index = header.index(dbCol.handPhoneNumber)
+            oldCustomerId_index = header.index(dbCol.oldCustomerId)
+
+            for line in csvFile:
                 if (
-                    userId.lower() in lines[ic_index].lower() or
-                    userId.lower() in lines[customer_id].lower() or
-                    userId.lower() in lines[name_index].lower() or
-                    userId.lower() in lines[contact_index].lower() or
-                    userId.lower() in lines[oldCustomerId_index].lower()
+                    userId.lower() in line[ic_index].lower() or
+                    userId.lower() in line[customer_id_idx].lower() or
+                    userId.lower() in line[name_index].lower() or
+                    userId.lower() in line[contact_index].lower() or
+                    userId.lower() in line[oldCustomerId_index].lower()
                 ):
-                    res.append([lines[customer_id], lines[ic_index], lines[name_index], lines[contact_index], lines[oldCustomerId_index]])
-            return res
+                    customer_id_raw = line[customer_id_idx]
+                    normalized_id = _normalize_customer_id(customer_id_raw)
+                    treatment_date = customer_latest_treatment.get(normalized_id, datetime.min)
+                    res.append((
+                        treatment_date,
+                        [line[customer_id_idx], line[ic_index], line[name_index], line[contact_index], line[oldCustomerId_index]]
+                    ))
+
+            # Step 3: Sort by latest treatment date
+            res.sort(key=lambda x: x[0], reverse=True)
+
+            # Return just the row data (not the datetime)
+            return [row for _, row in res] if res else errorCode.NO_USER_FOUND
         else:
             return errorCode.NO_USER_FOUND
+        
                     
 def addOldCustomerID(customerID, oldCustomerId):
     print(f'{customerID} --> {oldCustomerId}')
@@ -204,4 +253,70 @@ def deleteCustomerById(customerId):
 
     except Exception as e:
         print(f"Error deleting customer: {e}")
+        
+        
+def getCustomerListByLatestTreatmentDate(limit=20):
+    # Step 1: Read conditionId -> customerId mapping
+    condition_to_customer = {}
+    with open(CONDITION_DB_PATH, mode='r', encoding='utf-8') as condition_file:
+        reader = csv.DictReader(condition_file)
+        for row in reader:
+            condition_id = row.get("conditionId")
+            customer_id = row.get("customerId")
+            if condition_id and customer_id:
+                condition_to_customer[condition_id] = customer_id
+
+    # Step 2: Read treatment data and map customerId -> latest treatment date
+    customer_latest_treatment = defaultdict(lambda: datetime.min)
+    with open(TREATMENT_DB_PATH, mode='r', encoding='utf-8') as treatment_file:
+        reader = csv.DictReader(treatment_file)
+        for row in reader:
+            condition_id = row.get("conditionId")
+            treatment_date_str = row.get("treatmentDate")
+            if not condition_id or not treatment_date_str:
+                continue
+
+            customer_id = condition_to_customer.get(condition_id)
+            if not customer_id:
+                continue
+
+            try:
+                treatment_date = datetime.strptime(treatment_date_str, "%Y-%m-%d %H:%M:%S")
+                if treatment_date > customer_latest_treatment[customer_id]:
+                    customer_latest_treatment[customer_id] = treatment_date
+            except ValueError:
+                continue
+
+    # Step 3: Sort customers by latest treatment date
+    sorted_customers = sorted(customer_latest_treatment.items(), key=lambda x: x[1], reverse=True)[:limit]
+    sorted_customer_ids = [customer_id for customer_id, _ in sorted_customers]
+
+    # Step 4: Fetch customer details
+    results = []
+    with open(DB_PATH, mode='r', encoding='utf-8') as db_file:
+        reader = csv.DictReader(db_file)
+        customer_dict = {
+            _normalize_customer_id(row.get(dbCol.customerId)): row
+            for row in reader
+        }
+
+    for customer_id in sorted_customer_ids:
+        row = customer_dict.get(customer_id)
+        if row:
+            results.append([
+                row.get(dbCol.customerId, ""),
+                row.get(dbCol.ic, ""),
+                row.get(dbCol.name, ""),
+                row.get(dbCol.handPhoneNumber, ""),
+                row.get(dbCol.oldCustomerId, ""),
+            ])
+
+    return results
+
+
+def _normalize_customer_id(raw_id: str) -> str:
+        """Normalize timestamp-style customer ID into compact numeric string."""
+        return raw_id.replace('/', '').replace(':', '').replace(' ', '')
+
+
         
