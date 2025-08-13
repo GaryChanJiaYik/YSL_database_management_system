@@ -5,6 +5,7 @@ from Constant.appConstant import (
     FONT
 )
 from PIL import Image, ImageTk
+from pathlib import Path
 from utils import resourcePath
 
 class Table:
@@ -20,7 +21,7 @@ class Table:
         
         # Load icon
         try:
-            image_path = resourcePath("program\\asset\\icons\\edit.png")
+            image_path = Path(resourcePath("program/asset/icons/edit.png"))
             edit_image_raw = Image.open(image_path).convert("RGBA").resize((15, 15))
             self.edit_icon = ImageTk.PhotoImage(edit_image_raw)
         except FileNotFoundError:

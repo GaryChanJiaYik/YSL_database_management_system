@@ -164,7 +164,9 @@ class App:
             self.current_frame = AddCustomerView(self.container, self, isEditMode=True, customerId=customerId, previousWindow=previousWindow)
 
         self.current_frame.pack(fill="both", expand=True)
-    
+
+        self.container._parent_canvas.yview_moveto(0)
+        
         self.set_header()
         
         # Debug Window stack

@@ -278,6 +278,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         # Refresh the UI
         self.renderCustomerDetailSection()
 
+
     def viewConsentForm(self):
         viewCustomerFilePDF(self.customerId)
         

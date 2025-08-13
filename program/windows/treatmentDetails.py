@@ -131,7 +131,7 @@ class TreatmentDetailView(ctk.CTkFrame):
             self.treatmentDetailFrame,
             text="Treatment Details",
             bg_color='transparent',
-            font=('Arial', 16),
+            font=FONT["HEADER"],
             anchor="w"
         ).grid(row=0, column=0, sticky="w", padx=(10, 5), pady=5)
 
