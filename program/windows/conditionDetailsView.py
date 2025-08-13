@@ -47,7 +47,6 @@ class ConditionDetailsView(ctk.CTkFrame):
         self.controller.switch_frame(WINDOW_EDIT_TREATMENT)
 
         
-
     def renderConditionPictureContainerContent(self, root):
         self.uploadConditionPictureBtn = None
         #Check if there is any picture for the condition
@@ -60,6 +59,7 @@ class ConditionDetailsView(ctk.CTkFrame):
             self.uploadConditionPictureBtn = ctk.CTkButton(root, text="Upload Picture", command=self.uploadConditionPicture)
             self.uploadConditionPictureBtn.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
 
+
     def renderConditionPicture(self, root, conditionPicturePath):
         #render the picture
         image = Image.open(conditionPicturePath)
@@ -69,7 +69,6 @@ class ConditionDetailsView(ctk.CTkFrame):
         # photo = ImageTk.PhotoImage(image)
         photo = ctk.CTkImage(light_image=image, dark_image=image, size=(250, 250))
 
-
         # Display in CTkLabel
         label = ctk.CTkLabel(root, image=photo, text="")    #     # If no picture, render button to upload a picture
         label.image = photo
@@ -77,19 +76,25 @@ class ConditionDetailsView(ctk.CTkFrame):
 
 
     def uploadConditionPicture(self):
-        filePath = renderFilePicker(pdefaultextension='',pfiletypes=[
-            ("Image files", "*.png *.jpg *.jpeg *.gif *.bmp *.tiff"),
-            ("All files", "*.*")  # Optional fallback
-        ], ptitle="Select a picture")
-        
-        if filePath is not None:
-            #manipulate the file path to the condition picture path            
-            result = uploadCustomerFile(self.customerId,filePath, self._root,  self.conditionModel.conditionId)
-            if result == SUCCESS:
+        filePath = renderFilePicker(
+            pdefaultextension='',
+            pfiletypes=[
+                ("Image files", "*.png *.jpg *.jpeg *.gif *.bmp *.tiff"),
+                ("All files", "*.*")
+            ],
+            ptitle="Select a picture"
+        )
+
+        if not filePath:
+            return  # User clicked cancel, do nothing
+
+        # Upload the file to the correct condition picture path
+        result = uploadCustomerFile(self.customerId, filePath, self.parent, self.conditionModel.conditionId)
+
+        if result == SUCCESS:
+            if hasattr(self, 'uploadConditionPictureBtn') and self.uploadConditionPictureBtn:
                 self.uploadConditionPictureBtn.destroy()
-                self.renderConditionPicture(self.conditionPictureContainer, filePath)
-                
-            print(filePath)
+            self.renderConditionPicture(self.conditionPictureContainer, filePath)
 
 
     def navigateToTreatmentDetailView(self, model):
@@ -99,10 +104,12 @@ class ConditionDetailsView(ctk.CTkFrame):
         self.controller.setConditionID(self.conditionModel.conditionId)
         self.controller.switch_frame(WINDOW_TREATMENT_DETAIL)
 
+
     def __init__(self, parent, controller, customerId, conditionModel):
         # !!!!!!!! customerId is formattted
         super().__init__(parent)
         self.controller = controller
+        self.parent = parent
         self.customerId = customerId
         self.conditionModel = conditionModel
         self.grid_columnconfigure(0, weight=1)
@@ -220,7 +227,7 @@ class ConditionDetailsView(ctk.CTkFrame):
         self.treatmentList = getAllTreatmentByConditionID(self.conditionModel.conditionId)
 
         if len(self.treatmentList) <= 0:
-            ctk.CTkLabel(self.treatmentListFrame, text="No treatment found", font=('Arial', 12)).grid(row=1, column=0, sticky="w", padx=(10, 5), pady=5)
+            ctk.CTkLabel(self.treatmentListFrame, text="No treatment found", font=FONT["CONTENT"]).grid(row=1, column=0, sticky="w", padx=(10, 5), pady=5)
             return
         else:
             # # treatment list with scroll

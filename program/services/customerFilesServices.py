@@ -53,10 +53,11 @@ def viewCustomerFilePDF(customerId):
     openPdf(consent_form_path)
 
 
-
 def uploadCustomerFile(customer_id, filePath, root, fileName):
-    _, extension = os.path.splitext(filePath)
+    if not filePath:
+        return ERROR  # No file, silently return
 
+    _, extension = os.path.splitext(filePath)
 
     #check if foolder to store customer file exist 
     customer_folder_path = os.path.join(attachment_path, customer_id)
@@ -64,6 +65,7 @@ def uploadCustomerFile(customer_id, filePath, root, fileName):
     # if no folder storing customer file exist create one
     if not os.path.exists(customer_folder_path):
         os.makedirs(customer_folder_path)
+
     new_file_path = os.path.join(customer_folder_path, f'{fileName}{extension}')
     
     #Save the file in the folder with the name consentForm
@@ -73,9 +75,9 @@ def uploadCustomerFile(customer_id, filePath, root, fileName):
         return SUCCESS
     except Exception as e:
         renderPopUpModal(root, "Error uploading file", "Upload", "Error")
-
         print(f"Error copying file: {e}")
         return ERROR
+
 
 def getConditionPicturePath(customerId, conditionId):
     """
@@ -97,6 +99,28 @@ def getConditionPicturePath(customerId, conditionId):
             return file_path
 
     return None
+
+
+def getTreatmentPicturePath(customerId, treatmentId):
+    """
+    Retrieves the treatment picture path for a given customer ID and treatment ID.
+    :param customerId: The ID of the customer.
+    :param treatmentId: The ID of the treatment.
+    :return: The path to the treatment picture or None.
+    """
+    customer_folder_path = os.path.join(attachment_path, customerId)
+    allowed_extensions = ('.jpg', '.jpeg', '.png', '.webp')
+
+    # Find all files starting with treatmentId and any extension
+    pattern = os.path.join(customer_folder_path, f"{treatmentId}.*")
+    matches = glob.glob(pattern)
+
+    for file_path in matches:
+        if file_path.lower().endswith(allowed_extensions):
+            return file_path
+
+    return None
+
 
 def renderFilePicker(pdefaultextension, pfiletypes, ptitle=""):
     """

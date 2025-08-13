@@ -3,6 +3,10 @@ import customtkinter as ctk
 from Constant.converterFunctions import getDatefromTimeStamp
 from PIL import Image
 from utils import resourcePath, bindClickEventRecursively, bindHoverEventRecursively
+from services.customerFilesServices import renderFilePicker, uploadCustomerFile
+from Components.popupModal import renderPopUpModal
+from Constant.errorCode import SUCCESS
+
 
 def create_level_cell(parent, row, col, label_text, value_text):
     container = tk.Frame(parent, padx=5, pady=5)
@@ -14,6 +18,7 @@ def create_level_cell(parent, row, col, label_text, value_text):
     value = tk.Label(container, text=value_text, font=('Arial', 9), anchor="w")
     value.grid(row=1, column=0, sticky="w")
 
+
 def create_level_cell_revamp(parent, row, col, label_text, value_text):
     container = ctk.CTkFrame(parent, corner_radius=0, height=40, width=40, fg_color="transparent")
     container.grid_propagate(False)
@@ -24,6 +29,7 @@ def create_level_cell_revamp(parent, row, col, label_text, value_text):
 
     value = ctk.CTkLabel(container, text=value_text, font=('Arial', 12), height=16,width=40, anchor="center")
     value.grid(row=1, column=0, sticky="nsew")
+
 
 def renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel, on_click=None):
     marginContainer = tk.Frame(parentContainer, pady=2)
@@ -49,7 +55,6 @@ def renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel, on_clic
     create_level_cell(treatmentLevelsContainer, 0, 1, "Sore", treatmentModel.soreLevel)
     create_level_cell(treatmentLevelsContainer, 1, 1, "Numb", treatmentModel.numbLevel)
 
-
     if on_click:
         marginContainer.bind("<Button-1>", lambda e: on_click(treatmentModel))
         # Also bind children to make sure the whole area is clickable
@@ -57,9 +62,35 @@ def renderTreatmentSummaryBlockFunction(parentContainer, treatmentModel, on_clic
             child.bind("<Button-1>", lambda e: on_click(treatmentModel))
 
 
-
     wrapperContainer.grid(row=0, column=0, sticky="w")
-    return marginContainer   
+    return marginContainer
+
+
+def handleUploadTreatmentPicture(treatmentModel, parentContainer):
+    filePath = renderFilePicker(
+        pdefaultextension='',
+        pfiletypes=[
+            ("Image files", "*.png *.jpg *.jpeg *.gif *.bmp *.tiff"),
+            ("All files", "*.*")
+        ],
+        ptitle="Select a treatment picture"
+    )
+
+    if not filePath:
+        return  # User canceled
+
+    result = uploadCustomerFile(treatmentModel.customerId, filePath, parentContainer, treatmentModel.treatmentID)
+
+    if result == SUCCESS:
+        renderPopUpModal(
+            title="Upload Successful",
+            message=f"Successfully uploaded treatment picture for Treatment ID: {treatmentModel.treatmentID}"
+        )
+    else:
+        renderPopUpModal(
+            title="Upload Failed",
+            message=f"Failed to upload treatment picture for Treatment ID: {treatmentModel.treatmentID}. Please try again."
+        )
 
 
 
@@ -184,8 +215,17 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
                     fg_color='green',
                     command=lambda: on_click_view(treatmentModel))
         viewButton.place(relx=0.65, rely=0.5, anchor=ctk.CENTER)
-
         #viewButtonFrame.grid_propagate(False)
+        
+        # Upload Treatment Picture Button
+        # uploadButton = ctk.CTkButton(
+        #     master=editButtonFrame,
+        #     width=120,
+        #     text="Upload Picture",
+        #     fg_color='green',
+        #     command=lambda: handleUploadTreatmentPicture(treatmentModel, parentContainer)
+        # )
+        # uploadButton.place(relx=0.65, rely=0.5, anchor=ctk.CENTER)
 
     # # Click binding
     # if on_click:
