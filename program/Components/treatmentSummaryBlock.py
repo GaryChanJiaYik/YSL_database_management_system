@@ -2,11 +2,11 @@ import tkinter as tk
 import customtkinter as ctk
 from Constant.converterFunctions import getDatefromTimeStamp
 from PIL import Image
-from utils import resourcePath, bindClickEventRecursively, bindHoverEventRecursively
+from utils import bindClickEventRecursively, bindHoverEventRecursively
 from services.customerFilesServices import renderFilePicker, uploadCustomerFile
 from Components.popupModal import renderPopUpModal
 from Constant.errorCode import SUCCESS
-from pathlib import Path
+from Constant.appConstant import IMG_PATH
 
 
 def create_level_cell(parent, row, col, label_text, value_text):
@@ -183,7 +183,7 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
 
         #Get the image
         try:
-            image_path = Path(resourcePath("program/asset/icons/edit.png"))
+            image_path = IMG_PATH["EDIT"]
             button_image = Image.open(image_path)
             resized_image = button_image.resize((20, 20)) # Resize if needed
             ctk_button_image = ctk.CTkImage(light_image=resized_image, dark_image=resized_image)

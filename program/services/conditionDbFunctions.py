@@ -2,15 +2,13 @@ import csv
 import os
 import Model.conditionModel as CM
 from datetime import datetime
-from utils import resourcePath
-
-DB_PATH = resourcePath('./data/conditionDb.csv')
-
-
+from Constant.appConstant import DB_PATH
 import Constant.dbColumn as dbCol
 
+
+
 def getAllConditionsByCustomerId(customerId):
-    with open(DB_PATH, mode='r', encoding='utf-8') as file:
+    with open(DB_PATH["CONDITION"], mode='r', encoding='utf-8') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)           
         customer_id_index = header.index(dbCol.customerIdConditionDb)
@@ -47,7 +45,7 @@ def parse_date_safe(date_str):
 
 
 def insertConditionToDb(conditionModel):
-    with open(DB_PATH, mode='a', encoding='utf-8', newline='\n') as file:
+    with open(DB_PATH["CONDITION"], mode='a', encoding='utf-8', newline='\n') as file:
         # Ensure there's a newline before writing if needed
         file.write("\n")  
 
@@ -58,10 +56,10 @@ def insertConditionToDb(conditionModel):
     
 def updateTreatmentStatus(customer_id, condition_id, is_treated):
     print(f"Updating treatment status for customer {customer_id}, condition {condition_id}")
-    temp_file_path = DB_PATH + ".tmp"
+    temp_file_path = DB_PATH["CONDITION"].with_suffix('.tmp')
     updated = False
 
-    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+    with open(DB_PATH["CONDITION"], mode='r', encoding='utf-8', newline='') as infile, \
          open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
 
         reader = csv.reader(infile)
@@ -85,7 +83,7 @@ def updateTreatmentStatus(customer_id, condition_id, is_treated):
             writer.writerow(row)
 
     if updated:
-        os.replace(temp_file_path, DB_PATH)
+        os.replace(temp_file_path, DB_PATH["CONDITION"])
         print("Treatment status updated successfully.")
     else:
         os.remove(temp_file_path)
@@ -95,7 +93,7 @@ def updateTreatmentStatus(customer_id, condition_id, is_treated):
         
 
 def getTreatmentStatus(customer_id, condition_id):
-    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as file:
+    with open(DB_PATH["CONDITION"], mode='r', encoding='utf-8', newline='') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)
 
@@ -114,10 +112,10 @@ def getTreatmentStatus(customer_id, condition_id):
 
 
 def updateConditionByID(condition_id, new_description, new_datetime):
-    temp_file_path = DB_PATH + ".tmp"
+    temp_file_path = DB_PATH["CONDITION"].with_suffix('.tmp')
     updated = False
 
-    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+    with open(DB_PATH["CONDITION"], mode='r', encoding='utf-8', newline='') as infile, \
          open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
 
         reader = csv.reader(infile)
@@ -142,7 +140,7 @@ def updateConditionByID(condition_id, new_description, new_datetime):
             writer.writerow(row)
 
     if updated:
-        os.replace(temp_file_path, DB_PATH)
+        os.replace(temp_file_path, DB_PATH["CONDITION"])
     else:
         os.remove(temp_file_path)
 
@@ -150,10 +148,10 @@ def updateConditionByID(condition_id, new_description, new_datetime):
 
 
 def deleteCondition(condition_id):
-    temp_file_path = DB_PATH + ".tmp"
+    temp_file_path = DB_PATH["CONDITION"].with_suffix('.tmp')
     deleted = False
 
-    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+    with open(DB_PATH["CONDITION"], mode='r', encoding='utf-8', newline='') as infile, \
          open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
 
         reader = csv.reader(infile)
@@ -175,7 +173,7 @@ def deleteCondition(condition_id):
             writer.writerow(row)
 
     if deleted:
-        os.replace(temp_file_path, DB_PATH)
+        os.replace(temp_file_path, DB_PATH["CONDITION"])
     else:
         os.remove(temp_file_path)
 

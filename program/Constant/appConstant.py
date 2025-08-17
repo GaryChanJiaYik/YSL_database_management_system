@@ -1,3 +1,6 @@
+from utils import resourcePath
+from pathlib import Path
+
 APP_NAME = "Patient Care Patient Good"
 
 STANDARD_WINDOW_WIDTH = 900
@@ -31,4 +34,19 @@ FONT = {
     "HEADER": (FONT_FAMILY, 18, 'bold'),
     "LABEL": (FONT_FAMILY, 13, 'bold'),
     "CONTENT": (FONT_FAMILY, 13)
+}
+
+
+# CSV path
+DB_PATH = {
+    "MAIN": Path(resourcePath('./data/db.csv')),
+    "CONDITION": Path(resourcePath('./data/conditionDb.csv')),
+    "TREATMENT": Path(resourcePath('./data/treatmentDb.csv')),
+    "TREATMENT_REV": Path(resourcePath('./data/treatmentRevisionHistory.csv')),
+}
+
+
+# image path
+IMG_PATH = {
+    "EDIT": Path(resourcePath("program/asset/icons/edit.png"))
 }

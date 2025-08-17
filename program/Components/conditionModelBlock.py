@@ -2,9 +2,9 @@ import customtkinter as ctk
 from PIL import Image
 from services.conditionDbFunctions import getTreatmentStatus
 from Constant.treatmentDatabaseFunctions import getConditionTotalCost
-from Constant.appConstant import GREEN, RED
+from Constant.appConstant import GREEN, RED, IMG_PATH
 from datetime import datetime
-from utils import resourcePath, bindClickEventRecursively, bindHoverEventRecursively
+from utils import bindClickEventRecursively, bindHoverEventRecursively
 
 
 
@@ -96,7 +96,7 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
     
     # Edit condition button
     try:
-        image_path = resourcePath("program\\asset\\icons\\edit.png")
+        image_path = IMG_PATH["EDIT"]
         button_image = Image.open(image_path)
         resized_image = button_image.resize((15, 15)) # Resize if needed
         ctk_button_image = ctk.CTkImage(light_image=resized_image, dark_image=resized_image)

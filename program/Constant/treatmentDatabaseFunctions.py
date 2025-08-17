@@ -6,15 +6,13 @@ from Constant.converterFunctions import getFormattedDateTime
 from Constant.generatorFunctions import generateUUID
 import os
 from datetime import datetime
-from utils import resourcePath
+from Constant.appConstant import DB_PATH
 
-DB_PATH = resourcePath('./data/treatmentDb.csv')
-TREATMENT_REVISION_PATH = resourcePath('./data/treatmentRevisionHistory.csv')
 
 def getAllTreatmentByCustomerId(customerId):
    
    #!!!!!!!!!!!! customerId --> converted format
-   with open(DB_PATH, mode='r', encoding='utf-8') as file:
+   with open(DB_PATH["TREATMENT"], mode='r', encoding='utf-8') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)           
         customer_id_index = header.index(dbCol.customerIdTreatment)
@@ -48,7 +46,7 @@ def getAllTreatmentByCustomerId(customerId):
 
 
 def createTreatment(treatmentModel):
-    with open(DB_PATH, mode='a', encoding='utf-8', newline='\n') as file:
+    with open(DB_PATH["TREATMENT"], mode='a', encoding='utf-8', newline='\n') as file:
         # Ensure there's a newline before writing if needed
         file.write("\n")  
 
@@ -60,7 +58,7 @@ def createTreatment(treatmentModel):
 
 def getAllTreatmentByConditionID(conditionId):
    #!!!!!!!!!!!! customerId --> converted format
-   with open(DB_PATH, mode='r', encoding='utf-8', newline='') as file:
+   with open(DB_PATH["TREATMENT"], mode='r', encoding='utf-8', newline='') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)           
         customer_id_index = header.index(dbCol.conditionId)
@@ -96,7 +94,7 @@ def getAllTreatmentByConditionID(conditionId):
 
 def getTreatmentByID(treatmentID):
     #!!!!!!!!!!!! customerId --> converted format
-   with open(DB_PATH, mode='r', encoding='utf-8') as file:
+   with open(DB_PATH["TREATMENT"], mode='r', encoding='utf-8') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)           
         condition_id_index = header.index(dbCol.conditionId)
@@ -134,10 +132,10 @@ def updateTreatmentByID(newTreatmentModel):
     print("treatment id: ", newTreatmentModel.treatmentID)
 
     treatmentId = newTreatmentModel.treatmentID
-    temp_file_path = DB_PATH + ".tmp"
+    temp_file_path = DB_PATH["TREATMENT"].with_suffix('.tmp')
     updated = False
 
-    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+    with open(DB_PATH["TREATMENT"], mode='r', encoding='utf-8', newline='') as infile, \
          open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
 
         reader = csv.reader(infile)
@@ -175,7 +173,7 @@ def updateTreatmentByID(newTreatmentModel):
 
     if updated:
         print("UPDATED DB")
-        os.replace(temp_file_path, DB_PATH)
+        os.replace(temp_file_path, DB_PATH["TREATMENT"])
     else:
         print("DB NOT UPDATED")
         os.remove(temp_file_path)
@@ -183,14 +181,14 @@ def updateTreatmentByID(newTreatmentModel):
     return updated
 
 def addToTreatmentRevisionTable(data):
-    with open(TREATMENT_REVISION_PATH, mode='a', encoding='utf-8', newline='\n') as file:
+    with open(DB_PATH["TREATMENT_REV"], mode='a', encoding='utf-8', newline='\n') as file:
         # Ensure there's a newline before writing if needed
         file.write("\n")  
         writer_object = writer(file)
         writer_object.writerow(data)
 
 def getAllTreatmentRevisionByID(treatmentID):
-    with open(TREATMENT_REVISION_PATH, mode='r', encoding='utf-8') as file:
+    with open(DB_PATH["TREATMENT_REV"], mode='r', encoding='utf-8') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)    
 
@@ -228,11 +226,11 @@ def deleteTreatmentByID(treatmentID):
     print("DELETING treatment")
     print("treatment id: ", treatmentID)
 
-    temp_file_path = DB_PATH + ".tmp"
+    temp_file_path = DB_PATH["TREATMENT"].with_suffix('.tmp')
     deleted = False
 
     # Step 1: Delete from main treatment CSV
-    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+    with open(DB_PATH["TREATMENT"], mode='r', encoding='utf-8', newline='') as infile, \
          open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
 
         reader = csv.reader(infile)
@@ -252,7 +250,7 @@ def deleteTreatmentByID(treatmentID):
                 writer.writerow(row)
 
     if deleted:
-        os.replace(temp_file_path, DB_PATH)
+        os.replace(temp_file_path, DB_PATH["TREATMENT"])
         print("TREATMENT DELETED FROM MAIN FILE")
         # Now also delete from revisions
         __deleteTreatmentRevisionsByID(treatmentID)
@@ -266,10 +264,10 @@ def deleteTreatmentByID(treatmentID):
 def __deleteTreatmentRevisionsByID(treatmentID):
     print("DELETING RELATED TREATMENT REVISIONS")
     
-    revision_temp_path = TREATMENT_REVISION_PATH + ".tmp"
+    revision_temp_path = DB_PATH["TREATMENT_REV"].with_suffix('.tmp')
     deleted_any = False
 
-    with open(TREATMENT_REVISION_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+    with open(DB_PATH["TREATMENT_REV"], mode='r', encoding='utf-8', newline='') as infile, \
          open(revision_temp_path, mode='w', encoding='utf-8', newline='') as outfile:
 
         reader = csv.reader(infile)
@@ -289,7 +287,7 @@ def __deleteTreatmentRevisionsByID(treatmentID):
                 writer.writerow(row)
 
     if deleted_any:
-        os.replace(revision_temp_path, TREATMENT_REVISION_PATH)
+        os.replace(revision_temp_path, DB_PATH["TREATMENT_REV"])
         print("RELATED REVISIONS DELETED")
     else:
         os.remove(revision_temp_path)
@@ -299,7 +297,7 @@ def __deleteTreatmentRevisionsByID(treatmentID):
 def getConditionTotalCost(conditionId):
     total_cost = 0.0
 
-    with open(DB_PATH, mode='r', encoding='utf-8', newline='') as file:
+    with open(DB_PATH["TREATMENT"], mode='r', encoding='utf-8', newline='') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)
         

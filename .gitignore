@@ -3,3 +3,4 @@ data/
 todo.txt
 /release/build/
 /release/dist/
+data_clean/

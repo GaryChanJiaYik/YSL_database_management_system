@@ -4,20 +4,16 @@ import Constant.errorCode as errorCode
 import Constant.dbColumn as dbCol
 from Model.customerObjectModel import CustomerModel
 from Constant.converterFunctions import convertTimeStampToId
-from utils import resourcePath
+from Constant.appConstant import DB_PATH
 from datetime import datetime
 from collections import defaultdict
 
-
-DB_PATH = resourcePath('./data/db.csv')
-TREATMENT_DB_PATH = resourcePath('./data/treatmentDb.csv')
-CONDITION_DB_PATH = resourcePath('./data/conditionDb.csv')
 
 
 def searchForSingleUser( userId):
     print("from searching constant function")
     print(userId)
-    with open(DB_PATH, mode='r', encoding='utf-8') as file:
+    with open(DB_PATH["MAIN"], mode='r', encoding='utf-8') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)           
         
@@ -60,7 +56,7 @@ def searchForSingleUser( userId):
 def searchForUserBasedOn_ID_IC_Name_Contact_oldCustomerId(userId):
     # Step 1: Build treatment mapping (customerId -> latest treatment date)
     condition_to_customer = {}
-    with open(CONDITION_DB_PATH, mode='r', encoding='utf-8') as condition_file:
+    with open(DB_PATH["CONDITION"], mode='r', encoding='utf-8') as condition_file:
         reader = csv.DictReader(condition_file)
         for row in reader:
             condition_id = row.get("conditionId")
@@ -69,7 +65,7 @@ def searchForUserBasedOn_ID_IC_Name_Contact_oldCustomerId(userId):
                 condition_to_customer[condition_id] = customer_id
 
     customer_latest_treatment = defaultdict(lambda: datetime.min)
-    with open(TREATMENT_DB_PATH, mode='r', encoding='utf-8') as treatment_file:
+    with open(DB_PATH["TREATMENT"], mode='r', encoding='utf-8') as treatment_file:
         reader = csv.DictReader(treatment_file)
         for row in reader:
             condition_id = row.get("conditionId")
@@ -84,7 +80,7 @@ def searchForUserBasedOn_ID_IC_Name_Contact_oldCustomerId(userId):
                     continue
 
     # Step 2: Perform text search
-    with open(DB_PATH, mode='r', encoding='utf-8') as file:
+    with open(DB_PATH["MAIN"], mode='r', encoding='utf-8') as file:
         csvFile = csv.reader(file)
         header = next(csvFile)
         res = []
@@ -125,7 +121,7 @@ def addOldCustomerID(customerID, oldCustomerId):
     updated = False
 
     # Read all rows
-    with open(DB_PATH, mode='r', encoding='utf-8') as file:
+    with open(DB_PATH["MAIN"], mode='r', encoding='utf-8') as file:
         csv_reader = csv.reader(file)
         rows = list(csv_reader)
 
@@ -146,7 +142,7 @@ def addOldCustomerID(customerID, oldCustomerId):
 
         if updated:
             # Write the updated rows back to the file
-            with open(DB_PATH, mode='w', encoding='utf-8', newline='') as file:
+            with open(DB_PATH["MAIN"], mode='w', encoding='utf-8', newline='') as file:
                 csv_writer = csv.writer(file)
                 csv_writer.writerows(rows)
             print("Added old customer ID successfully.")
@@ -160,9 +156,9 @@ def addOldCustomerID(customerID, oldCustomerId):
 def addCustomer(getFormDataFunc):
     header, row, customerId = getFormDataFunc()
 
-    file_exists = os.path.exists(DB_PATH)
+    file_exists = os.path.exists(DB_PATH["MAIN"])
     try:
-        with open(DB_PATH, mode='a', encoding='utf-8', newline='') as file:
+        with open(DB_PATH["MAIN"], mode='a', encoding='utf-8', newline='') as file:
             writer = csv.writer(file)
             if not file_exists:
                 writer.writerow(header)
@@ -173,11 +169,11 @@ def addCustomer(getFormDataFunc):
 
 def saveCustomerChanges(getFormDataFunc, customer_id_value):
     header, updated_row, customerId = getFormDataFunc(customer_id_value)
-    temp_file_path = DB_PATH + ".tmp"
+    temp_file_path = DB_PATH["MAIN"].with_suffix('.tmp')
     updated = False
 
     try:
-        with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+        with open(DB_PATH["MAIN"], mode='r', encoding='utf-8', newline='') as infile, \
              open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
 
             reader = csv.reader(infile)
@@ -200,14 +196,14 @@ def saveCustomerChanges(getFormDataFunc, customer_id_value):
                     writer.writerow(row)
 
         if updated:
-            os.replace(temp_file_path, DB_PATH)
+            os.replace(temp_file_path, DB_PATH["MAIN"])
             print(f"Customer updated: {customerId}")
         else:
             os.remove(temp_file_path)
             print("Customer ID not found, no update done.")
 
     except FileNotFoundError:
-        with open(DB_PATH, mode='w', encoding='utf-8', newline='') as file:
+        with open(DB_PATH["MAIN"], mode='w', encoding='utf-8', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(header)
             writer.writerow(updated_row)
@@ -216,11 +212,11 @@ def saveCustomerChanges(getFormDataFunc, customer_id_value):
         print(f"Error updating customer: {e}")
 
 def deleteCustomerById(customerId):
-    temp_file_path = DB_PATH + ".tmp"
+    temp_file_path = DB_PATH["MAIN"].with_suffix('.tmp')
     deleted = False
 
     try:
-        with open(DB_PATH, mode='r', encoding='utf-8', newline='') as infile, \
+        with open(DB_PATH["MAIN"], mode='r', encoding='utf-8', newline='') as infile, \
              open(temp_file_path, mode='w', encoding='utf-8', newline='') as outfile:
 
             reader = csv.reader(infile)
@@ -245,7 +241,7 @@ def deleteCustomerById(customerId):
                 writer.writerow(row)
 
         if deleted:
-            os.replace(temp_file_path, DB_PATH)
+            os.replace(temp_file_path, DB_PATH["MAIN"])
             print("Customer deleted successfully.")
         else:
             os.remove(temp_file_path)
@@ -258,7 +254,7 @@ def deleteCustomerById(customerId):
 def getCustomerListByLatestTreatmentDate(limit=20):
     # Step 1: Read conditionId -> customerId mapping
     condition_to_customer = {}
-    with open(CONDITION_DB_PATH, mode='r', encoding='utf-8') as condition_file:
+    with open(DB_PATH["CONDITION"], mode='r', encoding='utf-8') as condition_file:
         reader = csv.DictReader(condition_file)
         for row in reader:
             condition_id = row.get("conditionId")
@@ -268,7 +264,7 @@ def getCustomerListByLatestTreatmentDate(limit=20):
 
     # Step 2: Read treatment data and map customerId -> latest treatment date
     customer_latest_treatment = defaultdict(lambda: datetime.min)
-    with open(TREATMENT_DB_PATH, mode='r', encoding='utf-8') as treatment_file:
+    with open(DB_PATH["TREATMENT"], mode='r', encoding='utf-8') as treatment_file:
         reader = csv.DictReader(treatment_file)
         for row in reader:
             condition_id = row.get("conditionId")
@@ -293,7 +289,7 @@ def getCustomerListByLatestTreatmentDate(limit=20):
 
     # Step 4: Fetch customer details
     results = []
-    with open(DB_PATH, mode='r', encoding='utf-8') as db_file:
+    with open(DB_PATH["MAIN"], mode='r', encoding='utf-8') as db_file:
         reader = csv.DictReader(db_file)
         customer_dict = {
             _normalize_customer_id(row.get(dbCol.customerId)): row
