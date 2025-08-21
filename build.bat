@@ -24,7 +24,7 @@ if exist release\dist (
 
 REM Run PyInstaller with your spec file
 echo [4/5] Running PyInstaller...
-pyinstaller release\main.spec --distpath release\dist --workpath release\build
+pyinstaller release\main_windows.spec --distpath release\dist --workpath release\build
 
 REM Final message
 echo [5/5] Build complete!

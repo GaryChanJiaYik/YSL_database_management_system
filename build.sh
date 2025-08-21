@@ -17,7 +17,7 @@ rm -rf release/dist
 
 # Step 4: Run PyInstaller with your spec file
 echo "[4/5] Running PyInstaller..."
-pyinstaller release/main.spec --distpath release/dist --workpath release/build
+pyinstaller release/main_macos.spec --distpath release/dist --workpath release/build
 
 # Step 5: Final message
 echo "[5/5] Build complete!"
