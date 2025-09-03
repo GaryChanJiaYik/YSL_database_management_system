@@ -7,11 +7,11 @@ a = Analysis(
     pathex=['program'],
     binaries=[],
     datas=[
-        ('../data/conditionDb.csv', 'data'),
-        ('../data/db.csv', 'data'),
-        ('../data/treatmentDb.csv', 'data'),
-        ('../data/treatmentRevisionHistory.csv', 'data'),
-        ('../data/attachment', 'data/attachment'),
+        # ('../data/conditionDb.csv', 'data'),  # Excluded for prod build
+        # ('../data/db.csv', 'data'),   # Excluded for prod build
+        # ('../data/treatmentDb.csv', 'data'),  # Excluded for prod build
+        # ('../data/treatmentRevisionHistory.csv', 'data'), # Excluded for prod build
+        # ('../data/attachment', 'data/attachment'),    # Excluded for prod build
         ('../program/asset/icons', 'program/asset/icons'),
     ],
     hiddenimports=[],
