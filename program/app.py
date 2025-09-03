@@ -86,10 +86,12 @@ class App:
         self.resetWindow()
 
     def __init__(self):        
+        ctk.set_appearance_mode("dark")
+        
         self.appRoot = ctk.CTk()
         self.appRoot.title(APP_NAME)
         #self.appRoot.geometry("1100x600")  # Replace with your STANDARD_WINDOW_SIZE
-        self.center_window(1100, 600)
+        self.center_window(1200, 600)
 
         self.appCommonHeaderContainer = ctk.CTkFrame(self.appRoot, bg_color="transparent", fg_color="transparent", height=50)
         self.appCommonHeaderContainer.grid_rowconfigure(0, weight=1)

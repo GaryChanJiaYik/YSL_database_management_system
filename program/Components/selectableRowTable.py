@@ -64,7 +64,7 @@ class Table:
                 offset += 2
 
             if not is_header:
-                # Add delete button in the last column
+                # Add edit button in the last column
                 edit_btn = tk.Button(
                     self.root,
                     image=self.edit_icon,
