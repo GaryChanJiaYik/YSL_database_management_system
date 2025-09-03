@@ -5,116 +5,13 @@ from services.conditionDbFunctions import updateConditionByID, deleteCondition
 from Components.popupModal import renderPopUpModal
 from Components.datePickerModal import DatePickerModal
 from Components.timePickerModal import TimePickerModal
+from utils import setEntryValue
 from datetime import datetime
 
 
 class EditConditionView(customtkinter.CTkFrame):
     
     entryFieldList = [dbCol.conditionDescription]
-    
-    def saveCondition(self):
-        updated_desc = self.entryFields[dbCol.conditionDescription].get("1.0", customtkinter.END).strip()
-        date_str = self.date_value.get().strip()
-        time_str = self.time_value.get().strip()
-        # Warning
-        # if not updated_desc:
-        #     self.desc_warning_label.configure(text="Description cannot be empty.")
-        #     return
-        # else:
-        #     self.desc_warning_label.configure(text="")
-        try:
-            combined_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %I:%M %p")
-            final_datetime_str = combined_datetime.strftime("%Y-%m-%d %H:%M")
-        except ValueError:
-            final_datetime_str = datetime.now().strftime("%Y-%m-%d %H:%M")
-        
-        success = updateConditionByID(self.conditionModel.conditionId, updated_desc, final_datetime_str)
-
-        if success:
-            renderPopUpModal(self.parent, "Condition updated successfully", "Success", "Success")
-            print("Condition updated")
-        else:
-            renderPopUpModal(self.parent, "Failed to update condition", "Error", "Error")
-            print("Failed to update condition")
-        
-        self.backToPreviousWindow()
-    
-    
-    def deleteCondition(self):
-        #  Confirmation
-        # confirm = customtkinter.CTkInputDialog(text="Are you sure you want to delete this condition?", title="Confirm Delete")
-        # if confirm.get_input() != "yes":
-        #     return
-        success = deleteCondition(self.conditionModel.conditionId)
-
-        if success:
-            renderPopUpModal(self.parent, "Condition deleted successfully", "Deleted", "Success")
-            print("Condition deleted")
-        else:
-            renderPopUpModal(self.parent, "Failed to delete condition", "Error", "Error")
-            print("Failed to delete condition")
-   
-        self.backToPreviousWindow()
-    
-    
-    def backToPreviousWindow(self):
-        self.controller.setCustomerID(self.conditionModel.customerId)
-        self.controller.setConditionModel(self.conditionModel)
-
-        # Clean up the current frame from stack
-        if len(self.controller.window_stack) > 0:
-            self.controller.window_stack.pop()
-
-        self.controller.switch_frame(WINDOW_CUSTOMER_DETAIL, isFromBackButton=True)
-    
-    
-    def openDatePicker(self):
-        DatePickerModal.open_date_picker(
-            parent=self,
-            current_date_str=self.date_value.get(),
-            on_selected=lambda date_str: self._set_date_value(date_str)
-        )
-
-    def _set_date_value(self, date_str):
-        self.date_value.configure(state="normal")
-        self.date_value.delete(0, "end")
-        self.date_value.insert(0, date_str)
-        self.date_value.configure(state="disabled")
-
-    
-    def openTimePicker(self):
-        TimePickerModal.open_time_picker(
-            parent=self,
-            current_time_str=self.time_value.get().strip(),
-            on_selected=lambda time_str: self._set_time_value(time_str)
-        )
-
-    def _set_time_value(self, time_str):
-        self.time_value.configure(state="normal")
-        self.time_value.delete(0, "end")
-        self.time_value.insert(0, time_str)
-        self.time_value.configure(state="disabled")
-    
-    
-    def populateDateTimeFields(self, datetime_string):
-        try:
-            dt = datetime.strptime(datetime_string, "%Y-%m-%d %H:%M")
-            formatted_date = dt.strftime("%Y-%m-%d")
-            formatted_time = dt.strftime("%I:%M %p")
-
-            self.date_value.configure(state="normal")
-            self.date_value.delete(0, "end")
-            self.date_value.insert(0, formatted_date)
-            self.date_value.configure(state="disabled")
-
-            self.time_value.configure(state="normal")
-            self.time_value.delete(0, "end")
-            self.time_value.insert(0, formatted_time)
-            self.time_value.configure(state="disabled")
-
-        except ValueError:
-            print("Invalid datetime format.")
-    
     
     def __init__(self, parent, controller, customerId, conditionModel):
         super().__init__(parent)
@@ -209,5 +106,97 @@ class EditConditionView(customtkinter.CTkFrame):
 
         customtkinter.CTkButton(self.actionButtonsFrame, text="Save", command=self.saveCondition).grid(row=0, column=0)
         customtkinter.CTkButton(self.actionButtonsFrame, text="Delete", fg_color="red", text_color="white", hover_color="darkred", command=self.deleteCondition).grid(row=0, column=1, padx=(10,0))
+    
+    
+    def saveCondition(self):
+        updated_desc = self.entryFields[dbCol.conditionDescription].get("1.0", customtkinter.END).strip()
+        date_str = self.date_value.get().strip()
+        time_str = self.time_value.get().strip()
+        # Warning
+        # if not updated_desc:
+        #     self.desc_warning_label.configure(text="Description cannot be empty.")
+        #     return
+        # else:
+        #     self.desc_warning_label.configure(text="")
+        try:
+            combined_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %I:%M %p")
+            final_datetime_str = combined_datetime.strftime("%Y-%m-%d %H:%M")
+        except ValueError:
+            final_datetime_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        
+        success = updateConditionByID(self.conditionModel.conditionId, updated_desc, final_datetime_str)
+
+        if success:
+            renderPopUpModal(self.parent, "Condition updated successfully", "Success", "Success")
+            print("Condition updated")
+        else:
+            renderPopUpModal(self.parent, "Failed to update condition", "Error", "Error")
+            print("Failed to update condition")
+        
+        self.backToPreviousWindow()
+    
+    
+    def deleteCondition(self):
+        #  Confirmation
+        # confirm = customtkinter.CTkInputDialog(text="Are you sure you want to delete this condition?", title="Confirm Delete")
+        # if confirm.get_input() != "yes":
+        #     return
+        success = deleteCondition(self.conditionModel.conditionId)
+
+        if success:
+            renderPopUpModal(self.parent, "Condition deleted successfully", "Deleted", "Success")
+            print("Condition deleted")
+        else:
+            renderPopUpModal(self.parent, "Failed to delete condition", "Error", "Error")
+            print("Failed to delete condition")
+   
+        self.backToPreviousWindow()
+    
+    
+    def backToPreviousWindow(self):
+        self.controller.setCustomerID(self.conditionModel.customerId)
+        self.controller.setConditionModel(self.conditionModel)
+
+        # Clean up the current frame from stack
+        if len(self.controller.window_stack) > 0:
+            self.controller.window_stack.pop()
+
+        self.controller.switch_frame(WINDOW_CUSTOMER_DETAIL, isFromBackButton=True)
+    
+    
+    def openDatePicker(self):
+        DatePickerModal.open_date_picker(
+            parent=self,
+            current_date_str=self.date_value.get(),
+            on_selected=lambda date_str: setEntryValue(self.date_value, date_str)
+        )
+
+    
+    def openTimePicker(self):
+        TimePickerModal.open_time_picker(
+            parent=self,
+            current_time_str=self.time_value.get().strip(),
+            on_selected=lambda time_str: setEntryValue(self.time_value, time_str)
+        )
+    
+    
+    def populateDateTimeFields(self, datetime_string):
+        try:
+            dt = datetime.strptime(datetime_string, "%Y-%m-%d %H:%M")
+            formatted_date = dt.strftime("%Y-%m-%d")
+            formatted_time = dt.strftime("%I:%M %p")
+
+            self.date_value.configure(state="normal")
+            self.date_value.delete(0, "end")
+            self.date_value.insert(0, formatted_date)
+            self.date_value.configure(state="disabled")
+
+            self.time_value.configure(state="normal")
+            self.time_value.delete(0, "end")
+            self.time_value.insert(0, formatted_time)
+            self.time_value.configure(state="disabled")
+
+        except ValueError:
+            print("Invalid datetime format.")
         
         

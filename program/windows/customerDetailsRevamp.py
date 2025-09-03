@@ -15,7 +15,10 @@ from Components.conditionModelBlock import instantiateConditionModelBlock
 from services.customerFilesServices import customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile, deleteCustomerFile
 from tkinter.filedialog import askopenfilename
 from Components.popupModal import renderPopUpModal
+from Components.datePickerModal import DatePickerModal
+from Components.timePickerModal import TimePickerModal
 from Constant.fileKeywords import CONSENT_FORM_KEYWORD
+from utils import setEntryValue
 
 class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
@@ -126,12 +129,24 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             renderPopUpModal(root, "Old ID CANNOT be empty!", "Error", "Error")
 
     def addConditionToDb(self):
+        # Get date and time from user input
+        date_str = self.date_value.get().strip()
+        time_str = self.time_value.get().strip()
+        
+        # Comine to create datetime object
+        try:
+            combined_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %I:%M %p")
+            formatted_datetime = combined_datetime.strftime("%Y-%m-%d %H:%M")
+        except ValueError:
+            print("Invalid date/time format. Using current datetime.")
+            formatted_datetime = datetime.now().strftime("%Y-%m-%d %H:%M")
+        
         conditionModel = ConditionModel(
             customerId=convertTimeStampToId(self.customerId),
             condition_id= generateUUID(),  # Assuming this is auto-generated in the database
             conditionDescription=self.conditionEntry.get("1.0", "end-1c"),
             undergoingTreatment=True,
-            conditionDate= getFormattedDateTime()  # Placeholder date, replace with actual date if needed
+            conditionDate= formatted_datetime
         )
         insertConditionToDb(conditionModel)
 
@@ -141,6 +156,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         
         self.closeAddConditionFrame()  # Close the frame after submission
 
+    
     def openAddConditionWindow(self):
         if self.addConditionFrame is None:
             self.renderAddConditionFrame(self.conditionFrame)    
@@ -162,29 +178,77 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             height=100
         )
         self.conditionEntry.grid(row=0, column=1, sticky="w", padx=(10, 5), pady=5)
+        
+        # Date Field
+        customtkinter.CTkLabel(self.addConditionFrame, text="Date:", pady=1).grid(
+            row=1, column=0, sticky="w", padx=(10, 5), pady=(10, 0)
+        )
 
+        dateInputFrame = customtkinter.CTkFrame(self.addConditionFrame, fg_color="transparent")
+        dateInputFrame.grid(row=1, column=1, sticky="w", padx=(0, 5), pady=(10, 0))
 
-        # Add condition button
+        self.date_value = customtkinter.CTkEntry(dateInputFrame, width=120)
+        self.date_value.insert(0, datetime.now().strftime("%Y-%m-%d"))
+        self.date_value.configure(state="disabled")
+        self.date_value.grid(row=0, column=0, padx=(0, 10))
+        customtkinter.CTkButton(dateInputFrame, text="Edit", width=60, command=self.openDatePicker).grid(row=0, column=1)
+
+        # Time Field
+        customtkinter.CTkLabel(self.addConditionFrame, text="Time:", pady=1).grid(
+            row=2, column=0, sticky="w", padx=(10, 5), pady=(5, 0)
+        )
+
+        timeInputFrame = customtkinter.CTkFrame(self.addConditionFrame, fg_color="transparent")
+        timeInputFrame.grid(row=2, column=1, sticky="w", padx=(0, 5), pady=(5, 0))
+
+        self.time_value = customtkinter.CTkEntry(timeInputFrame, width=120)
+        self.time_value.insert(0, datetime.now().strftime("%I:%M %p"))
+        self.time_value.configure(state="disabled")
+        self.time_value.grid(row=0, column=0, padx=(0, 10))
+        customtkinter.CTkButton(timeInputFrame, text="Edit", width=60, command=self.openTimePicker).grid(row=0, column=1)
+
+        # Add and close buttons
+        buttonFrame = customtkinter.CTkFrame(self.addConditionFrame, fg_color="transparent")
+        buttonFrame.grid(row=3, column=0, columnspan=2, sticky="w", padx=(10, 5), pady=(10, 0))
+        buttonFrame.grid_columnconfigure(0, weight=0)
+        buttonFrame.grid_columnconfigure(1, weight=0)
+
         customtkinter.CTkButton(
-            master=self.addConditionFrame,
+            master=buttonFrame,
             text="Add",
             command=lambda: self.addConditionToDb(),
-        ).grid(row=1, column=0, sticky="w", padx=(10, 5), pady=5)
-
+        ).grid(row=0, column=0, padx=(0, 10))
 
         customtkinter.CTkButton(
-            master=self.addConditionFrame,
+            master=buttonFrame,
             text="Close",
             command=lambda: self.closeAddConditionFrame(),
             fg_color="red",
             hover_color="darkred",
-        ).grid(row=1, column=1, sticky="w", padx=(10, 5), pady=5)
-        self.addConditionFrame.grid(row=1, column=0, sticky="w", padx=(10, 5), pady=5)
+        ).grid(row=0, column=1)
+        
+    
+    def openDatePicker(self):
+        DatePickerModal.open_date_picker(
+            parent=self,
+            current_date_str=self.date_value.get(),
+            on_selected=lambda date_str: setEntryValue(self.date_value, date_str)
+        )
+
+    
+    def openTimePicker(self):
+        TimePickerModal.open_time_picker(
+            parent=self,
+            current_time_str=self.time_value.get().strip(),
+            on_selected=lambda time_str: setEntryValue(self.time_value, time_str)
+        )
+
 
     def closeAddConditionFrame(self):
         if self.addConditionFrame:
             self.addConditionFrame.destroy()  # remove the frame from the screen
             self.addConditionFrame = None     # reset state
+
 
     def renderConditionList(self):
         # Clear the existing widgets inside the container

@@ -13,7 +13,7 @@ from Components.popupModal import renderPopUpModal
 from Constant.inputValidations import checkLengthOfInput
 from Components.datePickerModal import DatePickerModal
 from Components.timePickerModal import TimePickerModal
-from utils import setEntryValue  # adjust the path if needed
+from utils import setEntryValue
 
 class AddTreatmentViewRevamp(customtkinter.CTkFrame):
 
