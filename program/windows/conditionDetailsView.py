@@ -69,7 +69,7 @@ class ConditionDetailsView(ctk.CTkFrame):
         for widget in root.winfo_children():
             widget.destroy()
 
-        conditionHasAttachmentVar = HasAttachment(self.customerId, ATTACHMENT_TYPE)
+        conditionHasAttachmentVar = HasAttachment(self.customerId, ATTACHMENT_TYPE, self.conditionModel.conditionId)
 
         upload_btn = ctk.CTkButton(
             master=root,
@@ -138,7 +138,7 @@ class ConditionDetailsView(ctk.CTkFrame):
         all_success = True
         if file_paths:
             for filePath in file_paths:
-                result = uploadAttachmentFile(self.customerId, filePath, self.parent, ATTACHMENT_TYPE)
+                result = uploadAttachmentFile(self.customerId, filePath, self.parent, ATTACHMENT_TYPE, self.conditionModel.conditionId)
                 if result != SUCCESS:
                     all_success = False
         else:
@@ -153,7 +153,7 @@ class ConditionDetailsView(ctk.CTkFrame):
     
 
     def viewConditionAttachmentDirectory(self):
-        openAttachmentDirectory(self.customerId, self.parent, ATTACHMENT_TYPE)
+        openAttachmentDirectory(self.customerId, self.parent, ATTACHMENT_TYPE, self.conditionModel.conditionId)
 
 
     def navigateToTreatmentDetailView(self, model):

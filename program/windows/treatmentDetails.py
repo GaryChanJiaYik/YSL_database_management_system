@@ -60,7 +60,7 @@ class TreatmentDetailView(ctk.CTkFrame):
         for widget in root.winfo_children():
             widget.destroy()
         
-        treatmentHasAttachmentVar = HasAttachment(self.customerId, ATTACHMENT_TYPE)
+        treatmentHasAttachmentVar = HasAttachment(self.customerId, ATTACHMENT_TYPE, self.treatmentModel.treatmentID)
         
         upload_btn = ctk.CTkButton(
             master=root,
@@ -92,7 +92,7 @@ class TreatmentDetailView(ctk.CTkFrame):
         all_success = True
         if file_paths:
             for filePath in file_paths:
-                result = uploadAttachmentFile(self.customerId, filePath, self.root, ATTACHMENT_TYPE)
+                result = uploadAttachmentFile(self.customerId, filePath, self.root, ATTACHMENT_TYPE, self.treatmentModel.treatmentID)
                 if result != SUCCESS:
                      all_success = False
         else:
@@ -107,7 +107,7 @@ class TreatmentDetailView(ctk.CTkFrame):
 
 
     def viewTreatmentAttachmentDirectory(self):
-        openAttachmentDirectory(self.customerId, self.root, ATTACHMENT_TYPE)
+        openAttachmentDirectory(self.customerId, self.root, ATTACHMENT_TYPE, self.treatmentModel.treatmentID)
 
 
     def renderTreatmentPicture(self, root, treatmentPicturePath):
