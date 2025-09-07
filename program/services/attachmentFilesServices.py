@@ -7,7 +7,7 @@ from Constant.errorCode import ERROR, SUCCESS
 #CONSTANTs
 attachment_path = os.path.join(os.getcwd(), "data", "attachment")
 
-def HasAttachment(customer_id, attachment_type):
+def HasAttachment(customer_id, attachment_type, entity_id=None):
     """
     Checks if any attachment file exists for a given customer ID
     within the data/attachment directory.
@@ -19,8 +19,10 @@ def HasAttachment(customer_id, attachment_type):
         bool: True if any attachment file exists within the
               customer's ID folder, False otherwise.
     """
-   
-    customer_folder_path = os.path.join(attachment_path, customer_id, attachment_type)
+    if entity_id:
+        customer_folder_path = os.path.join(attachment_path, customer_id, attachment_type, entity_id)
+    else:
+        customer_folder_path = os.path.join(attachment_path, customer_id, attachment_type)
 
     # Check if the customer's ID folder exists
     if os.path.isdir(customer_folder_path):
@@ -33,15 +35,18 @@ def HasAttachment(customer_id, attachment_type):
         return False
 
 
-def uploadAttachmentFile(customer_id, filePath, root, attachment_type):
+def uploadAttachmentFile(customer_id, filePath, root, attachment_type, entity_id=None):
     if not filePath:
         return ERROR  # No file, silently return
 
     fileNameWithExtension = os.path.basename(filePath)
     fileNameWithoutExtension, extension = os.path.splitext(fileNameWithExtension)
 
-    #check if foolder to store customer file exist 
-    customer_folder_path = os.path.join(attachment_path, customer_id, attachment_type)
+    #check if foolder to store customer file exist
+    if entity_id:
+        customer_folder_path = os.path.join(attachment_path, customer_id, attachment_type, entity_id)
+    else:
+        customer_folder_path = os.path.join(attachment_path, customer_id, attachment_type)
 
     # if no folder storing customer file exist create one
     if not os.path.exists(customer_folder_path):
@@ -65,9 +70,12 @@ def uploadAttachmentFile(customer_id, filePath, root, attachment_type):
         return ERROR
 
 
-def openAttachmentDirectory(customerId, root, attachment_type):
+def openAttachmentDirectory(customerId, root, attachment_type, entity_id=None):
     # Build the path to the customer's attachment folder
-    customer_folder_path = os.path.join(attachment_path, customerId, attachment_type)
+    if entity_id:
+        customer_folder_path = os.path.join(attachment_path, customerId, attachment_type, entity_id)
+    else:
+        customer_folder_path = os.path.join(attachment_path, customerId, attachment_type)
 
     # Make sure the folder exists
     if not os.path.exists(customer_folder_path):
