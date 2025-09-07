@@ -1,17 +1,22 @@
 import customtkinter as ctk
+from tkinter.filedialog import askopenfilenames
 from Constant.appConstant import (
     STANDARD_WINDOW_SIZE, WINDOW_ADD_TREATMENT, WINDOW_EDIT_TREATMENT, WINDOW_TREATMENT_DETAIL,
     FONT
     )
-from Components.customFields import createDetailField
 from Constant.converterFunctions import formatDateTime
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
-from services.conditionDbFunctions import updateTreatmentStatus, getTreatmentStatus
-from windows.addTreatmentRevamp import AddTreatmentViewRevamp
-from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunctionRevamp
-from services.customerFilesServices import getConditionPicturePath,renderFilePicker, uploadCustomerFile
-from PIL import Image
 from Constant.errorCode import SUCCESS
+from Components.customFields import createDetailField
+from Components.popupModal import renderPopUpModal
+from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunctionRevamp
+from services.conditionDbFunctions import updateTreatmentStatus, getTreatmentStatus
+from services.customerFilesServices import getConditionPicturePath,renderFilePicker, uploadCustomerFile
+from services.attachmentFilesServices import HasAttachment, uploadAttachmentFile, openAttachmentDirectory
+from PIL import Image
+
+# CONSTANTS
+ATTACHMENT_TYPE = "Condition"
 
 class ConditionDetailsView(ctk.CTkFrame):
 
@@ -60,6 +65,28 @@ class ConditionDetailsView(ctk.CTkFrame):
             self.uploadConditionPictureBtn.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
 
 
+    def renderConditionAttachmentContainerContent(self, root):
+        for widget in root.winfo_children():
+            widget.destroy()
+
+        conditionHasAttachmentVar = HasAttachment(self.customerId, ATTACHMENT_TYPE)
+
+        upload_btn = ctk.CTkButton(
+            master=root,
+            text="Upload",
+            command=self.uploadConditionAttachment
+        )
+        upload_btn.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
+
+        if conditionHasAttachmentVar:
+            view_btn = ctk.CTkButton(
+                master=root,
+                text="View",
+                command=self.viewConditionAttachmentDirectory
+            )
+            view_btn.place(relx=0.5, rely=0.7, anchor=ctk.CENTER)
+
+        
     def renderConditionPicture(self, root, conditionPicturePath):
         #render the picture
         image = Image.open(conditionPicturePath)
@@ -95,6 +122,38 @@ class ConditionDetailsView(ctk.CTkFrame):
             if hasattr(self, 'uploadConditionPictureBtn') and self.uploadConditionPictureBtn:
                 self.uploadConditionPictureBtn.destroy()
             self.renderConditionPicture(self.conditionPictureContainer, filePath)
+
+
+    def uploadConditionAttachment(self):
+        file_paths = askopenfilenames(
+            title="Select files to upload",
+            filetypes=[
+                ("All Files", "*.*"),
+                ("ZIP Files", "*.zip"),
+                ("PDF Files", "*.pdf"),
+                ("Images", "*.jpg *.jpeg *.png"),
+            ]
+        )
+
+        all_success = True
+        if file_paths:
+            for filePath in file_paths:
+                result = uploadAttachmentFile(self.customerId, filePath, self.parent, ATTACHMENT_TYPE)
+                if result != SUCCESS:
+                    all_success = False
+        else:
+            return
+        
+        if all_success:
+            renderPopUpModal(self.parent, "All files uploaded successfully", "Upload", "Success")
+        else:
+            renderPopUpModal(self.parent, "Some files failed to upload", "Upload", "Warning")
+        
+        self.renderConditionAttachmentContainerContent(self.conditionAttachmentContainer)
+    
+
+    def viewConditionAttachmentDirectory(self):
+        openAttachmentDirectory(self.customerId, self.parent, ATTACHMENT_TYPE)
 
 
     def navigateToTreatmentDetailView(self, model):
@@ -192,12 +251,20 @@ class ConditionDetailsView(ctk.CTkFrame):
         self.statusLabel = createDetailField(root=self.conditionDetailsField, fieldName="Status", content="Undergoing Treatement" if conditionModel.undergoingTreatment else "Treated", row=3, column=0)
         self.LoadTreatmentStatus()
 
-        #conditionPicture
-        self.conditionPictureContainer = ctk.CTkFrame(
-            self.conditionContainer,
-        )
-        self.conditionPictureContainer.grid(row=0, column=1, sticky="nsew", padx=(10, 5), pady=5)
-        self.renderConditionPictureContainerContent(self.conditionPictureContainer)
+        if "GCaring" in self.controller.getAppVersion():
+            # Upload Attachment
+            self.conditionAttachmentContainer = ctk.CTkFrame(
+                self.conditionContainer,
+            )
+            self.conditionAttachmentContainer.grid(row=0, column=1, sticky="nsew", padx=(10, 5), pady=5)
+            self.renderConditionAttachmentContainerContent(self.conditionAttachmentContainer)
+        else:
+            #conditionPicture
+            self.conditionPictureContainer = ctk.CTkFrame(
+                self.conditionContainer,
+            )
+            self.conditionPictureContainer.grid(row=0, column=1, sticky="nsew", padx=(10, 5), pady=5)
+            self.renderConditionPictureContainerContent(self.conditionPictureContainer)
 
 
         #Treatment list 

@@ -87,6 +87,9 @@ class App:
         self.adminAccess = False
         self.resetWindow()
 
+    def getAppVersion(self):
+        return __version__
+
     def __init__(self):        
         ctk.set_appearance_mode("dark")
         

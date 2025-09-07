@@ -1,12 +1,17 @@
 import customtkinter as ctk
+from tkinter.filedialog import askopenfilenames
 from PIL import Image
 from Constant.errorCode import SUCCESS
 from Constant.treatmentDatabaseFunctions import getTreatmentByID,getAllTreatmentRevisionByID
 from Constant.appConstant import FONT
 from Components.customFields import createDetailField
 from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunctionRevamp
+from Components.popupModal import renderPopUpModal
 from services.customerFilesServices import getTreatmentPicturePath, renderFilePicker, uploadCustomerFile
+from services.attachmentFilesServices import HasAttachment, uploadAttachmentFile, openAttachmentDirectory
 
+# CONSTANTS
+ATTACHMENT_TYPE = "Treatment"
 
 class TreatmentDetailView(ctk.CTkFrame):
     
@@ -42,14 +47,67 @@ class TreatmentDetailView(ctk.CTkFrame):
 
     def renderTreatmentPictureContainerContent(self, root):
         self.uploadTreatmentPictureBtn = None
-        customerId = self.controller.getCustomerID()
-        treatmentPicturePath = getTreatmentPicturePath(customerId, self.treatmentModel.treatmentID)
+        treatmentPicturePath = getTreatmentPicturePath(self.customerId, self.treatmentModel.treatmentID)
         
         if treatmentPicturePath is not None:
             self.renderTreatmentPicture(root, treatmentPicturePath)
         else:
             self.uploadTreatmentPictureBtn = ctk.CTkButton(root, text="Upload Picture", command=self.uploadTreatmentPicture)
             self.uploadTreatmentPictureBtn.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
+
+
+    def renderTreatmentAttachmentContainerContent(self, root):
+        for widget in root.winfo_children():
+            widget.destroy()
+        
+        treatmentHasAttachmentVar = HasAttachment(self.customerId, ATTACHMENT_TYPE)
+        
+        upload_btn = ctk.CTkButton(
+            master=root,
+            text="Upload",
+            command=self.uploadTreatmentAttachment
+        )
+        upload_btn.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
+
+        if treatmentHasAttachmentVar:
+            view_btn = ctk.CTkButton(
+                master=root,
+                text="View",
+                command=self.viewTreatmentAttachmentDirectory
+            )
+            view_btn.place(relx=0.5, rely=0.65, anchor=ctk.CENTER)
+
+
+    def uploadTreatmentAttachment(self):
+        file_paths = askopenfilenames(
+            title="Select files to upload",
+            filetypes=[
+                ("All Files", "*.*"),
+                ("ZIP Files", "*.zip"),
+                ("PDF Files", "*.pdf"),
+                ("Images", "*.jpg *.jpeg *.png"),
+            ]
+        )
+    
+        all_success = True
+        if file_paths:
+            for filePath in file_paths:
+                result = uploadAttachmentFile(self.customerId, filePath, self.root, ATTACHMENT_TYPE)
+                if result != SUCCESS:
+                     all_success = False
+        else:
+            return
+        
+        if all_success:
+            renderPopUpModal(self.root, "All files uploaded successfully", "Upload", "Success")
+        else:
+            renderPopUpModal(self.root, "Some files failed to upload", "Upload", "Warning")
+        
+        self.renderTreatmentAttachmentContainerContent(self.treatmentAttachmentContainer)
+
+
+    def viewTreatmentAttachmentDirectory(self):
+        openAttachmentDirectory(self.customerId, self.root, ATTACHMENT_TYPE)
 
 
     def renderTreatmentPicture(self, root, treatmentPicturePath):
@@ -75,8 +133,7 @@ class TreatmentDetailView(ctk.CTkFrame):
         if not filePath:
             return  # User clicked cancel, do nothing
 
-        customerId = self.controller.getCustomerID()
-        result = uploadCustomerFile(customerId, filePath, self.root, self.treatmentModel.treatmentID)
+        result = uploadCustomerFile(self.customerId, filePath, self.root, self.treatmentModel.treatmentID)
         
         if result == SUCCESS:
             if self.uploadTreatmentPictureBtn:
@@ -90,6 +147,7 @@ class TreatmentDetailView(ctk.CTkFrame):
         self.root = self
 
         self.treatmentModel = getTreatmentByID(treatmentID)
+        self.customerId = self.controller.getCustomerID()
 
         self.masterFrame = ctk.CTkFrame(master=self.root, bg_color="transparent", fg_color='transparent')
         self.masterFrame.grid(column=0, row=0, sticky="nsew")
@@ -137,16 +195,28 @@ class TreatmentDetailView(ctk.CTkFrame):
 
         self.renderTreatmentDetails()
 
-        # Treatment Picture Container (Right)
-        self.treatmentPictureContainer = ctk.CTkFrame(
-            master=self.topSectionFrame,
-            width=250,
-            height=250,
-            fg_color="transparent"
-        )
-        self.treatmentPictureContainer.grid_propagate(False)
-        self.treatmentPictureContainer.grid(row=0, column=1, padx=20, pady=10, sticky="n")
-        self.renderTreatmentPictureContainerContent(self.treatmentPictureContainer)
+        if "GCaring" in self.controller.getAppVersion():
+            # Upload Attachment
+            self.treatmentAttachmentContainer = ctk.CTkFrame(
+                master=self.topSectionFrame,
+                width=250,
+                height=250,
+                fg_color="transparent"
+            )
+            self.treatmentAttachmentContainer.grid_propagate(False)
+            self.treatmentAttachmentContainer.grid(row=0, column=1, padx=20, pady=10, sticky="n")
+            self.renderTreatmentAttachmentContainerContent(self.treatmentAttachmentContainer)
+        else:
+            # Treatment Picture Container (Right)
+            self.treatmentPictureContainer = ctk.CTkFrame(
+                master=self.topSectionFrame,
+                width=250,
+                height=250,
+                fg_color="transparent"
+            )
+            self.treatmentPictureContainer.grid_propagate(False)
+            self.treatmentPictureContainer.grid(row=0, column=1, padx=20, pady=10, sticky="n")
+            self.renderTreatmentPictureContainerContent(self.treatmentPictureContainer)
 
         #Treatment ammendment history
         self.treatmentRevisionHistoryFrame = ctk.CTkFrame(master=self.masterFrame, bg_color="transparent", fg_color='transparent' )
