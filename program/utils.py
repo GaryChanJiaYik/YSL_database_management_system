@@ -4,11 +4,7 @@ import customtkinter as ctk
 
 def resourcePath(relative_path):
     """ Get the absolute path to a resource, works for dev and for PyInstaller """
-    try:
-        base_path = sys._MEIPASS
-    except AttributeError:
-        base_path = os.path.abspath(".")
-
+    base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
     return os.path.join(base_path, relative_path)
 
 

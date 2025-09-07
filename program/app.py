@@ -8,6 +8,8 @@ from windows.treatmentDetails import TreatmentDetailView
 from windows.editCondition import EditConditionView
 from windows.addCustomerView import AddCustomerView
 from Components.previousWindowButton import PreviousWindowButton
+from version import __version__
+from Components.tooltip import ToolTip
 from windows.signIn import SignInWindow
 
 class App:
@@ -98,9 +100,11 @@ class App:
         
         self.appCommonHeaderContainer.grid_columnconfigure(0, weight=3)  
         self.appCommonHeaderContainer.grid_columnconfigure(1, weight=1)  
-        self.appCommonHeaderContainer.grid_columnconfigure(2, weight=1)  
+        self.appCommonHeaderContainer.grid_columnconfigure(2, weight=1)
 
-        ctk.CTkLabel(self.appCommonHeaderContainer, text="(ADMIN) " + APP_NAME if self.adminAccess else APP_NAME, font=ctk.CTkFont(size=20, weight="bold"), text_color="white").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        self.appNameLabel = ctk.CTkLabel(self.appCommonHeaderContainer, text="(ADMIN) " + APP_NAME if self.adminAccess else APP_NAME, font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
+        self.appNameLabel.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        ToolTip(self.appNameLabel, f"Version: {__version__}")
 
         self.buttonContainer = ctk.CTkFrame(self.appCommonHeaderContainer, fg_color="transparent", bg_color="transparent", height=50)
         self.buttonContainer.grid(row=0, column=2, padx=0, pady=0)

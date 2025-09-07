@@ -418,9 +418,18 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
                 ).grid(row=columnTwoRowIndex, column=3, sticky="w", padx=(10, 10), pady=(0, 5))
 
                 #render consent form option button
-                # Will display upload consent form if DO NOT HAVE consent form
-                # Will display view consent form if HAVE consent form
-                self.renderConsentFormOptionButton(row=columnTwoRowIndex, column=4)
+                if display_value == "Disagree不同意":
+                    customtkinter.CTkLabel(
+                        self.customerDetailFrame,
+                        text=display_value,
+                        font=FONT["CONTENT"],
+                        anchor="w",
+                        bg_color='transparent',
+                    ).grid(row=columnTwoRowIndex, column=4, sticky="w", padx=(10, 10), pady=(0, 5))
+                else:
+                    # Will display upload consent form if DO NOT HAVE consent form
+                    # Will display view consent form if HAVE consent form
+                    self.renderConsentFormOptionButton(row=columnTwoRowIndex, column=4)
 
                 columnTwoRowIndex += 1
                 continue  # Skip default rendering
