@@ -1,4 +1,5 @@
 import customtkinter
+from tkinter.filedialog import askopenfilename, askopenfilenames
 from Constant.appConstant import (
     STANDARD_WINDOW_SIZE, WINDOW_CONDITION_DETAIL, WINDOW_EDIT_CONDITION, WINDOW_EDIT_CUSTOMER, 
     WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_TREATMENT, FONT
@@ -6,19 +7,22 @@ from Constant.appConstant import (
 from Constant.databaseManipulationFunctions import searchForSingleUser, addOldCustomerID
 from Constant.dbColumn import customerModelAttributeToField, oldCustomerId, name, ic
 from Constant.converterFunctions import convertTimeStampToId
-from services.conditionDbFunctions import insertConditionToDb, getAllConditionsByCustomerId
-from Model.conditionModel import ConditionModel
+from Constant.errorCode import SUCCESS
 from Constant.generatorFunctions import generateUUID
-from Constant.converterFunctions import convertTimeStampToId, getFormattedDateTime
-from datetime import datetime
-from Components.conditionModelBlock import instantiateConditionModelBlock
-from services.customerFilesServices import customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile, deleteCustomerFile
-from tkinter.filedialog import askopenfilename
+from Constant.fileKeywords import CONSENT_FORM_KEYWORD
+from Constant.converterFunctions import convertTimeStampToId
 from Components.popupModal import renderPopUpModal
 from Components.datePickerModal import DatePickerModal
 from Components.timePickerModal import TimePickerModal
 from Components.datetimePickerModal import DateTimePickerModal
-from Constant.fileKeywords import CONSENT_FORM_KEYWORD
+from Components.conditionModelBlock import instantiateConditionModelBlock
+from services.conditionDbFunctions import insertConditionToDb, getAllConditionsByCustomerId
+from services.customerFilesServices import (
+    customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile, deleteCustomerFile,
+)
+from services.attachmentFilesServices import HasAttachment, uploadAttachmentFile, openAttachmentDirectory
+from Model.conditionModel import ConditionModel
+from datetime import datetime
 from utils import setEntryValue
 
 #Constants
@@ -329,6 +333,25 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
                 # command=lambda: self.renderCustomerDetailSection(),
                 command=lambda: self.deleteConsentForm(),
             ).grid(row=row, column=column +1, sticky="w", padx=(0, 5), pady=5)
+            
+    
+    def renderCustomerAttachmentOptionButton(self, row, column):
+        customerHasAttachmentVar = HasAttachment(self.customerId, ATTACHMENT_TYPE)
+    
+        # Create a button to upload attachment
+        customtkinter.CTkButton(
+            master=self.customerDetailFrame,
+            text="Upload",
+            command=lambda: self.uploadCustomerAttachment(),
+        ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
+        
+        if customerHasAttachmentVar:
+            # Create a button to open the customer attachment directory
+            customtkinter.CTkButton(
+                master=self.customerDetailFrame,
+                text="View",
+                command=lambda: self.viewCustomerAttachmentDirectory(),
+            ).grid(row=row, column=column+1, sticky="w", padx=(10, 5), pady=5)
 
     
     def uploadOrReplaceConsentForm(self):
@@ -336,6 +359,38 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         if filePath:
             uploadCustomerFile(self.customerId, filePath, self.root, CONSENT_FORM_KEYWORD, ATTACHMENT_TYPE)
             self.renderCustomerDetailSection()
+    
+    
+    def uploadCustomerAttachment(self):
+        file_paths = askopenfilenames(
+            title="Select files to upload",
+            filetypes=[
+                ("All Files", "*.*"),
+                ("ZIP Files", "*.zip"),
+                ("PDF Files", "*.pdf"),
+                ("Images", "*.jpg *.jpeg *.png"),
+            ]
+        )
+    
+        all_success = True
+        if file_paths:
+            for filePath in file_paths:
+                result = uploadAttachmentFile(self.customerId, filePath, self.root, ATTACHMENT_TYPE)
+                if result != SUCCESS:
+                    all_success = False
+        else:
+            return
+        
+        if all_success:
+            renderPopUpModal(self.root, "All files uploaded successfully", "Upload", "Success")
+        else:
+            renderPopUpModal(self.root, "Some files failed to upload", "Upload", "Warning")
+        
+        self.renderCustomerDetailSection()
+    
+    
+    def viewCustomerAttachmentDirectory(self):
+        openAttachmentDirectory(self.customerId, self.root, ATTACHMENT_TYPE)
     
     
     def deleteConsentForm(self):
@@ -416,10 +471,10 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             
             # for 'consent'
             if key == 'consent':
-                # Label for "Consent"
+                # Label for "Customer Attachment"
                 customtkinter.CTkLabel(
                     self.customerDetailFrame,
-                    text=field_name,
+                    text="Customer Attachment",
                     font=FONT["LABEL"],
                     anchor="w",
                     bg_color='transparent',
@@ -437,7 +492,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
                 else:
                     # Will display upload consent form if DO NOT HAVE consent form
                     # Will display view consent form if HAVE consent form
-                    self.renderConsentFormOptionButton(row=columnTwoRowIndex, column=4)
+                    self.renderCustomerAttachmentOptionButton(row=columnTwoRowIndex, column=4)
 
                 columnTwoRowIndex += 1
                 continue  # Skip default rendering
