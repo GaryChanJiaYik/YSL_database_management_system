@@ -13,6 +13,9 @@ from services.customerFilesServices import getConditionPicturePath,renderFilePic
 from PIL import Image
 from Constant.errorCode import SUCCESS
 
+#Constants
+ATTACHMENT_TYPE = "Condition"
+
 class ConditionDetailsView(ctk.CTkFrame):
 
     def treatmentChecked(self):
@@ -52,7 +55,7 @@ class ConditionDetailsView(ctk.CTkFrame):
         #Check if there is any picture for the condition
         # If yes, render the picture,
         # else, render button to upload a picture
-        conditionPicturePath = getConditionPicturePath(self.customerId, self.conditionModel.conditionId)
+        conditionPicturePath = getConditionPicturePath(self.customerId, self.conditionModel.conditionId, ATTACHMENT_TYPE)
         if conditionPicturePath is not None:
             self.renderConditionPicture(root, conditionPicturePath)
         else:
@@ -89,7 +92,7 @@ class ConditionDetailsView(ctk.CTkFrame):
             return  # User clicked cancel, do nothing
 
         # Upload the file to the correct condition picture path
-        result = uploadCustomerFile(self.customerId, filePath, self.parent, self.conditionModel.conditionId)
+        result = uploadCustomerFile(self.customerId, filePath, self.parent, self.conditionModel.conditionId, ATTACHMENT_TYPE)
 
         if result == SUCCESS:
             if hasattr(self, 'uploadConditionPictureBtn') and self.uploadConditionPictureBtn:

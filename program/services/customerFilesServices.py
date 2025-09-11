@@ -10,7 +10,7 @@ from Constant.errorCode import ERROR, SUCCESS
 attachment_path = os.path.join(os.getcwd(), "data", "attachment")
 
 
-def customerHasConsentForm(customer_id):
+def customerHasConsentForm(customer_id, attachment_type):
     """
     Checks if a consent form file exists for a given customer ID
     within the data/attachment directory.
@@ -23,7 +23,7 @@ def customerHasConsentForm(customer_id):
               customer's ID folder, False otherwise.
     """
    
-    customer_folder_path = os.path.join(attachment_path, customer_id)
+    customer_folder_path = os.path.join(attachment_path, customer_id, attachment_type)
     consent_form_filename = CONSENT_FORM_KEYWORD
     consent_form_path = os.path.join(customer_folder_path, f'{consent_form_filename}.pdf')
     print(f"consent_form_path: {consent_form_path}")
@@ -37,7 +37,7 @@ def customerHasConsentForm(customer_id):
     else:
         return False
         
-def viewCustomerFilePDF(customerId):
+def viewCustomerFilePDF(customerId, attachmentType):
     """
     This function retrieves the customer consent form from the database.
     :return: The customer consent form.
@@ -45,7 +45,7 @@ def viewCustomerFilePDF(customerId):
 
     # Go to the folder with customer ID
     #get the file with the name consentForm
-    customer_folder_path = os.path.join(attachment_path, customerId)
+    customer_folder_path = os.path.join(attachment_path, customerId, attachmentType)
     consent_form_filename = CONSENT_FORM_KEYWORD
     consent_form_path = os.path.join(customer_folder_path, f'{consent_form_filename}.pdf')
 
@@ -53,14 +53,17 @@ def viewCustomerFilePDF(customerId):
     openPdf(consent_form_path)
 
 
-def uploadCustomerFile(customer_id, filePath, root, fileName):
+def uploadCustomerFile(customer_id, filePath, root, fileName, attachmentType):
     if not filePath:
         return ERROR  # No file, silently return
 
     _, extension = os.path.splitext(filePath)
 
     #check if foolder to store customer file exist 
-    customer_folder_path = os.path.join(attachment_path, customer_id)
+    if fileName is not CONSENT_FORM_KEYWORD:
+        customer_folder_path = os.path.join(attachment_path, customer_id, attachmentType, fileName)
+    else:
+        customer_folder_path = os.path.join(attachment_path, customer_id, attachmentType)
 
     # if no folder storing customer file exist create one
     if not os.path.exists(customer_folder_path):
@@ -79,14 +82,14 @@ def uploadCustomerFile(customer_id, filePath, root, fileName):
         return ERROR
 
 
-def getConditionPicturePath(customerId, conditionId):
+def getConditionPicturePath(customerId, conditionId, attachmentType):
     """
     This function retrieves the condition picture path for a given customer ID and condition ID.
     :param customerId: The ID of the customer.
     :param conditionId: The ID of the condition.
     :return: The path to the condition picture.
     """
-    customer_folder_path = os.path.join(attachment_path, customerId)
+    customer_folder_path = os.path.join(attachment_path, customerId, attachmentType, conditionId)
     allowed_extensions = ('.jpg', '.jpeg', '.png', '.webp')
 
     # Find all files starting with conditionId and any extension
@@ -101,14 +104,14 @@ def getConditionPicturePath(customerId, conditionId):
     return None
 
 
-def getTreatmentPicturePath(customerId, treatmentId):
+def getTreatmentPicturePath(customerId, treatmentId, attachmentType):
     """
     Retrieves the treatment picture path for a given customer ID and treatment ID.
     :param customerId: The ID of the customer.
     :param treatmentId: The ID of the treatment.
     :return: The path to the treatment picture or None.
     """
-    customer_folder_path = os.path.join(attachment_path, customerId)
+    customer_folder_path = os.path.join(attachment_path, customerId, attachmentType, treatmentId)
     allowed_extensions = ('.jpg', '.jpeg', '.png', '.webp')
 
     # Find all files starting with treatmentId and any extension
@@ -131,9 +134,9 @@ def renderFilePicker(pdefaultextension, pfiletypes, ptitle=""):
     return file_path
 
 
-def deleteCustomerFile(customer_id, file_keyword):
+def deleteCustomerFile(customer_id, file_keyword, attachmentType):
     possible_extensions = ['.pdf']  # Stick with this if you want future flexibility
-    customer_folder_path = os.path.join(attachment_path, customer_id)
+    customer_folder_path = os.path.join(attachment_path, customer_id, attachmentType)
 
     for ext in possible_extensions:
         file_path = os.path.join(customer_folder_path, f'{file_keyword}{ext}')

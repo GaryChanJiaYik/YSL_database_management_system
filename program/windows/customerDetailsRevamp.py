@@ -20,6 +20,9 @@ from Components.timePickerModal import TimePickerModal
 from Constant.fileKeywords import CONSENT_FORM_KEYWORD
 from utils import setEntryValue
 
+#Constants
+ATTACHMENT_TYPE= "Customer"
+
 class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
     def createDetailField(self, root, fieldName, content, row, column, rowspan=1):
@@ -296,7 +299,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
 
     def renderConsentFormOptionButton(self, row, column):
-        customerHasConsentFormVar = customerHasConsentForm(self.customerId)
+        customerHasConsentFormVar = customerHasConsentForm(self.customerId, ATTACHMENT_TYPE)
         print("")
         print("Customer has consent form: ", customerHasConsentFormVar)
         print("")
@@ -327,12 +330,12 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
     def uploadOrReplaceConsentForm(self):
         filePath = askopenfilename(defaultextension='.pdf', filetypes=[('pdf file', '*.pdf')])
         if filePath:
-            uploadCustomerFile(self.customerId, filePath, self.root, CONSENT_FORM_KEYWORD)
+            uploadCustomerFile(self.customerId, filePath, self.root, CONSENT_FORM_KEYWORD, ATTACHMENT_TYPE)
             self.renderCustomerDetailSection()
     
     
     def deleteConsentForm(self):
-        success = deleteCustomerFile(self.customerId, CONSENT_FORM_KEYWORD)
+        success = deleteCustomerFile(self.customerId, CONSENT_FORM_KEYWORD, ATTACHMENT_TYPE)
 
         if success:
             renderPopUpModal(self.root, "Consent form deleted successfully.", "Delete", "Success")
@@ -344,7 +347,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
 
     def viewConsentForm(self):
-        viewCustomerFilePDF(self.customerId)
+        viewCustomerFilePDF(self.customerId, ATTACHMENT_TYPE)
         
         
     def editCustomerDetails(self):

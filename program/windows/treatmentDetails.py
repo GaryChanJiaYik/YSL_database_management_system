@@ -7,6 +7,8 @@ from Components.customFields import createDetailField
 from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunctionRevamp
 from services.customerFilesServices import getTreatmentPicturePath, renderFilePicker, uploadCustomerFile
 
+#Constants
+ATTACHMENT_TYPE = "Treatment"
 
 class TreatmentDetailView(ctk.CTkFrame):
     
@@ -43,7 +45,7 @@ class TreatmentDetailView(ctk.CTkFrame):
     def renderTreatmentPictureContainerContent(self, root):
         self.uploadTreatmentPictureBtn = None
         customerId = self.controller.getCustomerID()
-        treatmentPicturePath = getTreatmentPicturePath(customerId, self.treatmentModel.treatmentID)
+        treatmentPicturePath = getTreatmentPicturePath(customerId, self.treatmentModel.treatmentID, ATTACHMENT_TYPE)
         
         if treatmentPicturePath is not None:
             self.renderTreatmentPicture(root, treatmentPicturePath)
@@ -76,7 +78,7 @@ class TreatmentDetailView(ctk.CTkFrame):
             return  # User clicked cancel, do nothing
 
         customerId = self.controller.getCustomerID()
-        result = uploadCustomerFile(customerId, filePath, self.root, self.treatmentModel.treatmentID)
+        result = uploadCustomerFile(customerId, filePath, self.root, self.treatmentModel.treatmentID, ATTACHMENT_TYPE)
         
         if result == SUCCESS:
             if self.uploadTreatmentPictureBtn:
