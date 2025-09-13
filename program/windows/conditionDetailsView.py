@@ -1,5 +1,4 @@
 import customtkinter as ctk
-from tkinter.filedialog import askopenfilenames
 from Constant.appConstant import (
     STANDARD_WINDOW_SIZE, WINDOW_ADD_TREATMENT, WINDOW_EDIT_TREATMENT, WINDOW_TREATMENT_DETAIL,
     FONT
@@ -8,11 +7,10 @@ from Constant.converterFunctions import formatDateTime
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
 from Constant.errorCode import SUCCESS
 from Components.customFields import createDetailField
-from Components.popupModal import renderPopUpModal
 from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunctionRevamp
 from services.conditionDbFunctions import updateTreatmentStatus, getTreatmentStatus
 from services.customerFilesServices import getConditionPicturePath,renderFilePicker, uploadCustomerFile
-from services.attachmentFilesServices import HasAttachment, uploadAttachmentFile, openAttachmentDirectory
+from services.attachmentFilesServices import HasAttachment, handleAttachmentUpload, openAttachmentDirectory
 from PIL import Image
 
 # CONSTANTS
@@ -125,30 +123,7 @@ class ConditionDetailsView(ctk.CTkFrame):
 
 
     def uploadConditionAttachment(self):
-        file_paths = askopenfilenames(
-            title="Select files to upload",
-            filetypes=[
-                ("All Files", "*.*"),
-                ("ZIP Files", "*.zip"),
-                ("PDF Files", "*.pdf"),
-                ("Images", "*.jpg *.jpeg *.png"),
-            ]
-        )
-
-        all_success = True
-        if file_paths:
-            for filePath in file_paths:
-                result = uploadAttachmentFile(self.customerId, filePath, self.parent, ATTACHMENT_TYPE, self.conditionModel.conditionId)
-                if result != SUCCESS:
-                    all_success = False
-        else:
-            return
-        
-        if all_success:
-            renderPopUpModal(self.parent, "All files uploaded successfully", "Upload", "Success")
-        else:
-            renderPopUpModal(self.parent, "Some files failed to upload", "Upload", "Warning")
-        
+        handleAttachmentUpload(self.customerId, self.parent, ATTACHMENT_TYPE, entity_id=self.conditionModel.conditionId)
         self.renderConditionAttachmentContainerContent(self.conditionAttachmentContainer)
     
 

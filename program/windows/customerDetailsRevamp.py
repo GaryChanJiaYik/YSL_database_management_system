@@ -1,5 +1,6 @@
 import customtkinter
-from tkinter.filedialog import askopenfilename, askopenfilenames
+import os
+from tkinter.filedialog import askopenfilename
 from Constant.appConstant import (
     STANDARD_WINDOW_SIZE, WINDOW_CONDITION_DETAIL, WINDOW_EDIT_CONDITION, WINDOW_EDIT_CUSTOMER, 
     WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_TREATMENT, FONT
@@ -19,7 +20,7 @@ from services.conditionDbFunctions import insertConditionToDb, getAllConditionsB
 from services.customerFilesServices import (
     customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile, deleteCustomerFile,
 )
-from services.attachmentFilesServices import HasAttachment, uploadAttachmentFile, openAttachmentDirectory
+from services.attachmentFilesServices import HasAttachment, handleAttachmentUpload, openAttachmentDirectory
 from Model.conditionModel import ConditionModel
 from datetime import datetime
 from utils import setEntryValue
@@ -358,30 +359,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
     
     
     def uploadCustomerAttachment(self):
-        file_paths = askopenfilenames(
-            title="Select files to upload",
-            filetypes=[
-                ("All Files", "*.*"),
-                ("ZIP Files", "*.zip"),
-                ("PDF Files", "*.pdf"),
-                ("Images", "*.jpg *.jpeg *.png"),
-            ]
-        )
-    
-        all_success = True
-        if file_paths:
-            for filePath in file_paths:
-                result = uploadAttachmentFile(self.customerId, filePath, self.root, ATTACHMENT_TYPE)
-                if result != SUCCESS:
-                    all_success = False
-        else:
-            return
-        
-        if all_success:
-            renderPopUpModal(self.root, "All files uploaded successfully", "Upload", "Success")
-        else:
-            renderPopUpModal(self.root, "Some files failed to upload", "Upload", "Warning")
-        
+        handleAttachmentUpload(self.customerId, self.root, ATTACHMENT_TYPE)
         self.renderCustomerDetailSection()
     
     

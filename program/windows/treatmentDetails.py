@@ -1,14 +1,12 @@
 import customtkinter as ctk
-from tkinter.filedialog import askopenfilenames
 from PIL import Image
 from Constant.errorCode import SUCCESS
 from Constant.treatmentDatabaseFunctions import getTreatmentByID,getAllTreatmentRevisionByID
 from Constant.appConstant import FONT
 from Components.customFields import createDetailField
 from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunctionRevamp
-from Components.popupModal import renderPopUpModal
 from services.customerFilesServices import getTreatmentPicturePath, renderFilePicker, uploadCustomerFile
-from services.attachmentFilesServices import HasAttachment, uploadAttachmentFile, openAttachmentDirectory
+from services.attachmentFilesServices import HasAttachment, handleAttachmentUpload, openAttachmentDirectory
 
 # CONSTANTS
 ATTACHMENT_TYPE = "Treatment"
@@ -79,30 +77,7 @@ class TreatmentDetailView(ctk.CTkFrame):
 
 
     def uploadTreatmentAttachment(self):
-        file_paths = askopenfilenames(
-            title="Select files to upload",
-            filetypes=[
-                ("All Files", "*.*"),
-                ("ZIP Files", "*.zip"),
-                ("PDF Files", "*.pdf"),
-                ("Images", "*.jpg *.jpeg *.png"),
-            ]
-        )
-    
-        all_success = True
-        if file_paths:
-            for filePath in file_paths:
-                result = uploadAttachmentFile(self.customerId, filePath, self.root, ATTACHMENT_TYPE, self.treatmentModel.treatmentID)
-                if result != SUCCESS:
-                     all_success = False
-        else:
-            return
-        
-        if all_success:
-            renderPopUpModal(self.root, "All files uploaded successfully", "Upload", "Success")
-        else:
-            renderPopUpModal(self.root, "Some files failed to upload", "Upload", "Warning")
-        
+        handleAttachmentUpload(self.customerId, self.root, ATTACHMENT_TYPE, entity_id=self.treatmentModel.treatmentID)
         self.renderTreatmentAttachmentContainerContent(self.treatmentAttachmentContainer)
 
 
