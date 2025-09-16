@@ -273,7 +273,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             # Create a new condition model block for each condition
             instantiateConditionModelBlock(
                 self.ConditionListContainer, condition, 0, idx, self.openConditionDetailsWindowCallback, 
-                self.openEditConditionDetailsWindowCallback, self.OpenAddTreatmentWindow
+                self.openEditConditionDetailsWindowCallback, self.OpenAddTreatmentWindow, self.controller.getIsHiddenAccess()
             )
 
 
@@ -459,7 +459,6 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         super().__init__(parent)
         self.controller = controller
         self.root = self
-
         self.customerTimeStamp = customerId
         self.customerId = convertTimeStampToId(customerId) 
         self.customerModel = searchForSingleUser(self.customerId)
@@ -474,7 +473,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         print(len(self.conditionList))
 
         #For customer details
-        self.renderCustomerDetailSection();
+        self.renderCustomerDetailSection()
 
         #For condition
         self.conditionFrame = customtkinter.CTkFrame(master=self.root, bg_color="transparent")

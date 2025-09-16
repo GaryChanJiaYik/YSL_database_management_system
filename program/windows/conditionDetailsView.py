@@ -262,10 +262,11 @@ class ConditionDetailsView(ctk.CTkFrame):
                 renderTreatmentSummaryBlockFunctionRevamp(
                     self.treatmentListContainer,
                     treatment,
+                    self.controller.getIsHiddenAccess(),
                     hideButtons=False,
                     on_click_view=self.navigateToTreatmentDetailView,
                     on_click=self.handleTreatmentBlockEditClick,
-                    row_index=idx
+                    row_index=idx,
                 ).grid(row=idx, column=0, sticky="w")
                 
             

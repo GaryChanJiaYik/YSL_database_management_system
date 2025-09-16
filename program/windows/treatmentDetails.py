@@ -33,7 +33,8 @@ class TreatmentDetailView(ctk.CTkFrame):
     def renderTreatmentDetails(self):
         createDetailField(self.treatmentDetailFrame, "Created Date", self.treatmentModel.treatmentDate, row=2, column=0)    
         createDetailField(self.treatmentDetailFrame, "Description", self.treatmentModel.treatmentDescription, 3,0)
-        createDetailField(self.treatmentDetailFrame, "Cost", f"RM {self.treatmentModel.treatmentCost}", 4,0)
+        if self.controller.getIsHiddenAccess():
+            createDetailField(self.treatmentDetailFrame, "Cost", f"RM {self.treatmentModel.treatmentCost}", 4,0)
 
         #Levels
         createDetailField(self.treatmentDetailFrame, "Pain", self.treatmentModel.painLevel,5,0)
@@ -177,7 +178,10 @@ class TreatmentDetailView(ctk.CTkFrame):
             self.scrollableTreatmentListContainer.grid_columnconfigure(0, weight=1)
             self.scrollableTreatmentListContainer.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=5)
             for idx, treatment in enumerate(self.treatmentRevisionList):
-                renderTreatmentSummaryBlockFunctionRevamp(self.scrollableTreatmentListContainer,treatment,hideButtons=True,row_index=idx).grid(row=idx, column=0, sticky="w")
+                renderTreatmentSummaryBlockFunctionRevamp(
+                    self.scrollableTreatmentListContainer, treatment, self.controller.getIsHiddenAccess(),
+                    hideButtons=True, row_index=idx
+                ).grid(row=idx, column=0, sticky="w")
                 
             
 

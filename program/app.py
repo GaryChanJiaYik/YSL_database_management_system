@@ -1,4 +1,6 @@
 import customtkinter as ctk
+import time
+import threading
 from Constant.appConstant import *
 from windows.landing import LandingWindow
 from windows.customerDetailsRevamp import CustomerDetailsViewRevamp
@@ -70,6 +72,9 @@ class App:
     def getIsAdminAccess(self):
         return self.adminAccess
     
+    def getIsHiddenAccess(self):
+        return self.hiddenAccess
+    
     def resetWindow(self):
         self.window_stack = []
         print("Stack: ", self.window_stack)
@@ -89,6 +94,13 @@ class App:
 
     def __init__(self):        
         ctk.set_appearance_mode("dark")
+        self.hiddenAccess = False
+        self.click_count = 0
+        self.last_click_time = 0
+        self.listener_mode = False
+        self.typed_sequence = ""
+        self.current_frame_name = None
+        self.listener_timeout_timer = None
         
         self.appRoot = ctk.CTk()
         self.appRoot.title(APP_NAME)
@@ -105,12 +117,13 @@ class App:
         self.appNameLabel = ctk.CTkLabel(self.appCommonHeaderContainer, text="(ADMIN) " + APP_NAME if self.adminAccess else APP_NAME, font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
         self.appNameLabel.grid(row=0, column=0, padx=10, pady=5, sticky="w")
         ToolTip(self.appNameLabel, f"Version: {__version__}")
+        # Bind click event to app name label
+        self.appNameLabel.bind("<Button-1>", self.on_app_name_click)
 
         self.buttonContainer = ctk.CTkFrame(self.appCommonHeaderContainer, fg_color="transparent", bg_color="transparent", height=50)
         self.buttonContainer.grid(row=0, column=2, padx=0, pady=0)
 
         # Add buttons to the buttonContainer if needed
-
         self.backButtonContainer = ctk.CTkFrame(self.buttonContainer, fg_color="transparent", bg_color="transparent", height=50)
         self.backButtonContainer.grid(row=0, column=0, padx=0, pady=0)
 
@@ -174,7 +187,7 @@ class App:
         self.container._parent_canvas.yview_moveto(0)
         
         self.set_header()
-        
+        self.current_frame_name = frameClass
         # Debug Window stack
         # self.print_window_stack()
 
@@ -212,3 +225,86 @@ class App:
             else:
                 print(f"{i + 1}: {str(frame)}")
         print("========================")
+
+
+    def on_app_name_click(self, event):
+        if  self.listener_mode:
+            return
+        
+        current_time = time.time()
+        if current_time - self.last_click_time > 1:
+            self.click_count = 0  # Reset if too slow
+
+        self.click_count += 1
+        self.last_click_time = current_time
+
+        print(f"Title clicked {self.click_count} time(s)")
+
+        if self.click_count == 5:
+            self.click_count = 0  # Always reset
+
+            if self.hiddenAccess:
+                self.deactivate_hidden_access()
+            else:
+                self.activate_listener_mode()
+
+
+    def activate_listener_mode(self):
+        self.listener_mode = True
+        self.typed_sequence = ""
+        print("Listener mode activated")
+        self.appRoot.bind("<Key>", self.on_key_press)
+
+        # Start a timer to cancel listener mode after X seconds
+        if self.listener_timeout_timer:
+            self.listener_timeout_timer.cancel()  # Cancel previous timer if still running
+
+        self.listener_timeout_timer = threading.Timer(3.0, self.cancel_listener_mode)
+        self.listener_timeout_timer.start()
+
+
+    def cancel_listener_mode(self):
+        self.listener_mode = False
+        self.typed_sequence = ""
+        self.appRoot.unbind("<Key>")
+        print("Listener mode timed out")
+
+       
+    def deactivate_hidden_access(self):
+        self.hiddenAccess = False
+        self.listener_mode = False
+        self.typed_sequence = ""
+        self.appRoot.unbind("<Key>")
+        if self.listener_timeout_timer:
+            self.listener_timeout_timer.cancel()
+        print("Hidden access deactivated")
+        self.switch_frame(self.current_frame_name, True)
+
+
+    def on_key_press(self, event):
+        if not self.listener_mode:
+            return
+
+        # Only accept alphanumeric input
+        if event.char.isalnum():
+            self.typed_sequence += event.char
+            print(f"Key typed: {event.char} -> Sequence: {self.typed_sequence}")
+
+            if self.typed_sequence.endswith("ADMIN"):
+                self.unlock_hidden_access()
+
+            # Optional: prevent overflow
+            if len(self.typed_sequence) > 10:
+                self.typed_sequence = self.typed_sequence[-10:]
+
+
+    def unlock_hidden_access(self):
+        self.hiddenAccess = True
+        self.listener_mode = False
+        print("Hidden access granted!")
+
+        if self.listener_timeout_timer:
+            self.listener_timeout_timer.cancel()
+
+        self.appRoot.unbind("<Key>")
+        self.switch_frame(self.current_frame_name, True)

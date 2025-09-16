@@ -95,7 +95,7 @@ def handleUploadTreatmentPicture(treatmentModel, parentContainer):
 
 
 
-def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, hideButtons=False, on_click_view=None, on_click=None, showEditButton=False,row_index=0):
+def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, isHiddenAccess, hideButtons=False, on_click_view=None, on_click=None, showEditButton=False,row_index=0):
     def _on_enter(event):
         wrapperContainer.configure(border_width=2)  # Show border
 
@@ -147,13 +147,14 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, h
     treatmentDescriptionLabel.grid(row=1, column=0, sticky="w")
 
 
-    treatmentDescriptionCost = ctk.CTkLabel(
-        master=treatmentDetailContainer,
-        text=f"Cost: RM {treatmentModel.treatmentCost:.2f}",
-        font=('Arial', 13, "bold"),
-        anchor="w"
-    )
-    treatmentDescriptionCost.grid(row=2, column=0, sticky="w")
+    if isHiddenAccess:  
+        treatmentDescriptionCost = ctk.CTkLabel(
+            master=treatmentDetailContainer,
+            text=f"Cost: RM {treatmentModel.treatmentCost:.2f}",
+            font=('Arial', 13, "bold"),
+            anchor="w"
+        )
+        treatmentDescriptionCost.grid(row=2, column=0, sticky="w")
 
     #Space
     ctk.CTkLabel(

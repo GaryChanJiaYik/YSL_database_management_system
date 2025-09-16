@@ -8,7 +8,7 @@ from utils import bindClickEventRecursively, bindHoverEventRecursively
 
 
 
-def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, openConditionDetailsWindowCallback, openEditConditionDetailsWindowCallback, openAddTreatmentCallback):
+def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, openConditionDetailsWindowCallback, openEditConditionDetailsWindowCallback, openAddTreatmentCallback, isHiddenAccess):
     def _on_enter(event):
         conditionFrame.configure(border_width=2)  # Show border
 
@@ -78,14 +78,15 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
     detailSubFrame.grid_columnconfigure(1, weight=0)
     detailSubFrame.grid_columnconfigure(2, weight=0)
     
-    # Total Label
-    ctk.CTkLabel(
-        master=detailSubFrame,
-        text=f"Total: RM{getConditionTotalCost(conditionModel.conditionId):.2f}",
-        bg_color='transparent',
-        font=('Arial', 16, 'bold'),
-        anchor="w"
-    ).grid(row=0, column=0, sticky="w", padx=(0, 10), pady=5)
+    if isHiddenAccess:
+        # Total Label
+        ctk.CTkLabel(
+            master=detailSubFrame,
+            text=f"Total: RM{getConditionTotalCost(conditionModel.conditionId):.2f}",
+            bg_color='transparent',
+            font=('Arial', 16, 'bold'),
+            anchor="w"
+        ).grid(row=0, column=0, sticky="w", padx=(0, 10), pady=5)
     
     # Apply event to the entire condition model frame expect the buttons
     bindClickEventRecursively(conditionFrame, lambda event: openConditionDetailsWindowCallback(conditionModel))
