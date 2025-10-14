@@ -60,6 +60,12 @@ class App:
     
     def getConditionModel(self):
         return self.currentConditionModel
+    
+    def setCustomerModel(self, customerModel):
+        self.currentCustomerModel = customerModel
+    
+    def getCustomerModel(self):
+        return self.currentCustomerModel
 
     def setAdminAccess(self, access):
         self.adminAccess = access

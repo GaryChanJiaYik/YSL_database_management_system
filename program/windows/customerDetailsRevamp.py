@@ -362,6 +362,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
         # Re-fetch customer data
         self.customerModel = searchForSingleUser(self.customerId)
+        self.controller.setCustomerModel(self.customerModel)
         
         self.customerDetailFrame = customtkinter.CTkFrame(master=self.root, bg_color="transparent")
         self.customerDetailFrame.grid_columnconfigure(0, weight=1)
@@ -461,9 +462,9 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         self.root = self
         self.customerTimeStamp = customerId
         self.customerId = convertTimeStampToId(customerId) 
-        self.customerModel = searchForSingleUser(self.customerId)
-        print("THIS IS THE CUSTOMER MODEL")
-        print(self.customerModel)
+        # self.customerModel = searchForSingleUser(self.customerId)
+        # print("THIS IS THE CUSTOMER MODEL")
+        # print(self.customerModel)
 
         self.conditionList = getAllConditionsByCustomerId(self.customerId)
         print("customerId")

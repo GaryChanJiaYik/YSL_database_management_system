@@ -9,6 +9,7 @@ from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
 from services.conditionDbFunctions import updateTreatmentStatus, getTreatmentStatus
 from windows.addTreatmentRevamp import AddTreatmentViewRevamp
 from Components.treatmentSummaryBlock import renderTreatmentSummaryBlockFunctionRevamp
+from Components.floatingInfoPanel import attach_floating_info
 from services.customerFilesServices import getConditionPicturePath,renderFilePicker, uploadCustomerFile
 from PIL import Image
 from Constant.errorCode import SUCCESS
@@ -125,8 +126,18 @@ class ConditionDetailsView(ctk.CTkFrame):
         )
         self.customerInfoFrame.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=5)
         
-        createDetailField(root=self.customerInfoFrame, fieldName="Customer Name", content=self.controller.getCustomerName(), row=0, column=0)
+        self.customerModel = self.controller.getCustomerModel()
+        self.customerNameLabel = createDetailField(root=self.customerInfoFrame, fieldName="Customer Name", content=self.customerModel.customerName, row=0, column=0)
         createDetailField(root=self.customerInfoFrame, fieldName="IC", content=self.controller.getCustomerIC(), row=1, column=0)
+        attach_floating_info(
+            widget=self.customerNameLabel,  # ← bind to frame, not label
+            parent=self,
+            info_lines=[
+                f"CustomerID:   {self.customerModel.oldCustomerId}",
+                f"Gender:       {self.customerModel.gender}",
+                f"Contact:      {self.customerModel.handphone}"
+            ]
+        )
 
         #Condition details
 
