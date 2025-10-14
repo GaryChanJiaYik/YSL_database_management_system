@@ -85,6 +85,12 @@ class AddCustomerView(ctk.CTkFrame):
         self.how_dropdown = ctk.CTkComboBox(self, values=howDidYouFindUsOptions, variable=self.how_var)
         self.how_dropdown.grid(row=row, column=1, columnspan=2, sticky='w', pady=5)
         self.how_dropdown.configure(state="readonly")
+        self.how_dropdown.configure(command=lambda _: self.toggleHowOtherField())
+        row += 1
+        # "Other" field (shown only when 'Other' is selected)
+        self.how_other_entry = ctk.CTkEntry(self, placeholder_text="If Other, specify", width=300)
+        self.how_other_entry.grid(row=row, column=1, columnspan=2, sticky="w", padx=10, pady=5)
+        self.how_other_entry.grid_remove()
         row += 1
 
         # Consent Section Title
@@ -131,6 +137,12 @@ class AddCustomerView(ctk.CTkFrame):
             self.race_other_entry.grid()
         else:
             self.race_other_entry.grid_remove()
+            
+    def toggleHowOtherField(self):
+        if self.how_var.get() == "Other":
+            self.how_other_entry.grid()
+        else:
+            self.how_other_entry.grid_remove()
     
     
     def populateFields(self):
@@ -167,11 +179,17 @@ class AddCustomerView(ctk.CTkFrame):
             self.race_other_entry.grid()  # Show the entry
             self.race_other_entry.delete(0, "end")
             self.race_other_entry.insert(0, race_raw)
-        self.how_var.set(self.customerModel.howDidYouFindUs or "Other")
-
+            
         if self.customerModel.race == "Other":
             self.race_other_entry.grid()
             self.race_other_entry.insert(0, self.customerModel.raceOther or "")
+        
+        # How Did You Find Us
+        self.how_var.set(self.customerModel.howDidYouFindUs or "Other")
+
+        if self.how_var.get() == "Other":
+            self.how_other_entry.grid()
+            self.how_other_entry.insert(0, getattr(self.customerModel, 'howDidYouFindUsOther', ''))
     
         # Consent
         consent_raw = self.customerModel.consent
@@ -198,7 +216,7 @@ class AddCustomerView(ctk.CTkFrame):
         address_val = self.address_text.get("1.0", "end").strip()
         hp_val = self.fields[dbCol.handPhoneNumber].get()
         instagram_val = self.fields[dbCol.instagram].get()
-        how_val = self.how_var.get()
+        how_val = self.how_other_entry.get() if self.how_var.get() == "Other" else self.how_var.get()
         old_customer_id_val = self.fields[dbCol.oldCustomerId].get()
 
         header = [
