@@ -13,7 +13,8 @@ from Components.popupModal import renderPopUpModal
 from Constant.inputValidations import checkLengthOfInput
 from Components.datePickerModal import DatePickerModal
 from Components.timePickerModal import TimePickerModal
-from Components.timeSpinBoxPickerModal import TimeSpinBoxPickerModal
+from Components.timeSpinBoxPickerModal import TimeSpinBoxPickerModal 
+from Components.datetimePickerModal import DateTimePickerModal
 from utils import setEntryValue
 
 class AddTreatmentViewRevamp(customtkinter.CTkFrame):
@@ -47,22 +48,13 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         return frame
 
     def createTreatment(self, conditionId, entryFields, saveMode=False):
-        # Get date and time from pickers
-        date_str = self.date_value.get()
-        time_str = self.time_value.get()
+        # Get combined datetime value
+        datetime_str = self.datetime_value.get().strip()  # e.g., "2025-10-17 11:24 PM"
 
         try:
-            # Parse time (12-hour format with AM/PM)
-            dt_time = datetime.strptime(time_str, "%I:%M %p").time()
-
-            # Parse date and combine with time
-            combined_datetime = datetime.strptime(date_str, "%Y-%m-%d").replace(
-                hour=dt_time.hour, minute=dt_time.minute, second=0
-            )
-
-            final_time_string = combined_datetime.strftime("%Y-%m-%d %H:%M:%S")
+            combined_datetime = datetime.strptime(datetime_str, "%Y-%m-%d %I:%M %p")
+            final_time_string = combined_datetime.strftime("%Y-%m-%d %H:%M:%S")  # for storage
         except ValueError:
-            # fallback to current datetime if parsing fails
             combined_datetime = datetime.now()
             final_time_string = combined_datetime.strftime("%Y-%m-%d %H:%M:%S")
             
@@ -126,29 +118,40 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
 
             self.desc_warning_label.configure(text=f"{len(current_text)}/{TREATMENT_DESCRIPTION_CHARACTER_LIMIT}", text_color="green")
 
-    def populateTimeFields(self, datetime_string):
+    # def populateTimeFields(self, datetime_string):
+    #     try:
+    #         # Parse the datetime string into a datetime object
+    #         dt = datetime.strptime(datetime_string, "%Y-%m-%d %H:%M:%S")
+
+    #         # Format date and time
+    #         formatted_date = dt.strftime("%Y-%m-%d")
+    #         formatted_time = dt.strftime("%I:%M %p")  # 12-hour format with AM/PM
+
+    #         # Update the date entry
+    #         self.date_value.configure(state="normal")
+    #         self.date_value.delete(0, "end")
+    #         self.date_value.insert(0, formatted_date)
+    #         self.date_value.configure(state="disabled")
+
+    #         # Update the time entry
+    #         self.time_value.configure(state="normal")
+    #         self.time_value.delete(0, "end")
+    #         self.time_value.insert(0, formatted_time)
+    #         self.time_value.configure(state="disabled")
+
+    #     except ValueError:
+    #         print("Invalid datetime format. Expected: 'YYYY-MM-DD HH:MM:SS'")
+    
+    def populateTimeFields(self, treatmentDate):
         try:
-            # Parse the datetime string into a datetime object
-            dt = datetime.strptime(datetime_string, "%Y-%m-%d %H:%M:%S")
+            dt = datetime.strptime(treatmentDate, "%Y-%m-%d %H:%M:%S")  # <-- fixed
+            self.datetime_value.configure(state="normal")
+            self.datetime_value.delete(0, "end")
+            self.datetime_value.insert(0, dt.strftime("%Y-%m-%d %I:%M %p"))  # <-- display in 12-hour format
+            self.datetime_value.configure(state="disabled")
+        except ValueError as e:
+            print("[ERROR] Failed to parse treatment date:", e)
 
-            # Format date and time
-            formatted_date = dt.strftime("%Y-%m-%d")
-            formatted_time = dt.strftime("%I:%M %p")  # 12-hour format with AM/PM
-
-            # Update the date entry
-            self.date_value.configure(state="normal")
-            self.date_value.delete(0, "end")
-            self.date_value.insert(0, formatted_date)
-            self.date_value.configure(state="disabled")
-
-            # Update the time entry
-            self.time_value.configure(state="normal")
-            self.time_value.delete(0, "end")
-            self.time_value.insert(0, formatted_time)
-            self.time_value.configure(state="disabled")
-
-        except ValueError:
-            print("Invalid datetime format. Expected: 'YYYY-MM-DD HH:MM:SS'")
             
     def deleteRecord(self):
         TreatmentFunc.deleteTreatmentByID(self.treatmentModel.treatmentID)
@@ -186,6 +189,14 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
             parent=self,
             current_time_str=self.time_value.get().strip(),
             on_selected=lambda time_str: setEntryValue(self.time_value, time_str)
+        )
+        
+        
+    def openDateTimePicker(self):
+        DateTimePickerModal.open_datetime_picker(
+            parent=self,
+            current_datetime_str=self.datetime_value.get().strip(),
+            on_selected=lambda datetime_str: setEntryValue(self.datetime_value, datetime_str)
         )
 
 
@@ -305,43 +316,65 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
         # ======================== Date-Time Section ========================
         date_time_row = index + 1
 
-        # === Date Row ===
-        customtkinter.CTkLabel(self.entryGridFrame, text="Date:", pady=1).grid(
+        # # === Date Row ===
+        # customtkinter.CTkLabel(self.entryGridFrame, text="Date:", pady=1).grid(
+        #     row=date_time_row, column=0, sticky="w", pady=10
+        # )
+        # customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(
+        #     row=date_time_row, column=1
+        # )
+
+        # dateInputFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent")
+        # dateInputFrame.grid(row=date_time_row, column=2, sticky="w")
+
+        # self.date_value = customtkinter.CTkEntry(dateInputFrame, width=120)
+        # self.date_value.insert(0, datetime.now().strftime("%Y-%m-%d"))
+        # self.date_value.configure(state="disabled")
+        # self.date_value.grid(row=0, column=0, padx=(0, 10))
+
+        # self.date_edit_button = customtkinter.CTkButton(dateInputFrame, text="Edit", width=60, command=self.openDatePicker)
+        # self.date_edit_button.grid(row=0, column=1)
+
+        # # === Time Row ===
+        # customtkinter.CTkLabel(self.entryGridFrame, text="Time:", pady=1).grid(
+        #     row=date_time_row + 1, column=0, sticky="w", pady=10
+        # )
+        # customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(
+        #     row=date_time_row + 1, column=1
+        # )
+
+        # timeInputFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent")
+        # timeInputFrame.grid(row=date_time_row + 1, column=2, sticky="w")
+
+        # self.time_value = customtkinter.CTkEntry(timeInputFrame, width=120)
+        # self.time_value.insert(0, datetime.now().strftime("%I:%M %p"))  # 12-hour format
+        # self.time_value.configure(state="disabled")
+        # self.time_value.grid(row=0, column=0, padx=(0, 10))
+
+        # self.time_edit_button = customtkinter.CTkButton(timeInputFrame, text="Edit", width=60, command=self.openTimePicker)
+        # self.time_edit_button.grid(row=0, column=1)
+        
+        # === Combined DateTime Row ===
+        customtkinter.CTkLabel(self.entryGridFrame, text="Date Time:", pady=1).grid(
             row=date_time_row, column=0, sticky="w", pady=10
         )
         customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(
             row=date_time_row, column=1
         )
 
-        dateInputFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent")
-        dateInputFrame.grid(row=date_time_row, column=2, sticky="w")
+        datetimeInputFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent")
+        datetimeInputFrame.grid(row=date_time_row, column=2, sticky="w")
 
-        self.date_value = customtkinter.CTkEntry(dateInputFrame, width=120)
-        self.date_value.insert(0, datetime.now().strftime("%Y-%m-%d"))
-        self.date_value.configure(state="disabled")
-        self.date_value.grid(row=0, column=0, padx=(0, 10))
+        self.datetime_value = customtkinter.CTkEntry(datetimeInputFrame, width=180)
+        self.datetime_value.insert(0, datetime.now().strftime("%Y-%m-%d %I:%M %p"))
+        self.datetime_value.configure(state="disabled")
+        self.datetime_value.grid(row=0, column=0, padx=(0, 10))
 
-        self.date_edit_button = customtkinter.CTkButton(dateInputFrame, text="Edit", width=60, command=self.openDatePicker)
-        self.date_edit_button.grid(row=0, column=1)
-
-        # === Time Row ===
-        customtkinter.CTkLabel(self.entryGridFrame, text="Time:", pady=1).grid(
-            row=date_time_row + 1, column=0, sticky="w", pady=10
+        self.datetime_edit_button = customtkinter.CTkButton(
+            datetimeInputFrame, text="Modify", width=60, command=self.openDateTimePicker
         )
-        customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(
-            row=date_time_row + 1, column=1
-        )
+        self.datetime_edit_button.grid(row=0, column=1)
 
-        timeInputFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent")
-        timeInputFrame.grid(row=date_time_row + 1, column=2, sticky="w")
-
-        self.time_value = customtkinter.CTkEntry(timeInputFrame, width=120)
-        self.time_value.insert(0, datetime.now().strftime("%I:%M %p"))  # 12-hour format
-        self.time_value.configure(state="disabled")
-        self.time_value.grid(row=0, column=0, padx=(0, 10))
-
-        self.time_edit_button = customtkinter.CTkButton(timeInputFrame, text="Edit", width=60, command=self.openTimePicker)
-        self.time_edit_button.grid(row=0, column=1)
 
 
         # Add frame for buttons
