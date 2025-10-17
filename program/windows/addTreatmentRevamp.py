@@ -13,6 +13,7 @@ from Components.popupModal import renderPopUpModal
 from Constant.inputValidations import checkLengthOfInput
 from Components.datePickerModal import DatePickerModal
 from Components.timePickerModal import TimePickerModal
+from Components.timeSpinBoxPickerModal import TimeSpinBoxPickerModal
 from utils import setEntryValue
 
 class AddTreatmentViewRevamp(customtkinter.CTkFrame):
@@ -181,7 +182,7 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
 
     
     def openTimePicker(self):
-        TimePickerModal.open_time_picker(
+        TimeSpinBoxPickerModal.open_time_picker(
             parent=self,
             current_time_str=self.time_value.get().strip(),
             on_selected=lambda time_str: setEntryValue(self.time_value, time_str)
