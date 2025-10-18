@@ -84,7 +84,8 @@ class AddTreatmentViewRevamp(customtkinter.CTkFrame):
                 if method == "Others" and method in self.payment_other_desc_entries:
                     desc = self.payment_other_desc_entries[method].get().strip()
                     if desc:
-                        payment_data["OthersDesc"] = desc
+                        # Replace the "Others" key with actual description
+                        payment_data[desc] = payment_data.pop("Others", 0.0)
 
         # Fallback to "0.00" if no payment data is entered
         if payment_data:

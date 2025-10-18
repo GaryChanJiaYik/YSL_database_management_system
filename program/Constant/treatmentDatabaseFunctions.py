@@ -54,6 +54,25 @@ def createTreatment(treatmentModel):
         writer_object = writer(file)
         data = [value for key, value in vars(treatmentModel).items()]
         writer_object.writerow(data)
+        
+    with open(DB_PATH["TREATMENT2"], mode='a', encoding='utf-8', newline='\n') as file2:
+        file2.write("\n")  # Ensure newline
+        writer_object2 = writer(file2)
+
+        treatment2_data = [
+            treatmentModel.conditionID,
+            treatmentModel.treatmentID,
+            treatmentModel.painLevelAfter or "0",
+            treatmentModel.tenseLevelAfter or "0",
+            treatmentModel.soreLevelAfter or "0",
+            treatmentModel.numbLevelAfter or "0",
+            treatmentModel.appointmentDate,
+            "1",  # version
+            getFormattedDateTime(dateOnly=True)  # amendmentDate
+        ]
+
+        writer_object2.writerow(treatment2_data)
+        print("→ Treatment written to TREATMENT2")
 
 
 
@@ -343,9 +362,8 @@ def updateTreatmentByID(newTreatmentModel):
                     row[version_idx],  # Incremented version
                     getFormattedDateTime(dateOnly=True)  # Updated amendmentDate
                 ]
-
-                # Optional: backup old row
-                # addToTreatment2RevisionTable(row)
+                
+                addToTreatment2RevisionTable(row)
 
                 writer2.writerow(new_row)
                 updated2 = True
@@ -388,40 +406,84 @@ def addToTreatmentRevisionTable(data):
         writer_object = writer(file)
         writer_object.writerow(data)
 
+
+def addToTreatment2RevisionTable(data):
+    with open(DB_PATH["TREATMENT2_REV"], mode='a', encoding='utf-8', newline='\n') as file:
+        file.write("\n")
+        writer_object = csv.writer(file)
+        writer_object.writerow(data)
+
+
 def getAllTreatmentRevisionByID(treatmentID):
-    with open(DB_PATH["TREATMENT_REV"], mode='r', encoding='utf-8') as file:
-        csvFile = csv.reader(file)
-        header = next(csvFile)    
+    # Step 1: Read TREATMENT2_REV into a dictionary keyed by treatmentId
+    treatment2_rev_data = {}
+    with open(DB_PATH["TREATMENT2_REV"], mode='r', encoding='utf-8') as file2:
+        csvFile2 = csv.reader(file2)
+        header2 = next(csvFile2)
 
-        treatment_id_index = header.index(dbCol.treatmentId)
-        treatment_description = header.index(dbCol.treatmentDescription)
-        treatment_cost = header.index(dbCol.treatmentCost)
-        treatment_date = header.index(dbCol.treatmentDate)    
-        pain_lvl = header.index(dbCol.treatmentPainLevel)
-        tense_lvl = header.index(dbCol.treatmentTenseLevel)
-        sore_lvl = header.index(dbCol.treatmentSoreLevel)
-        numb_lvl = header.index(dbCol.treatmentNumbLevel)
-        ammendDate = header.index(dbCol.amendmentDate)
-        result = []
+        treatment_id_index2 = header2.index(dbCol.treatmentId)
+        pain_after_index = header2.index(dbCol.treatmentPainLevelAfter)
+        tense_after_index = header2.index(dbCol.treatmentTenseLevelAfter)
+        sore_after_index = header2.index(dbCol.treatmentSoreLevelAfter)
+        numb_after_index = header2.index(dbCol.treatmentNumbLevelAfter)
+        appointment_date_index = header2.index(dbCol.appointmentDate)
 
-        for line in csvFile:
-            if line != []:
-                if line[treatment_id_index] == treatmentID:
-                    treatment = TreatmentModel(
-                        pConditionId=line[0],
-                        pTreatmentId=line[treatment_id_index],
-                        pTreatmentDescription= line[treatment_description],
-                        pTreatmentCost=line[treatment_cost],
-                        pTreatmentDate=line[treatment_date],
-                        pNumbLevel=line[numb_lvl],
-                        pPainLevel=line[pain_lvl],
-                        pSoreLevel=line[sore_lvl],
-                        pTenseLevel=line[tense_lvl],
-                        pAmendmentDate= line[ammendDate]
-                    )
-                    result.append(treatment)
-        
-        return result
+        for line in csvFile2:
+            if line:
+                tid = line[treatment_id_index2].strip()
+                treatment2_rev_data[tid] = {
+                    "painAfter": line[pain_after_index],
+                    "tenseAfter": line[tense_after_index],
+                    "soreAfter": line[sore_after_index],
+                    "numbAfter": line[numb_after_index],
+                    "appointmentDate": line[appointment_date_index],
+                }
+
+    # Step 2: Read TREATMENT_REV and collect all revisions matching treatmentID
+    result = []
+    with open(DB_PATH["TREATMENT_REV"], mode='r', encoding='utf-8') as file1:
+        csvFile1 = csv.reader(file1)
+        header1 = next(csvFile1)
+
+        treatment_id_index = header1.index(dbCol.treatmentId)
+        treatment_description_index = header1.index(dbCol.treatmentDescription)
+        treatment_cost_index = header1.index(dbCol.treatmentCost)
+        treatment_date_index = header1.index(dbCol.treatmentDate)
+        pain_lvl_index = header1.index(dbCol.treatmentPainLevel)
+        tense_lvl_index = header1.index(dbCol.treatmentTenseLevel)
+        sore_lvl_index = header1.index(dbCol.treatmentSoreLevel)
+        numb_lvl_index = header1.index(dbCol.treatmentNumbLevel)
+        amendment_date_index = header1.index(dbCol.amendmentDate)
+
+        for line in csvFile1:
+            if line and line[treatment_id_index].strip() == treatmentID.strip():
+                after_data = treatment2_rev_data.get(treatmentID.strip(), {})
+
+                treatment = TreatmentModel(
+                    pConditionId=line[0],
+                    pTreatmentId=treatmentID,
+                    pTreatmentDescription=line[treatment_description_index],
+                    pTreatmentCost=line[treatment_cost_index],
+                    pTreatmentDate=line[treatment_date_index],
+                    pNumbLevel=line[numb_lvl_index],
+                    pPainLevel=line[pain_lvl_index],
+                    pSoreLevel=line[sore_lvl_index],
+                    pTenseLevel=line[tense_lvl_index],
+                    pAmendmentDate=line[amendment_date_index],
+
+                    # "After" data if exists
+                    pNumbLevelAfter=after_data.get("numbAfter"),
+                    pPainLevelAfter=after_data.get("painAfter"),
+                    pSoreLevelAfter=after_data.get("soreAfter"),
+                    pTenseLevelAfter=after_data.get("tenseAfter"),
+                    pAppointmentDate=after_data.get("appointmentDate"),
+                )
+
+                result.append(treatment)
+
+    return result
+
+
 
 def deleteTreatmentByID(treatmentID):
     print("DELETING treatment")
@@ -459,6 +521,7 @@ def deleteTreatmentByID(treatmentID):
 
         # Step 3: Delete from revisions
         __deleteTreatmentRevisionsByID(treatmentID)
+        __deleteTreatment2RevisionsByID(treatmentID)
     else:
         os.remove(temp_file_path)
         print("TREATMENT NOT FOUND")
@@ -529,7 +592,39 @@ def __deleteTreatmentRevisionsByID(treatmentID):
         os.remove(revision_temp_path)
         print("NO RELATED REVISIONS FOUND")
         
-        
+
+def __deleteTreatment2RevisionsByID(treatmentID):
+    print("DELETING RELATED TREATMENT2 REVISIONS")
+
+    revision2_temp_path = DB_PATH["TREATMENT2_REV"].with_suffix('.tmp')
+    deleted_any = False
+
+    with open(DB_PATH["TREATMENT2_REV"], mode='r', encoding='utf-8', newline='') as infile, \
+         open(revision2_temp_path, mode='w', encoding='utf-8', newline='') as outfile:
+
+        reader = csv.reader(infile)
+        header = next(reader)
+        writer = csv.writer(outfile)
+        writer.writerow(header)
+
+        treatment_id_idx = header.index('treatmentId')
+
+        for row in reader:
+            if not row or all(cell.strip() == '' for cell in row):
+                continue
+
+            if row[treatment_id_idx].strip() == treatmentID:
+                deleted_any = True  # Skip writing this revision (deleting it)
+            else:
+                writer.writerow(row)
+
+    if deleted_any:
+        os.replace(revision2_temp_path, DB_PATH["TREATMENT2_REV"])
+        print("→ RELATED TREATMENT2 REVISIONS DELETED")
+    else:
+        os.remove(revision2_temp_path)
+        print("→ NO RELATED TREATMENT2 REVISIONS FOUND")
+
 
 def getConditionTotalCost(conditionId):
     total_cost = 0.0
