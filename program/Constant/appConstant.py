@@ -43,6 +43,8 @@ DB_PATH = {
     "CONDITION": Path(resourcePath('./data/conditionDb.csv')),
     "TREATMENT": Path(resourcePath('./data/treatmentDb.csv')),
     "TREATMENT_REV": Path(resourcePath('./data/treatmentRevisionHistory.csv')),
+    "TREATMENT2": Path(resourcePath('./data/treatmentDb2.csv')),
+    "TREATMENT_REV2": Path(resourcePath('./data/treatmentRevisionHistory2.csv'))
 }
 
 

@@ -5,6 +5,7 @@ from services.conditionDbFunctions import updateConditionByID, deleteCondition
 from Components.popupModal import renderPopUpModal
 from Components.datePickerModal import DatePickerModal
 from Components.timePickerModal import TimePickerModal
+from Components.datetimePickerModal import DateTimePickerModal
 from utils import setEntryValue
 from datetime import datetime
 
@@ -59,43 +60,75 @@ class EditConditionView(customtkinter.CTkFrame):
             
             index+=1
         
-        # === Date ===
-        customtkinter.CTkLabel(self.entryGridFrame, text="Date:", pady=1).grid(
+        # # === Date ===
+        # customtkinter.CTkLabel(self.entryGridFrame, text="Date:", pady=1).grid(
+        #     row=index, column=0, sticky="w", pady=10
+        # )
+        # customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(
+        #     row=index, column=1
+        # )
+
+        # dateInputFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent")
+        # dateInputFrame.grid(row=index, column=2, sticky="w")
+
+        # self.date_value = customtkinter.CTkEntry(dateInputFrame, width=120)
+        # self.date_value.insert(0, datetime.now().strftime("%Y-%m-%d"))
+        # self.date_value.configure(state="disabled")
+        # self.date_value.grid(row=0, column=0, padx=(0, 10))
+
+        # customtkinter.CTkButton(dateInputFrame, text="Edit", width=60, command=self.openDatePicker).grid(row=0, column=1)
+
+        # # === Time ===
+        # customtkinter.CTkLabel(self.entryGridFrame, text="Time:", pady=1).grid(
+        #     row=index + 1, column=0, sticky="w", pady=10
+        # )
+        # customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(
+        #     row=index + 1, column=1
+        # )
+
+        # timeInputFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent")
+        # timeInputFrame.grid(row=index + 1, column=2, sticky="w")
+
+        # self.time_value = customtkinter.CTkEntry(timeInputFrame, width=120)
+        # self.time_value.insert(0, datetime.now().strftime("%I:%M %p"))
+        # self.time_value.configure(state="disabled")
+        # self.time_value.grid(row=0, column=0, padx=(0, 10))
+
+        # customtkinter.CTkButton(timeInputFrame, text="Edit", width=60, command=self.openTimePicker).grid(row=0, column=1)
+        
+        # === Combined DateTime Row ===
+        customtkinter.CTkLabel(self.entryGridFrame, text="Condition Date Time:", pady=1).grid(
             row=index, column=0, sticky="w", pady=10
         )
         customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(
             row=index, column=1
         )
 
-        dateInputFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent")
-        dateInputFrame.grid(row=index, column=2, sticky="w")
+        datetimeInputFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent")
+        datetimeInputFrame.grid(row=index, column=2, sticky="w")
 
-        self.date_value = customtkinter.CTkEntry(dateInputFrame, width=120)
-        self.date_value.insert(0, datetime.now().strftime("%Y-%m-%d"))
-        self.date_value.configure(state="disabled")
-        self.date_value.grid(row=0, column=0, padx=(0, 10))
+        self.datetime_value = customtkinter.CTkEntry(datetimeInputFrame, width=180)
+        self.datetime_value.configure(state="normal")
 
-        customtkinter.CTkButton(dateInputFrame, text="Edit", width=60, command=self.openDatePicker).grid(row=0, column=1)
+        # === Use conditionModel.conditionDate if available ===
+        if self.conditionModel.conditionDate:
+            try:
+                dt = datetime.strptime(self.conditionModel.conditionDate, "%Y-%m-%d %H:%M")
+                self.datetime_value.insert(0, dt.strftime("%Y-%m-%d %I:%M %p"))
+            except ValueError:
+                self.datetime_value.insert(0, datetime.now().strftime("%Y-%m-%d %I:%M %p"))
+        else:
+            self.datetime_value.insert(0, datetime.now().strftime("%Y-%m-%d %I:%M %p"))
 
-        # === Time ===
-        customtkinter.CTkLabel(self.entryGridFrame, text="Time:", pady=1).grid(
-            row=index + 1, column=0, sticky="w", pady=10
+        self.datetime_value.configure(state="disabled")
+        self.datetime_value.grid(row=0, column=0, padx=(0, 10))
+
+        self.datetime_edit_button = customtkinter.CTkButton(
+            datetimeInputFrame, text="Modify", width=60, command=self.openDateTimePicker
         )
-        customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(
-            row=index + 1, column=1
-        )
+        self.datetime_edit_button.grid(row=0, column=1)
 
-        timeInputFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent")
-        timeInputFrame.grid(row=index + 1, column=2, sticky="w")
-
-        self.time_value = customtkinter.CTkEntry(timeInputFrame, width=120)
-        self.time_value.insert(0, datetime.now().strftime("%I:%M %p"))
-        self.time_value.configure(state="disabled")
-        self.time_value.grid(row=0, column=0, padx=(0, 10))
-
-        customtkinter.CTkButton(timeInputFrame, text="Edit", width=60, command=self.openTimePicker).grid(row=0, column=1)
-        
-        self.populateDateTimeFields(self.conditionModel.conditionDate)
+        self.populateDateTimeField(self.conditionModel.conditionDate)
             
         # Add frame for buttons
         self.actionButtonsFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent", bg_color="transparent")
@@ -110,21 +143,20 @@ class EditConditionView(customtkinter.CTkFrame):
     
     def saveCondition(self):
         updated_desc = self.entryFields[dbCol.conditionDescription].get("1.0", customtkinter.END).strip()
-        date_str = self.date_value.get().strip()
-        time_str = self.time_value.get().strip()
+        datetime_str = self.datetime_value.get().strip()
+        try:
+            final_dt = datetime.strptime(datetime_str, "%Y-%m-%d %I:%M %p")
+            formatted_dt = final_dt.strftime("%Y-%m-%d %H:%M")  # to store in DB
+        except ValueError:
+            formatted_dt = datetime.now().strftime("%Y-%m-%d %H:%M")
         # Warning
         # if not updated_desc:
         #     self.desc_warning_label.configure(text="Description cannot be empty.")
         #     return
         # else:
         #     self.desc_warning_label.configure(text="")
-        try:
-            combined_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %I:%M %p")
-            final_datetime_str = combined_datetime.strftime("%Y-%m-%d %H:%M")
-        except ValueError:
-            final_datetime_str = datetime.now().strftime("%Y-%m-%d %H:%M")
         
-        success = updateConditionByID(self.conditionModel.conditionId, updated_desc, final_datetime_str)
+        success = updateConditionByID(self.conditionModel.conditionId, updated_desc, formatted_dt)
 
         if success:
             renderPopUpModal(self.parent, "Condition updated successfully", "Success", "Success")
@@ -180,21 +212,27 @@ class EditConditionView(customtkinter.CTkFrame):
         )
     
     
-    def populateDateTimeFields(self, datetime_string):
+    def openDateTimePicker(self):
+        DateTimePickerModal.open_datetime_picker(
+            parent=self,
+            current_datetime_str=self.datetime_value.get().strip(),
+            on_selected=lambda datetime_str: setEntryValue(self.datetime_value, datetime_str)
+        )
+
+    
+    def populateDateTimeField(self, datetime_string):
         try:
             dt = datetime.strptime(datetime_string, "%Y-%m-%d %H:%M")
-            formatted_date = dt.strftime("%Y-%m-%d")
-            formatted_time = dt.strftime("%I:%M %p")
+            formatted_datetime = dt.strftime("%Y-%m-%d %I:%M %p")
 
-            self.date_value.configure(state="normal")
-            self.date_value.delete(0, "end")
-            self.date_value.insert(0, formatted_date)
-            self.date_value.configure(state="disabled")
+            self.datetime_value.configure(state="normal")
+            self.datetime_value.delete(0, "end")
+            self.datetime_value.insert(0, formatted_datetime)
+            self.datetime_value.configure(state="disabled")
+            
+        except ValueError:
+            print("Invalid datetime format.")
 
-            self.time_value.configure(state="normal")
-            self.time_value.delete(0, "end")
-            self.time_value.insert(0, formatted_time)
-            self.time_value.configure(state="disabled")
 
         except ValueError:
             print("Invalid datetime format.")

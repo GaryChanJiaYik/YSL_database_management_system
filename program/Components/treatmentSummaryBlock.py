@@ -1,5 +1,7 @@
 import tkinter as tk
 import customtkinter as ctk
+import json
+from datetime import datetime
 from Constant.converterFunctions import getDatefromTimeStamp
 from PIL import Image
 from utils import bindClickEventRecursively, bindHoverEventRecursively
@@ -121,9 +123,10 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, i
     wrapperContainer.grid_columnconfigure(0, weight=2)
     wrapperContainer.grid_columnconfigure(1, weight=1)
     wrapperContainer.grid_columnconfigure(2, weight=2)
-    wrapperContainer.grid_columnconfigure(3, weight=1)
+    wrapperContainer.grid_columnconfigure(3, weight=2)
+    wrapperContainer.grid_columnconfigure(4, weight=1)
     
-    treatmentDetailContainer = ctk.CTkFrame(master=wrapperContainer, fg_color="transparent", height=85, width=350)
+    treatmentDetailContainer = ctk.CTkFrame(master=wrapperContainer, fg_color="transparent", height=125, width=350)
     treatmentDetailContainer.grid(row=0, column=0, sticky="nw", padx=12, pady=5)
     treatmentDetailContainer.grid_propagate(False)
 
@@ -146,15 +149,59 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, i
     )
     treatmentDescriptionLabel.grid(row=1, column=0, sticky="w")
 
+    # Next Appointment Date
+    appointment_date_str = ""
+    if treatmentModel.appointmentDate:
+        try:
+            dt = datetime.strptime(treatmentModel.appointmentDate, "%Y-%m-%d %H:%M:%S")
+            appointment_date_str = dt.strftime("%Y-%m-%d %H:%M")
+        except Exception as e:
+            print("Failed to parse appointmentDate:", e)
+            appointment_date_str = treatmentModel.appointmentDate  # fallback
 
-    if isHiddenAccess:  
+    appointmentDateLabel = ctk.CTkLabel(
+        master=treatmentDetailContainer,
+        text=f"Next Appointment: {appointment_date_str or "N/A"}",
+        font=('Arial', 13, "italic"),
+        anchor="w",
+        text_color="#C2C2C2"  # subtle color for appointment
+    )
+    appointmentDateLabel.grid(row=2, column=0, sticky="w")
+
+    if isHiddenAccess:
+        cost_value = treatmentModel.treatmentCost
+        try:
+            if isinstance(cost_value, (float, int)):
+                # Just show amount with no payment type
+                cost_display = f"RM {cost_value:.2f}"
+            elif isinstance(cost_value, str):
+                try:
+                    payment_data = json.loads(cost_value)
+                    if isinstance(payment_data, dict):
+                        payment_strings = [
+                            f"RM {float(amount):.2f} ({method})" for method, amount in payment_data.items()
+                        ]
+                        cost_display = ", ".join(payment_strings)
+                    else:
+                        # JSON parsed but not a dict - just show amount only
+                        cost_display = f"RM {float(payment_data):.2f}"
+                except (json.JSONDecodeError, TypeError, ValueError):
+                    # Not JSON, try parse as float string - just show amount only
+                    amount = float(cost_value)
+                    cost_display = f"RM {amount:.2f}"
+            else:
+                cost_display = "RM 0.00"
+        except Exception:
+            cost_display = "RM 0.00"
+
         treatmentDescriptionCost = ctk.CTkLabel(
             master=treatmentDetailContainer,
-            text=f"Cost: RM {treatmentModel.treatmentCost:.2f}",
+            text=f"Fee: {cost_display}",
             font=('Arial', 13, "bold"),
             anchor="w"
         )
-        treatmentDescriptionCost.grid(row=2, column=0, sticky="w")
+        treatmentDescriptionCost.grid(row=3, column=0, sticky="w")
+
 
     #Space
     ctk.CTkLabel(
@@ -163,20 +210,47 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, i
     ).grid(row=0, column=1, sticky="w")
 
 
-    # Treatment levels container (right side)
-    treatmentLevelsContainer = ctk.CTkFrame(master=wrapperContainer, fg_color="transparent", height=45, width=200)
-    treatmentLevelsContainer.grid(row=0, column=2, rowspan=1, columnspan=1, sticky="w", pady=5, padx=4) 
+    # Treatment levels container
+    # Treament levels container left
+    treatmentLevelsContainerLeft = ctk.CTkFrame(master=wrapperContainer, fg_color="transparent")
+    treatmentLevelsContainerLeft.grid(row=0, column=2, rowspan=1, sticky="w", pady=5, padx=4)
+    treatmentLevelsContainerLeft.grid_columnconfigure((0, 1, 2), weight=1)
 
-    create_level_cell_revamp(treatmentLevelsContainer, 0, 0, "Pain", treatmentModel.painLevel)
-    create_level_cell_revamp(treatmentLevelsContainer, 1, 0, "Tense", treatmentModel.tenseLevel)
-    create_level_cell_revamp(treatmentLevelsContainer, 0, 1, "Sore", treatmentModel.soreLevel)
-    create_level_cell_revamp(treatmentLevelsContainer, 1, 1, "Numb", treatmentModel.numbLevel)
+    beforeLabel = ctk.CTkLabel(
+        master=treatmentLevelsContainerLeft,
+        text="Before",
+        font=('Arial', 13, "bold"),
+        anchor="center"
+    )
+    beforeLabel.grid(row=0, column=0, columnspan=3, sticky="ew", pady=(0, 5))
     
+    create_level_cell_revamp(treatmentLevelsContainerLeft, 1, 0, "Pain", treatmentModel.painLevel)
+    create_level_cell_revamp(treatmentLevelsContainerLeft, 2, 0, "Tense", treatmentModel.tenseLevel)
+    create_level_cell_revamp(treatmentLevelsContainerLeft, 1, 1, "Sore", treatmentModel.soreLevel)
+    create_level_cell_revamp(treatmentLevelsContainerLeft, 2, 1, "Numb", treatmentModel.numbLevel)
 
+    # treament levels container right
+    treatmentLevelsContainerRight = ctk.CTkFrame(master=wrapperContainer, fg_color="transparent")
+    treatmentLevelsContainerRight.grid(row=0, column=3, rowspan=1, sticky="w", pady=5, padx=4)
+    treatmentLevelsContainerRight.grid_columnconfigure((0, 1, 2), weight=1)
+    afterLabel = ctk.CTkLabel(
+        master=treatmentLevelsContainerRight,
+        text="After",
+        font=('Arial', 13, "bold"),
+        anchor="center"
+    )
+    afterLabel.grid(row=0, column=0, columnspan=3, sticky="ew", pady=(0, 5))
+    
+    create_level_cell_revamp(treatmentLevelsContainerRight, 1, 0, "Pain", treatmentModel.painLevelAfter or "0")
+    create_level_cell_revamp(treatmentLevelsContainerRight, 2, 0, "Tense", treatmentModel.tenseLevelAfter or "0")
+    create_level_cell_revamp(treatmentLevelsContainerRight, 1, 1, "Sore", treatmentModel.soreLevelAfter or "0")
+    create_level_cell_revamp(treatmentLevelsContainerRight, 2, 1, "Numb", treatmentModel.numbLevelAfter or "0")
+    
+    
     if not hideButtons:
         # Edit treatment button
         editButtonFrame = ctk.CTkFrame(master=wrapperContainer,  width=250, height=50, fg_color="transparent")
-        editButtonFrame.grid(row=0, column=3,  rowspan=2, columnspan=1, sticky="nsew", pady=5, padx=4)
+        editButtonFrame.grid(row=0, column=4,  rowspan=2, columnspan=1, sticky="nsew", pady=5, padx=4)
         editButtonFrame.grid_propagate(False)
 
         bindClickEventRecursively(wrapperContainer, lambda event: on_click_view(treatmentModel))

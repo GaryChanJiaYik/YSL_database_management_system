@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import json
 from PIL import Image
 from Constant.errorCode import SUCCESS
 from Constant.treatmentDatabaseFunctions import getTreatmentByID,getAllTreatmentRevisionByID
@@ -34,7 +35,25 @@ class TreatmentDetailView(ctk.CTkFrame):
         createDetailField(self.treatmentDetailFrame, "Created Date", self.treatmentModel.treatmentDate, row=2, column=0)    
         createDetailField(self.treatmentDetailFrame, "Description", self.treatmentModel.treatmentDescription, 3,0)
         if self.controller.getIsHiddenAccess():
-            createDetailField(self.treatmentDetailFrame, "Cost", f"RM {self.treatmentModel.treatmentCost}", 4,0)
+            cost_value = self.treatmentModel.treatmentCost
+
+            # Try to parse JSON if it's a string
+            if isinstance(cost_value, str):
+                try:
+                    parsed_value = json.loads(cost_value)
+                    cost_value = parsed_value
+                except json.JSONDecodeError:
+                    pass  # Keep the string as is if it can't be parsed
+
+            # Format depending on the type
+            if isinstance(cost_value, dict):
+                formatted_cost = ", ".join([f"RM {amount:.2f} ({method})" for method, amount in cost_value.items()])
+            elif isinstance(cost_value, (int, float)):
+                formatted_cost = f"RM {cost_value:.2f}"
+            else:
+                formatted_cost = "N/A"
+
+            createDetailField(self.treatmentDetailFrame, "Cost", formatted_cost, 4, 0)
 
         #Levels
         createDetailField(self.treatmentDetailFrame, "Pain", self.treatmentModel.painLevel,5,0)
@@ -154,6 +173,7 @@ class TreatmentDetailView(ctk.CTkFrame):
         #Treatment ammendment history
         self.treatmentRevisionHistoryFrame = ctk.CTkFrame(master=self.masterFrame, bg_color="transparent", fg_color='transparent' )
         self.treatmentRevisionHistoryFrame.grid(column=0, row=1, sticky="nsew")
+        self.treatmentRevisionHistoryFrame.grid_columnconfigure(0, weight=1)
         ctk.CTkLabel(
             self.treatmentRevisionHistoryFrame,
             text="Revision History",
@@ -172,11 +192,11 @@ class TreatmentDetailView(ctk.CTkFrame):
                 self.treatmentRevisionHistoryFrame,
                 bg_color='transparent',
                 fg_color='transparent',
-                width=500,
-                height=250
+                height=250  # No fixed width!
             )
             self.scrollableTreatmentListContainer.grid_columnconfigure(0, weight=1)
             self.scrollableTreatmentListContainer.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=5)
+
             for idx, treatment in enumerate(self.treatmentRevisionList):
                 renderTreatmentSummaryBlockFunctionRevamp(
                     self.scrollableTreatmentListContainer, treatment, self.controller.getIsHiddenAccess(),
