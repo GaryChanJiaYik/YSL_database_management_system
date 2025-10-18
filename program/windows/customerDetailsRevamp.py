@@ -17,6 +17,7 @@ from tkinter.filedialog import askopenfilename
 from Components.popupModal import renderPopUpModal
 from Components.datePickerModal import DatePickerModal
 from Components.timePickerModal import TimePickerModal
+from Components.datetimePickerModal import DateTimePickerModal
 from Constant.fileKeywords import CONSENT_FORM_KEYWORD
 from utils import setEntryValue
 
@@ -133,12 +134,11 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
     def addConditionToDb(self):
         # Get date and time from user input
-        date_str = self.date_value.get().strip()
-        time_str = self.time_value.get().strip()
+        datetime_str = self.datetime_value.get().strip()
         
         # Comine to create datetime object
         try:
-            combined_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %I:%M %p")
+            combined_datetime = datetime.strptime(datetime_str, "%Y-%m-%d %I:%M %p")
             formatted_datetime = combined_datetime.strftime("%Y-%m-%d %H:%M")
         except ValueError:
             print("Invalid date/time format. Using current datetime.")
@@ -182,33 +182,30 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         )
         self.conditionEntry.grid(row=0, column=1, sticky="w", padx=(10, 5), pady=5)
         
-        # Date Field
-        customtkinter.CTkLabel(self.addConditionFrame, text="Date:", pady=1).grid(
+        # Combined DateTime Field
+        customtkinter.CTkLabel(self.addConditionFrame, text="Date & Time:", pady=1).grid(
             row=1, column=0, sticky="w", padx=(10, 5), pady=(10, 0)
         )
 
-        dateInputFrame = customtkinter.CTkFrame(self.addConditionFrame, fg_color="transparent")
-        dateInputFrame.grid(row=1, column=1, sticky="w", padx=(0, 5), pady=(10, 0))
+        datetimeInputFrame = customtkinter.CTkFrame(self.addConditionFrame, fg_color="transparent")
+        datetimeInputFrame.grid(row=1, column=1, sticky="w", padx=(0, 5), pady=(10, 0))
 
-        self.date_value = customtkinter.CTkEntry(dateInputFrame, width=120)
-        self.date_value.insert(0, datetime.now().strftime("%Y-%m-%d"))
-        self.date_value.configure(state="disabled")
-        self.date_value.grid(row=0, column=0, padx=(0, 10))
-        customtkinter.CTkButton(dateInputFrame, text="Edit", width=60, command=self.openDatePicker).grid(row=0, column=1)
+        # Combined datetime field in 24hr format
+        self.datetime_value = customtkinter.CTkEntry(datetimeInputFrame, width=180)
+        self.datetime_value.insert(0, datetime.now().strftime("%Y-%m-%d %I:%M %p"))
+        self.datetime_value.configure(state="disabled")
+        self.datetime_value.grid(row=0, column=0, padx=(0, 10))
 
-        # Time Field
-        customtkinter.CTkLabel(self.addConditionFrame, text="Time:", pady=1).grid(
-            row=2, column=0, sticky="w", padx=(10, 5), pady=(5, 0)
-        )
-
-        timeInputFrame = customtkinter.CTkFrame(self.addConditionFrame, fg_color="transparent")
-        timeInputFrame.grid(row=2, column=1, sticky="w", padx=(0, 5), pady=(5, 0))
-
-        self.time_value = customtkinter.CTkEntry(timeInputFrame, width=120)
-        self.time_value.insert(0, datetime.now().strftime("%I:%M %p"))
-        self.time_value.configure(state="disabled")
-        self.time_value.grid(row=0, column=0, padx=(0, 10))
-        customtkinter.CTkButton(timeInputFrame, text="Edit", width=60, command=self.openTimePicker).grid(row=0, column=1)
+        customtkinter.CTkButton(
+            datetimeInputFrame,
+            text="Edit",
+            width=60,
+            command=lambda: DateTimePickerModal.open_datetime_picker(
+                parent=self,
+                current_datetime_str=self.datetime_value.get().strip(),
+                on_selected=lambda datetime_str: setEntryValue(self.datetime_value, datetime_str)
+            )
+        ).grid(row=0, column=1)
 
         # Add and close buttons
         buttonFrame = customtkinter.CTkFrame(self.addConditionFrame, fg_color="transparent")
@@ -246,6 +243,13 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             on_selected=lambda time_str: setEntryValue(self.time_value, time_str)
         )
 
+
+    def openDateTimePicker(self):
+        DateTimePickerModal.open_datetime_picker(
+                parent=self,
+                current_datetime_str=self.datetime_value.get().strip(),
+                on_selected=lambda datetime_str: setEntryValue(self.datetime_value, datetime_str)
+            )
 
     def closeAddConditionFrame(self):
         if self.addConditionFrame:
