@@ -5,10 +5,13 @@ from utils import center_popup_window
 
 class DatePickerModal:
     def open_date_picker(parent, current_date_str, on_selected):
-        try:
-            current_date = datetime.strptime(current_date_str, "%Y-%m-%d").date()
-        except ValueError:
+        if not current_date_str or not isinstance(current_date_str, str):
             current_date = date.today()
+        else:
+            try:
+                current_date = datetime.strptime(current_date_str, "%Y-%m-%d").date()
+            except ValueError:
+                current_date = date.today()
 
         def handle_selection(date_str):
             on_selected(date_str)
