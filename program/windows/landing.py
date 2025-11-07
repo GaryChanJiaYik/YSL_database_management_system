@@ -5,7 +5,7 @@ from Model.searchModel import searchModel as sm
 import Constant.errorCode as errorCode
 import Constant.dbColumn as dbCol
 from Components.selectableRowTable import Table
-from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_CUSTOMER
+from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_CUSTOMER, WINDOW_VIEW_SALE
 from tkinter.filedialog import askopenfilename
 import shutil
 from Constant.databaseManipulationFunctions import (
@@ -28,24 +28,42 @@ class LandingWindow(ctk.CTkFrame):
         self.resultFrame = tk.Frame(self.root)   
         self.resultFrame.grid(column=0, columnspan=3, row=1, rowspan=5)
 
-        self.Entryframe = tk.Frame(self.root)  # Create a frame for the entry field
+        # Configure the root grid to allow spacing between left and right sections
+        self.root.grid_columnconfigure(1, weight=1)
+
+        # --- Left side: Entry + Add Customer ---
+        self.Entryframe = tk.Frame(self.root)
+        self.Entryframe.grid(column=0, row=0, sticky="w")  # align left
+
         # Entry with placeholder
         self.searchCustomerField = entry.EntryWithPlaceholder(
             self.Entryframe, placeholder="Customer ID...", on_text_change=self.print_user_input
         )
         self.searchCustomerField.grid(column=0, row=0)
-        tk.Frame(self.Entryframe, width=40).grid(column=1, row=0)  
-        
+
+        # Spacer between entry field and Add Customer button
+        tk.Frame(self.Entryframe, width=40).grid(column=1, row=0)
+
+        # Add Customer button
         tk.Button(
             self.Entryframe, text="Add Customer", command=self.addNewCustomer
         ).grid(column=2, row=0, padx=(5, 0))
-        self.Entryframe.grid(column=0, row=0)
 
         # # Hide this button as it is not used at the moment
+        # Add Update CSV Button
         # tk.Button(
         #     self.Entryframe, text="Update CSV", command=self.selectAndUpdateCsv
         # ).grid(column=3, row=0)
         # self.Entryframe.grid(column=0, row=0)
+
+        if self.controller.getIsHiddenAccess():
+            # --- Right side: View Sale ---
+            self.viewSaleFrame = tk.Frame(self.root)
+            self.viewSaleFrame.grid(column=2, row=0, sticky="e", padx=(0, 20))  # align to right edge
+
+            tk.Button(
+                self.viewSaleFrame, text="View Sale", command=self.viewSale
+            ).grid(column=0, row=0)
         
         # Show default customer list
         self.showLatestCustomer()
@@ -97,5 +115,8 @@ class LandingWindow(ctk.CTkFrame):
         
     def addNewCustomer(self):
         self.controller.switch_frame(WINDOW_ADD_CUSTOMER)
+        
+    def viewSale(self):
+        self.controller.switch_frame(WINDOW_VIEW_SALE)
        
 

@@ -21,6 +21,7 @@ WINDOW_EDIT_TREATMENT = "EditTreatmentWindow"
 WINDOW_EDIT_CONDITION = "EditConditionWindow"
 WINDOW_ADD_CUSTOMER = "AddCustomerWindow"
 WINDOW_EDIT_CUSTOMER = "EditCustomerWindow"
+WINDOW_VIEW_SALE = "ViewSalesWindow"
 
 
 #color

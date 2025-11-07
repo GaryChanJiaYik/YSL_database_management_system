@@ -9,6 +9,7 @@ from windows.addTreatmentRevamp import AddTreatmentViewRevamp
 from windows.treatmentDetails import TreatmentDetailView
 from windows.editCondition import EditConditionView
 from windows.addCustomerView import AddCustomerView
+from windows.viewSalesView import ViewSalesView
 from Components.previousWindowButton import PreviousWindowButton
 from version import __version__
 from Components.tooltip import ToolTip
@@ -190,6 +191,8 @@ class App:
         elif frameClass == WINDOW_EDIT_CUSTOMER:
             customerId = self.getCustomerID()
             self.current_frame = AddCustomerView(self.container, self, isEditMode=True, customerId=customerId, previousWindow=previousWindow)
+        elif frameClass == WINDOW_VIEW_SALE:
+            self.current_frame = ViewSalesView(self.container, self)
 
         self.current_frame.pack(fill="both", expand=True)
 
