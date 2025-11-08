@@ -24,7 +24,7 @@ class ViewAppointmentView(ctk.CTkFrame):
         self.load_and_display_data()
     
 
-    # ✅ Custom safe loader for treatmentDb.csv
+    # Custom safe loader for treatmentDb.csv
     def load_treatment_data(self, path):
         """Safely load malformed treatmentDb.csv"""
         rows = []
@@ -71,7 +71,7 @@ class ViewAppointmentView(ctk.CTkFrame):
 
 
     def load_and_display_data(self):
-        """Load all CSVs and display combined appointments with fixed width, wrapped text, and clickable rows."""
+        """Load all CSVs and display combined appointments sorted by date."""
         try:
             # --- Load CSVs ---
             treatment2_df = pd.read_csv(DB_PATH["TREATMENT2"])
@@ -123,6 +123,10 @@ class ViewAppointmentView(ctk.CTkFrame):
                     "appointmentDate": "Appointment Date",
                 }
             )
+
+            # --- Convert and Sort by Appointment Date ---
+            display_df["Appointment Date"] = pd.to_datetime(display_df["Appointment Date"], errors="coerce")
+            display_df = display_df.sort_values(by="Appointment Date", ascending=False)
 
             # --- Clear scroll frame ---
             for widget in self.scroll_frame.winfo_children():
@@ -188,7 +192,6 @@ class ViewAppointmentView(ctk.CTkFrame):
         clicked_row = self.scroll_frame.winfo_children()[row_index + 1]
         clicked_row.configure(fg_color="#2D6CDF")
 
-        # Example redirect:
         self.controller.setCustomerID(customer_id)
         self.controller.switch_frame(WINDOW_CUSTOMER_DETAIL)
 
