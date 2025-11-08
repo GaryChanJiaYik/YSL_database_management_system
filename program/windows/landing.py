@@ -5,7 +5,10 @@ from Model.searchModel import searchModel as sm
 import Constant.errorCode as errorCode
 import Constant.dbColumn as dbCol
 from Components.selectableRowTable import Table
-from Constant.appConstant import STANDARD_WINDOW_SIZE,WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_CUSTOMER, WINDOW_VIEW_SALE
+from Constant.appConstant import (
+    STANDARD_WINDOW_SIZE, WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_CUSTOMER, WINDOW_VIEW_SALE,
+    WINDOW_VIEW_APPOINTMENT
+)
 from tkinter.filedialog import askopenfilename
 import shutil
 from Constant.databaseManipulationFunctions import (
@@ -20,12 +23,11 @@ class LandingWindow(ctk.CTkFrame):
         super().__init__(parent)
         self.controller = controller
         self.root = self
-        
-
 
         self.table = Table(self.root, self.controller, [], onRowClickCallback=self.openNewWindow)
+
         # Create a result frame
-        self.resultFrame = tk.Frame(self.root)   
+        self.resultFrame = tk.Frame(self.root)
         self.resultFrame.grid(column=0, columnspan=3, row=1, rowspan=5)
 
         # Configure the root grid to allow spacing between left and right sections
@@ -55,16 +57,24 @@ class LandingWindow(ctk.CTkFrame):
         #     self.Entryframe, text="Update CSV", command=self.selectAndUpdateCsv
         # ).grid(column=3, row=0)
         # self.Entryframe.grid(column=0, row=0)
+        
+        # --- Middle: View Appointment ---
+        self.viewAppointmentFrame = tk.Frame(self.root)
+        self.viewAppointmentFrame.grid(column=1, row=0, sticky="e", padx=(0, 20))  # between left & right
 
+        tk.Button(
+            self.viewAppointmentFrame, text="View Appointment", command=self.viewAppointment
+        ).grid(column=0, row=0)
+
+        # --- Right side: View Sale ---
         if self.controller.getIsHiddenAccess():
-            # --- Right side: View Sale ---
             self.viewSaleFrame = tk.Frame(self.root)
-            self.viewSaleFrame.grid(column=2, row=0, sticky="e", padx=(0, 20))  # align to right edge
+            self.viewSaleFrame.grid(column=2, row=0, sticky="e", padx=(0, 20))  # align right
 
             tk.Button(
                 self.viewSaleFrame, text="View Sale", command=self.viewSale
             ).grid(column=0, row=0)
-        
+
         # Show default customer list
         self.showLatestCustomer()
 
@@ -76,7 +86,6 @@ class LandingWindow(ctk.CTkFrame):
             filename = filePath.split("/")[-1]
             shutil.copyfile(filePath, f'./data/{filename}')  # Copy the selected file to the target location
             print(f"Selected file: {filePath}")
-
 
 
     def print_user_input(self, text):
@@ -118,5 +127,8 @@ class LandingWindow(ctk.CTkFrame):
         
     def viewSale(self):
         self.controller.switch_frame(WINDOW_VIEW_SALE)
+        
+    def viewAppointment(self):
+        self.controller.switch_frame(WINDOW_VIEW_APPOINTMENT)
        
 
