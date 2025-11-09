@@ -23,6 +23,7 @@ WINDOW_ADD_CUSTOMER = "AddCustomerWindow"
 WINDOW_EDIT_CUSTOMER = "EditCustomerWindow"
 WINDOW_VIEW_SALE = "ViewSalesWindow"
 WINDOW_VIEW_APPOINTMENT = "ViewAppointmentWindow"
+WINDOW_VIEW_GENERATE_REPORT = "ViewGenerateReportWindow"
 
 
 #color
@@ -37,7 +38,11 @@ FONT = {
     "LABEL": (FONT_FAMILY, 13, 'bold'),
     "CONTENT": (FONT_FAMILY, 13)
 }
-
+FONT_REPORT = {
+    "SOHO": Path(resourcePath("program/asset/fonts/NotoSansSC-VariableFont_wght.ttf")),
+    "SOHO_REGULAR": Path(resourcePath("program/asset/fonts/NotoSansSC-Regular.ttf")),
+    "SOHO_BOLD": Path(resourcePath("program/asset/fonts/NotoSansSC-Bold.ttf")),
+    }
 
 # CSV path
 DB_PATH = {

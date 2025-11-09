@@ -11,6 +11,7 @@ from windows.editCondition import EditConditionView
 from windows.addCustomerView import AddCustomerView
 from windows.viewSalesView import ViewSalesView
 from windows.viewAppointmentView import ViewAppointmentView
+from windows.viewGenerateReportView import ViewGenerateReportView
 from Components.previousWindowButton import PreviousWindowButton
 from version import __version__
 from Components.tooltip import ToolTip
@@ -196,6 +197,8 @@ class App:
             self.current_frame = ViewSalesView(self.container, self)
         elif frameClass == WINDOW_VIEW_APPOINTMENT:
             self.current_frame = ViewAppointmentView(self.container, self)
+        elif frameClass == WINDOW_VIEW_GENERATE_REPORT:
+            self.current_frame = ViewGenerateReportView(self.container, self, self.getCustomerModel(), self.getConditionModel(), self.getTreatmentID())
 
         self.current_frame.pack(fill="both", expand=True)
 

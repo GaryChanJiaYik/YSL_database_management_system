@@ -25,9 +25,3 @@ class CustomerModel():
         self.instagram = pInstagram
         self.howDidYouFindUs = pHowDidYouFindUs
         self.consent = pConsent
-        
-
-
-
-
-

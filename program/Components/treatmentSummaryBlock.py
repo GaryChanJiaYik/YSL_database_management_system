@@ -96,8 +96,7 @@ def handleUploadTreatmentPicture(treatmentModel, parentContainer):
         )
 
 
-
-def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, isHiddenAccess, hideButtons=False, on_click_view=None, on_click=None, showEditButton=False,row_index=0):
+def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, isHiddenAccess, hideButtons=False, on_click_view=None, on_click=None, on_click_report=None, showEditButton=False,row_index=0, customerModel=None, conditionModel=None):
     def _on_enter(event):
         wrapperContainer.configure(border_width=2)  # Show border
 
@@ -302,6 +301,16 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, i
         #     command=lambda: handleUploadTreatmentPicture(treatmentModel, parentContainer)
         # )
         # uploadButton.place(relx=0.65, rely=0.5, anchor=ctk.CENTER)
+        
+        generateReportButton = ctk.CTkButton(
+            master=editButtonFrame,
+            width=140,
+            text="Generate Report",
+            fg_color='#6A5ACD',  
+            hover_color='#144870',
+            command=lambda: on_click_report(treatmentModel)
+        )
+        generateReportButton.place(relx=0.45, rely=0.75, anchor=ctk.CENTER)
 
     # # Click binding
     # if on_click:

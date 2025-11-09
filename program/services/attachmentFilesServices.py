@@ -8,32 +8,43 @@ from Constant.errorCode import ERROR, SUCCESS
 #CONSTANTs
 attachment_path = os.path.join(os.getcwd(), "data", "attachment")
 
-def HasAttachment(customer_id, attachment_type, entity_id=None):
+def HasAttachment(customer_id, attachment_type, entity_id=None, filename_contains=None):
     """
     Checks if any attachment file exists for a given customer ID
-    within the data/attachment directory.
+    within the data/attachment directory. Optionally checks if
+    the filename contains a specific substring.
 
     Args:
         customer_id (str): The ID of the customer.
+        attachment_type (str): The type of attachment (e.g., "CUSTOMER").
+        entity_id (str, optional): Specific subfolder/entity ID.
+        filename_contains (str, optional): Substring to search in filenames.
 
     Returns:
-        bool: True if any attachment file exists within the
-              customer's ID folder, False otherwise.
+        bool: True if any attachment file exists (and optionally contains
+              the substring), False otherwise.
     """
     if entity_id:
         customer_folder_path = os.path.join(attachment_path, customer_id, attachment_type, entity_id)
     else:
         customer_folder_path = os.path.join(attachment_path, customer_id, attachment_type)
 
-    # Check if the customer's ID folder exists
-    if os.path.isdir(customer_folder_path):
-        # If the folder exists, check if there are any files inside it
-        if os.listdir(customer_folder_path):
-            return True
-        else:
-            return False
-    else:
+    if not os.path.isdir(customer_folder_path):
         return False
+
+    files = os.listdir(customer_folder_path)
+    if not files:
+        return False
+
+    if filename_contains:
+        # Check if any file contains the given substring
+        for f in files:
+            if filename_contains in f:
+                return True
+        return False
+    else:
+        # Just check if there are any files
+        return True
 
 
 def handleAttachmentUpload(customer_id, root, attachment_type, entity_id=None):

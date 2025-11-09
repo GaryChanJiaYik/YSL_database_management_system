@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from Constant.appConstant import (
     STANDARD_WINDOW_SIZE, WINDOW_ADD_TREATMENT, WINDOW_EDIT_TREATMENT, WINDOW_TREATMENT_DETAIL,
-    FONT
+    WINDOW_VIEW_GENERATE_REPORT, FONT
     )
 from Constant.converterFunctions import formatDateTime
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
@@ -50,6 +50,13 @@ class ConditionDetailsView(ctk.CTkFrame):
         self.controller.setConditionModel(self.conditionModel)
         self.controller.setConditionID(self.conditionModel.conditionId)
         self.controller.switch_frame(WINDOW_EDIT_TREATMENT)
+        
+    def handleGenerateReport(self, model):
+        self.controller.setTreatmentID(model.treatmentID)
+        self.controller.setCustomerID(self.conditionModel.customerId)
+        self.controller.setConditionModel(self.conditionModel)
+        self.controller.setConditionID(self.conditionModel.conditionId)
+        self.controller.switch_frame(WINDOW_VIEW_GENERATE_REPORT)
 
         
     def renderConditionPictureContainerContent(self, root):
@@ -308,7 +315,8 @@ class ConditionDetailsView(ctk.CTkFrame):
                     hideButtons=False,
                     on_click_view=self.navigateToTreatmentDetailView,
                     on_click=self.handleTreatmentBlockEditClick,
-                    row_index=idx,
+                    on_click_report=self.handleGenerateReport,
+                    row_index=idx
                 ).grid(row=idx, column=0, sticky="w")
                 
             
