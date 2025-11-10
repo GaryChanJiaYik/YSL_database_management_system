@@ -13,6 +13,7 @@ a = Analysis(
         # ('../data/treatmentRevisionHistory.csv', 'data'), # Excluded for prod build
         # ('../data/attachment', 'data/attachment'),    # Excluded for prod build
         ('../program/asset/icons', 'program/asset/icons'),
+        ('../program/asset/fonts', 'program/asset/fonts'),
     ],
     hiddenimports=[],
     hookspath=[],
