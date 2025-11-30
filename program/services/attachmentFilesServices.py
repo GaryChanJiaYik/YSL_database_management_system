@@ -5,8 +5,10 @@ import shutil
 from Components.popupModal import renderPopUpModal, renderChoiceModal
 from tkinter.filedialog import askopenfilenames, askdirectory
 from Constant.errorCode import ERROR, SUCCESS
+from utils import resourcePath
+
 #CONSTANTs
-attachment_path = os.path.join(os.getcwd(), "data", "attachment")
+attachment_path = resourcePath(os.path.join("data", "attachment"))
 
 def HasAttachment(customer_id, attachment_type, entity_id=None, filename_contains=None):
     """

@@ -6,8 +6,10 @@ from Components.popupModal import renderPopUpModal
 from tkinter.filedialog import askopenfilename
 import glob
 from Constant.errorCode import ERROR, SUCCESS
+from utils import resourcePath
+
 #CONSTANTs
-attachment_path = os.path.join(os.getcwd(), "data", "attachment")
+attachment_path = resourcePath(os.path.join("data", "attachment"))
 
 
 def customerHasConsentForm(customer_id, attachment_type):

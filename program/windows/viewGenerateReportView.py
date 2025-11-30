@@ -2,7 +2,7 @@ import os
 import customtkinter as ctk
 import subprocess
 import platform
-from tkinter import filedialog
+from utils import resourcePath
 from datetime import datetime
 from Constant.treatmentDatabaseFunctions import getTreatmentByID
 from Constant.appConstant import FONT_REPORT
@@ -157,8 +157,8 @@ class ViewGenerateReportView(ctk.CTkFrame):
     # Save Report PDF
     # -------------------
     def save_report(self):
-        default_path = os.path.join("data","attachment", self.getFormattedId(self.customerModel.customerId), ATTACHMENT_TYPE, self.default_filename)
-
+        default_path = resourcePath(os.path.join("data","attachment", self.getFormattedId(self.customerModel.customerId), ATTACHMENT_TYPE, self.default_filename))
+        
         try:
             # Generate PDF directly to default path
             self.generate_pdf_report(default_path)
@@ -189,8 +189,8 @@ class ViewGenerateReportView(ctk.CTkFrame):
         except Exception as e:
             renderPopUpModal(
                 self.parent,
-                f"Failed to generate report.\nClose any open PDF viewers and try again.",
-                #f"Failed to generate report.\n{str(e)}",
+                # f"Failed to generate report.\nClose any open PDF viewers and try again.",
+                f"Failed to generate report.\n{str(e)}",
                 "Save Report",
                 "Error"
             )
@@ -200,7 +200,7 @@ class ViewGenerateReportView(ctk.CTkFrame):
     # View Report PDF
     # -------------------
     def view_report(self):
-        customer_folder = os.path.join("data","attachment", self.getFormattedId(self.customerModel.customerId), ATTACHMENT_TYPE)
+        customer_folder = resourcePath(os.path.join("data","attachment", self.getFormattedId(self.customerModel.customerId), ATTACHMENT_TYPE))
         if os.path.isdir(customer_folder):
             if platform.system() == "Windows":
                 subprocess.Popen(f'explorer "{customer_folder}"')
