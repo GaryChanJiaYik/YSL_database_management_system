@@ -12,7 +12,7 @@ from utils import resourcePath
 attachment_path = resourcePath(os.path.join("data", "attachment"))
 
 
-def customerHasConsentForm(customer_id, attachment_type):
+def customerHasConsentForm(customer_id, customer_name, attachment_type):
     """
     Checks if a consent form file exists for a given customer ID
     within the data/attachment directory.
@@ -25,14 +25,15 @@ def customerHasConsentForm(customer_id, attachment_type):
               customer's ID folder, False otherwise.
     """
    
-    customer_folder_path = os.path.join(attachment_path, customer_id, attachment_type)
+    customer_folder_path = resourcePath(os.path.join(attachment_path, customer_id, attachment_type))
     consent_form_filename = CONSENT_FORM_KEYWORD
-    consent_form_path = os.path.join(customer_folder_path, f'{consent_form_filename}.pdf')
+    consent_form_path_template = resourcePath(os.path.join(customer_folder_path, f'{customer_name}{consent_form_filename}-TEMPLATE.pdf'))
+    consent_form_path = resourcePath(os.path.join(customer_folder_path, f'{customer_name}{consent_form_filename}.pdf'))
     print(f"consent_form_path: {consent_form_path}")
     # Check if the customer's ID folder exists
     if os.path.isdir(customer_folder_path):
         # If the folder exists, check if the consentForm file exists inside it
-        if os.path.isfile(consent_form_path):
+        if os.path.isfile(consent_form_path) or os.path.isfile(consent_form_path_template):
             return True
         else:
             return False
@@ -63,15 +64,15 @@ def uploadCustomerFile(customer_id, filePath, root, fileName, attachmentType):
 
     #check if foolder to store customer file exist 
     if fileName is not CONSENT_FORM_KEYWORD:
-        customer_folder_path = os.path.join(attachment_path, customer_id, attachmentType, fileName)
+        customer_folder_path = resourcePath(os.path.join(attachment_path, customer_id, attachmentType, fileName))
     else:
-        customer_folder_path = os.path.join(attachment_path, customer_id, attachmentType)
+        customer_folder_path = resourcePath(os.path.join(attachment_path, customer_id, attachmentType))
 
     # if no folder storing customer file exist create one
     if not os.path.exists(customer_folder_path):
         os.makedirs(customer_folder_path)
 
-    new_file_path = os.path.join(customer_folder_path, f'{fileName}{extension}')
+    new_file_path = resourcePath(os.path.join(customer_folder_path, f'{fileName}{extension}'))
     
     #Save the file in the folder with the name consentForm
     try:

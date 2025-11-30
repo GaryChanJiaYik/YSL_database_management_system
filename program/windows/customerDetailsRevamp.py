@@ -19,8 +19,9 @@ from Components.datetimePickerModal import DateTimePickerModal
 from Components.conditionModelBlock import instantiateConditionModelBlock
 from services.conditionDbFunctions import insertConditionToDb, getAllConditionsByCustomerId
 from services.customerFilesServices import (
-    customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile, deleteCustomerFile,
+    customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile, deleteCustomerFile
 )
+from services.reportGenerateServices import generateCustomerConsentForm
 from services.attachmentFilesServices import HasAttachment, handleAttachmentUpload, openAttachmentDirectory
 from Model.conditionModel import ConditionModel
 from datetime import datetime
@@ -308,33 +309,68 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
 
     def renderConsentFormOptionButton(self, row, column):
-        customerHasConsentFormVar = customerHasConsentForm(self.customerId, ATTACHMENT_TYPE)
+        customerHasConsentFormVar = customerHasConsentForm(self.customerId, self.customerModel.customerName, ATTACHMENT_TYPE)
         print("")
         print("Customer has consent form: ", customerHasConsentFormVar)
         print("")
-        if not customerHasConsentFormVar:
+        
+        if customerHasConsentFormVar:
             # Create a button to upload consent form
             customtkinter.CTkButton(
                 master=self.customerDetailFrame,
                 text="Upload",
                 command=lambda: self.uploadOrReplaceConsentForm(),
             ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
-        else:
+            
             # Create a button to view consent form
             customtkinter.CTkButton(
                 master=self.customerDetailFrame,
                 text="View",
-                command=lambda: self.viewConsentForm(),
-            ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
-
-            # Delete button
+                command=lambda: self.viewCustomerAttachmentDirectory() # self.viewConsentForm(),
+            ).grid(row=row, column=column + 1, sticky="w", padx=(10, 5), pady=5)
+        else:
+            # Create a button to generate consent form
             customtkinter.CTkButton(
                 master=self.customerDetailFrame,
-                text="Delete",
-                # command=lambda: self.renderCustomerDetailSection(),
-                command=lambda: self.deleteConsentForm(),
-            ).grid(row=row, column=column +1, sticky="w", padx=(0, 5), pady=5)
+                text="Generate",
+                command=lambda: self.generateConsentForm(),
+            ).grid(row=row, column=column, sticky="w", padx=(10, 5), pady=5)
+
+            # # Delete button
+            # customtkinter.CTkButton(
+            #     master=self.customerDetailFrame,
+            #     text="Delete",
+            #     # command=lambda: self.renderCustomerDetailSection(),
+            #     command=lambda: self.deleteConsentForm(),
+            # ).grid(row=row, column=column +1, sticky="w", padx=(10, 5), pady=5)
             
+    def generateConsentForm(self):
+        # # PDF filename
+        # today_str = datetime.now().strftime("%Y%m%d%H%M")
+        # filename = f"{today_str}_ConsentForm.pdf"
+
+        # # Folder path
+        # customerFolder = f"data/attachment/{self.customerId}/{ATTACHMENT_TYPE}"
+        # fullFolderPath = resourcePath(customerFolder)
+
+        # # Make sure folder exists
+        # os.makedirs(fullFolderPath, exist_ok=True)
+
+        # # Full file path
+        # pdf_path = os.path.join(fullFolderPath, filename)
+
+        # Generate the PDF
+        pdf_path = generateCustomerConsentForm(self.customerModel, self.customerId)
+
+        # Save to system using existing file handler
+        # uploadCustomerFile(self.customerId, pdf_path, self.root, CONSENT_FORM_KEYWORD, ATTACHMENT_TYPE)
+
+        renderPopUpModal(self.root, "Consent form generated successfully!", "Generate", "Success")
+
+        # Refresh UI
+        self.renderCustomerDetailSection()
+
+    
     
     def renderCustomerAttachmentOptionButton(self, row, column):
         customerHasAttachmentVar = HasAttachment(self.customerId, ATTACHMENT_TYPE)
@@ -471,6 +507,19 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
                     # Will display upload consent form if DO NOT HAVE consent form
                     # Will display view consent form if HAVE consent form
                     self.renderCustomerAttachmentOptionButton(row=columnTwoRowIndex, column=4)
+
+                columnTwoRowIndex += 1
+                
+                customtkinter.CTkLabel(
+                    self.customerDetailFrame,
+                    text="Consent Form",
+                    font=FONT["LABEL"],
+                    anchor="w",
+                    bg_color='transparent',
+                ).grid(row=columnTwoRowIndex, column=3, sticky="w", padx=(10, 10), pady=(0, 5))
+
+                # Render consent form buttons (Upload / View / Delete)
+                self.renderConsentFormOptionButton(row=columnTwoRowIndex, column=4)
 
                 columnTwoRowIndex += 1
                 continue  # Skip default rendering

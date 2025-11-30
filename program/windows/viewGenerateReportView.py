@@ -17,14 +17,17 @@ from reportlab.pdfbase import pdfmetrics
 from datetime import datetime
 from services.attachmentFilesServices import saveAttachmentFile, HasAttachment, ERROR, SUCCESS
 
-
-
 # Register fonts
 pdfmetrics.registerFont(TTFont('Soho-Regular', str(FONT_REPORT["SOHO_REGULAR"])))
 pdfmetrics.registerFont(TTFont('Soho-Bold', str(FONT_REPORT["SOHO_BOLD"])))
 pdfmetrics.registerFont(TTFont('NotoSansCJK', str(FONT_REPORT["SOHO"])))  # For Chinese
 
 ATTACHMENT_TYPE = "CUSTOMER"
+CONSENT_TEXT = ''' 
+I understand that I can ask any questions pertaining to the therapy before filling this form proceed treament with my signature above.
+I could, if the need arises, withdraw my consent to stop the therapy at any time throughout the procedure. 
+The procedure, its risks and benefits have been explained to me, and I understand the explanation given.
+'''
 
 class ViewGenerateReportView(ctk.CTkFrame):
     def __init__(self, parent, controller, customerModel, conditionModel, treatmentID):
@@ -95,9 +98,7 @@ class ViewGenerateReportView(ctk.CTkFrame):
             f"Numb: {t.numbLevel} / {t.numbLevelAfter}",
             "",
             "=== Consent Statement ===",
-            "I understand that I can ask any questions pertaining to the therapy before filling this form. "
-            "I could, if the need arises, withdraw my consent to stop the therapy at any time throughout the procedure. "
-            "The procedure, its risks and benefits have been explained to me, and I understand the explanation given."
+            CONSENT_TEXT
         ]
         return "\n".join(report_lines)
 
@@ -328,11 +329,7 @@ class ViewGenerateReportView(ctk.CTkFrame):
 
         # --- Consent Statement ---
         story.append(Paragraph("Consent Statement", section_header))
-        consent_text = (
-            "I understand that I can ask any questions pertaining to the therapy before filling this form. "
-            "I could, if the need arises, withdraw my consent to stop the therapy at any time throughout the procedure. "
-            "The procedure, its risks and benefits have been explained to me, and I understand the explanation given."
-        )
+        consent_text = CONSENT_TEXT
         story.append(Paragraph(consent_text, normal))
 
         # --- Signature Section ---
