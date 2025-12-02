@@ -326,7 +326,7 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             customtkinter.CTkButton(
                 master=self.customerDetailFrame,
                 text="View",
-                command=lambda: self.viewCustomerAttachmentDirectory() # self.viewConsentForm(),
+                command=lambda: self.viewCustomerConsentDirectory() # self.viewConsentForm(),
             ).grid(row=row, column=column + 1, sticky="w", padx=(10, 5), pady=5)
         else:
             # Create a button to generate consent form
@@ -402,9 +402,13 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         handleAttachmentUpload(self.customerId, self.root, ATTACHMENT_TYPE)
         self.renderCustomerDetailSection()
     
-    
+
     def viewCustomerAttachmentDirectory(self):
         openAttachmentDirectory(self.customerId, self.root, ATTACHMENT_TYPE)
+        
+        
+    def viewCustomerConsentDirectory(self):
+        openAttachmentDirectory(self.customerId, self.root, ATTACHMENT_TYPE, "CONSENT")
     
     
     def deleteConsentForm(self):

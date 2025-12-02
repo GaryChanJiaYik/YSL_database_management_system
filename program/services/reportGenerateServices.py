@@ -26,9 +26,12 @@ def generateCustomerConsentForm(customerModel, customerId):
     """
     Generate a professional PDF consent form containing customer details.
     """
-    file_name = f"{customerModel.customerName}{CONSENT_FORM_KEYWORD}-TEMPLATE.pdf"
-    entity_id = "CUSTOMER"
-    save_path = resourcePath(os.path.join("data", "attachment", str(customerId), entity_id, file_name))
+    file_name = f"{customerModel.customerName}{CONSENT_FORM_KEYWORD}-FORM.pdf"
+    attachment_type = "Customer"
+    save_path = resourcePath(os.path.join("data", "attachment", str(customerId), attachment_type, "Consent", file_name))
+    
+    # Ensure save directory exists
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
     # Styles
     styles = getSampleStyleSheet()
@@ -81,26 +84,17 @@ def generateCustomerConsentForm(customerModel, customerId):
     # Consent text (bilingual polished version)
     # ------------------------------------------
     CONSENT_TEXT = """
-    <b>CONSENT FOR TREATMENT</b><br/>
-    <b>治疗同意书</b><br/><br/>
-
-    I understand that I may ask any questions pertaining to the therapy before completing this form. 
-    I acknowledge that I may withdraw my consent and stop the therapy at any time during the procedure.<br/><br/>
-
-    我明白在填写此表格之前，我可以询问与治疗相关的任何问题。  
-    我也了解在治疗进行过程中，我有权随时撤回同意并终止治疗。<br/><br/>
-
-    The procedure, including its risks and benefits, has been clearly explained to me, and I confirm 
-    that I understand the explanation given.<br/><br/>
-
-    治疗的程序、风险及益处已向我清楚说明，我确认已充分理解相关内容。<br/><br/>
-
-    I hereby agree to undergo the therapy. I also understand that a record of the treatment provided 
-    to me will be kept. This record is confidential and will not be disclosed to any external party 
-    unless authorised by me, my representative, or required by an order of the court of law.<br/><br/>
-
-    我在此同意接受治疗。我也明白治疗记录将被保存，并会受到严格保密，除非经由本人、  
-    我的代表授权，或根据法院指令，否则不会向任何外部人士披露。
+    <b>CONSENT FOR TREATMENT</b> <br/><br />
+    
+    I understand that I can ask any questions pertaining to the therapy before filling this form. 
+    I could, if the need arises, withdraw my consent to stop the therapy at any time throughout the procedure. <br/><br/>
+    
+    The procedure, its risks and benefits have been explained to me, and I understand the explanation given. <br/><br/>
+    I hereby agree for the therapy to be carried out on me. <br/><br/>
+    
+    I also understand that a record of the therapy 
+    given shall be kept. This record is confidential and will not be disclosed to an outside party, unless it 
+    has been authorised by me, or my representative, or as ordered by the court of law to do so.
     """
 
     story = []
@@ -108,7 +102,7 @@ def generateCustomerConsentForm(customerModel, customerId):
     # ----------------------------------------------------
     # Title section with spacing
     # ----------------------------------------------------
-    story.append(Paragraph("Customer Consent Form / 客户治疗同意书", title))
+    story.append(Paragraph("Customer Consent Statement", title))
     story.append(Spacer(1, 10))
 
     # ----------------------------------------------------
@@ -148,7 +142,7 @@ def generateCustomerConsentForm(customerModel, customerId):
     story.append(Spacer(1, 10))
 
     today_str = datetime.now().strftime("%Y-%m-%d")
-    story.append(Paragraph(f"Date / 日期： _______________________________", signature_style))
+    story.append(Paragraph(f"Name / 名字： _______________________________", signature_style))
     story.append(Spacer(1, 20))
 
     # ----------------------------------------------------
@@ -177,11 +171,16 @@ def add_footer(canvas, doc, generated_date):
     canvas.saveState()
     canvas.setFont("Soho-Regular", 9)
 
-    footer_text = f"Generated on: {generated_date}"
+    # ---- Footer Content ----
+    company_name = "杨式龙跌打馆 Yeoh Sek Leong Tuinalogy Center"
+    created_text = f"Created on: {generated_date}"
 
     page_width = doc.pagesize[0]
 
-    # Right-aligned footer (20 pts from right edge)
-    canvas.drawRightString(page_width - 20, 15, footer_text)
+    # Left-aligned company name (20 pts from left edge)
+    canvas.drawString(20, 15, company_name)
+
+    # Right-aligned created date (20 pts from right edge)
+    canvas.drawRightString(page_width - 20, 15, created_text)
 
     canvas.restoreState()

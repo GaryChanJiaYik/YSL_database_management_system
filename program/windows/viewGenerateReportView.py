@@ -22,7 +22,7 @@ pdfmetrics.registerFont(TTFont('Soho-Regular', str(FONT_REPORT["SOHO_REGULAR"]))
 pdfmetrics.registerFont(TTFont('Soho-Bold', str(FONT_REPORT["SOHO_BOLD"])))
 pdfmetrics.registerFont(TTFont('NotoSansCJK', str(FONT_REPORT["SOHO"])))  # For Chinese
 
-ATTACHMENT_TYPE = "CUSTOMER"
+ATTACHMENT_TYPE = "Treatment"
 CONSENT_TEXT = ''' 
 I understand that I can ask any questions pertaining to the therapy before filling this form proceed treament with my signature above.
 I could, if the need arises, withdraw my consent to stop the therapy at any time throughout the procedure. 
@@ -38,7 +38,7 @@ class ViewGenerateReportView(ctk.CTkFrame):
         self.conditionModel = conditionModel
         self.treatmentModel = getTreatmentByID(treatmentID)
 
-        self.customerId = self.customerModel.oldCustomerId
+        self.customerId = self.getFormattedId(self.customerModel.customerId)
         treatment_date_str = self.treatmentModel.treatmentDate
         if isinstance(treatment_date_str, str):
             try:
@@ -119,7 +119,7 @@ class ViewGenerateReportView(ctk.CTkFrame):
     # Get Customer Formatted ID
     # -------------------
     def getFormattedId(self, customerId):
-        dt = datetime.strptime(self.customerModel.customerId, '%m/%d/%Y %H:%M:%S')
+        dt = datetime.strptime(customerId, '%m/%d/%Y %H:%M:%S')
         formatted_id = f"{dt.month}{dt.day}{dt.year}{dt.hour:02d}{dt.minute:02d}{dt.second:02d}"
         return formatted_id
 
@@ -139,7 +139,7 @@ class ViewGenerateReportView(ctk.CTkFrame):
             widget.destroy()
 
         # View Report Button first (if exists)
-        if HasAttachment(self.customerId, ATTACHMENT_TYPE, filename_contains="_YSLReport"):
+        if HasAttachment(self.customerId, ATTACHMENT_TYPE, entity_id=self.treatmentModel.treatmentID , filename_contains="_YSLReport"):
             ctk.CTkButton(
                 master=self.button_frame,
                 text="View Report",
@@ -158,14 +158,17 @@ class ViewGenerateReportView(ctk.CTkFrame):
     # Save Report PDF
     # -------------------
     def save_report(self):
-        default_path = resourcePath(os.path.join("data","attachment", self.getFormattedId(self.customerModel.customerId), ATTACHMENT_TYPE, self.default_filename))
+        default_path = resourcePath(os.path.join("data","attachment", self.getFormattedId(self.customerModel.customerId), ATTACHMENT_TYPE, self.treatmentModel.treatmentID, self.default_filename))
+        os.makedirs(os.path.dirname(default_path), exist_ok=True)
         
         try:
             # Generate PDF directly to default path
             self.generate_pdf_report(default_path)
 
             # Save via saveAttachmentFile to customer's folder (optional backup)
-            result = saveAttachmentFile(self.customerId, default_path, ATTACHMENT_TYPE)
+            # result = saveAttachmentFile(self.customerId, default_path, ATTACHMENT_TYPE, entity_id=self.treatmentModel.treatmentID)
+            if os.path.isfile(default_path):
+                result = SUCCESS
 
             if result == SUCCESS:
                 # Refresh buttons to show "View Report" if not already
@@ -201,7 +204,7 @@ class ViewGenerateReportView(ctk.CTkFrame):
     # View Report PDF
     # -------------------
     def view_report(self):
-        customer_folder = resourcePath(os.path.join("data","attachment", self.getFormattedId(self.customerModel.customerId), ATTACHMENT_TYPE))
+        customer_folder = resourcePath(os.path.join("data","attachment", self.customerId, ATTACHMENT_TYPE, self.treatmentModel.treatmentID))
         if os.path.isdir(customer_folder):
             if platform.system() == "Windows":
                 subprocess.Popen(f'explorer "{customer_folder}"')
@@ -341,6 +344,22 @@ class ViewGenerateReportView(ctk.CTkFrame):
         story.append(Paragraph("Date: ________________________________", normal))
 
         # Build PDF
-        doc.build(story)
+        doc.build(
+            story,
+            onFirstPage=self.add_footer,
+            onLaterPages=self.add_footer
+        )
+        
+        
+    def add_footer(self, canvas, doc):
+        canvas.saveState()
+        canvas.setFont("Soho-Regular", 9)
+
+        company_name = "杨式龙跌打馆 Yeoh Sek Leong Tuinalogy Center"
+
+        # Left-aligned footer (20 pt from the left)
+        canvas.drawString(20, 15, company_name)
+
+        canvas.restoreState()
 
 

@@ -54,7 +54,6 @@ DB_PATH = {
     "TREATMENT2_REV": Path(resourcePath('./data/treatmentRevisionHistory2.csv'))
 }
 
-
 # image path
 IMG_PATH = {
     "EDIT": Path(resourcePath("program/asset/icons/edit.png"))

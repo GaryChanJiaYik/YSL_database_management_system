@@ -102,9 +102,9 @@ def saveAttachmentFile(customer_id, file_path, attachment_type, entity_id=None, 
 
     # Base folder path
     if entity_id:
-        base_folder_path = os.path.join(attachment_path, customer_id, attachment_type, entity_id)
+        base_folder_path = resourcePath(os.path.join(attachment_path, customer_id, attachment_type, entity_id))
     else:
-        base_folder_path = os.path.join(attachment_path, customer_id, attachment_type)
+        base_folder_path = resourcePath(os.path.join(attachment_path, customer_id, attachment_type))
 
     # If relative_path is given (for folders), append its directory structure
     if relative_path:
@@ -158,9 +158,9 @@ def saveAttachmentFolder(customer_id, file_path, attachment_type, entity_id=None
 def openAttachmentDirectory(customerId, root, attachment_type, entity_id=None):
     # Build the path to the customer's attachment folder
     if entity_id:
-        customer_folder_path = os.path.join(attachment_path, customerId, attachment_type, entity_id)
+        customer_folder_path = resourcePath(os.path.join(attachment_path, customerId, attachment_type, entity_id))
     else:
-        customer_folder_path = os.path.join(attachment_path, customerId, attachment_type)
+        customer_folder_path = resourcePath(os.path.join(attachment_path, customerId, attachment_type))
 
     # Make sure the folder exists
     if not os.path.exists(customer_folder_path):
