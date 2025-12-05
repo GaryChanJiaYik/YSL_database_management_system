@@ -27,9 +27,14 @@ WINDOW_VIEW_GENERATE_REPORT = "ViewGenerateReportWindow"
 
 
 #color
-BLUE = "#1f6aa5"
-RED = "#E74C3C"
-GREEN = "#27AE60"
+COLOR = {
+    "BLUE": "#1f6aa5",
+    "RED": "#E74C3C",
+    "GREEN": "#27AE60",
+    "PURPLE": "#6A5ACD",
+    "HOVER": '#144870'
+}
+
 
 #font design
 FONT_FAMILY = 'Arial'

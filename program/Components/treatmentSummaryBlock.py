@@ -8,7 +8,7 @@ from utils import bindClickEventRecursively, bindHoverEventRecursively
 from services.customerFilesServices import renderFilePicker, uploadCustomerFile
 from Components.popupModal import renderPopUpModal
 from Constant.errorCode import SUCCESS
-from Constant.appConstant import IMG_PATH
+from Constant.appConstant import IMG_PATH, COLOR
 
 
 def create_level_cell(parent, row, col, label_text, value_text):
@@ -306,8 +306,8 @@ def renderTreatmentSummaryBlockFunctionRevamp(parentContainer, treatmentModel, i
             master=editButtonFrame,
             width=140,
             text="Generate Report",
-            fg_color='#6A5ACD',  
-            hover_color='#144870',
+            fg_color=COLOR["PURPLE"],  
+            hover_color=COLOR["HOVER"],
             command=lambda: on_click_report(treatmentModel)
         )
         generateReportButton.place(relx=0.45, rely=0.75, anchor=ctk.CENTER)

@@ -167,6 +167,95 @@ def generateCustomerConsentForm(customerModel, customerId):
 
     return save_path
 
+
+def generateAppointmentPdf(appointments_by_date, save_path):
+    """
+    Generate a PDF report for selected appointments.
+    appointments_by_date: dict { "YYYY-MM-DD": [ {dict of appt info}, ... ] }
+    save_path: final PDF path to save to.
+    """
+    # Create directory if not exists
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+    styles = getSampleStyleSheet()
+
+    title_style = ParagraphStyle(
+        "Title",
+        parent=styles["Heading1"],
+        fontName="Soho-Bold",
+        fontSize=22,
+        textColor=colors.HexColor("#003B73"),
+        spaceAfter=20,
+    )
+
+    normal = ParagraphStyle(
+        "NormalText",
+        parent=styles["Normal"],
+        fontName="Soho-Regular",
+        fontSize=12,
+        leading=16,
+        spaceAfter=6,
+    )
+
+    markdown_bold = ParagraphStyle(
+        "BoldText",
+        parent=styles["Normal"],
+        fontName="Soho-Bold",
+        fontSize=12,
+        leading=16,
+        spaceAfter=6,
+    )
+
+    story = []
+    story.append(Paragraph("Appointment Details", title_style))
+    story.append(Spacer(1, 12))
+
+    # -------- Build content --------
+    for date_str in sorted(appointments_by_date.keys(), reverse=True):
+        
+        # Determine day name
+        try:
+            dt = datetime.strptime(date_str, "%Y-%m-%d")
+            day_name = dt.strftime("%A")
+        except:
+            day_name = ""
+
+        # Day + date title
+        story.append(Paragraph(f"<b>{day_name} {date_str}</b>", markdown_bold))
+        story.append(Paragraph("=" * 16, normal))
+        story.append(Spacer(1, 6))
+
+        # Appointment entries
+        for appt in appointments_by_date[date_str]:
+
+            story.append(Paragraph(f"{appt['time']} ({appt['customer_id']})", normal))
+            story.append(Paragraph(f"<b>{appt['name']} {appt['contact']}</b>", markdown_bold))
+            story.append(Paragraph(f"<i>{appt['condition']}</i>", normal))
+            story.append(Paragraph(f"<i>{appt['treatment']}</i>", normal))
+
+            story.append(Spacer(1, 14))   # blank space between appointments
+
+    # -------- Build PDF --------
+    doc = SimpleDocTemplate(
+        save_path,
+        pagesize=A4,
+        leftMargin=25 * mm,
+        rightMargin=25 * mm,
+        topMargin=20 * mm,
+        bottomMargin=20 * mm,
+    )
+
+    generated_date = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    doc.build(
+        story,
+        onFirstPage=lambda canvas, doc: add_footer(canvas, doc, generated_date),
+        onLaterPages=lambda canvas, doc: add_footer(canvas, doc, generated_date),
+    )
+
+    return save_path
+
+
 def add_footer(canvas, doc, generated_date):
     canvas.saveState()
     canvas.setFont("Soho-Regular", 9)

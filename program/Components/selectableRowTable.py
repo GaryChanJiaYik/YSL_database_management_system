@@ -1,7 +1,7 @@
 import tkinter as tk
 from Constant.converterFunctions import convertTimeStampToId
 from Constant.appConstant import (
-    STANDARD_WINDOW_WIDTH, WINDOW_EDIT_CUSTOMER, WINDOW_LANDING, BLUE,
+    STANDARD_WINDOW_WIDTH, WINDOW_EDIT_CUSTOMER, WINDOW_LANDING, COLOR,
     FONT, IMG_PATH
 )
 from PIL import Image, ImageTk
@@ -70,7 +70,7 @@ class Table:
                     image=self.edit_icon,
                     command=lambda row=i: self.modify_row(row),
                     relief="flat",
-                    bg=BLUE, #if i % 2 == 0 else "lightgray",
+                    bg=COLOR["BLUE"], #if i % 2 == 0 else "lightgray",
                     activebackground="lightgray"
                 )
                 edit_btn.grid(row=i + 1, column=self.total_columns * 2, sticky="nsew", padx=(5, 0), pady=(5, 0))

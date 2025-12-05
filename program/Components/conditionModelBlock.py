@@ -2,7 +2,7 @@ import customtkinter as ctk
 from PIL import Image
 from services.conditionDbFunctions import getTreatmentStatus
 from Constant.treatmentDatabaseFunctions import getConditionTotalCost
-from Constant.appConstant import GREEN, RED, IMG_PATH
+from Constant.appConstant import COLOR, IMG_PATH
 from datetime import datetime
 from utils import bindClickEventRecursively, bindHoverEventRecursively
 
@@ -43,10 +43,10 @@ def instantiateConditionModelBlock(parentFrame, conditionModel, column, row, ope
 
     conditionModel.undergoingTreatment = not getTreatmentStatus(conditionModel.customerId, conditionModel.conditionId)
     if conditionModel.undergoingTreatment:
-        textColor = RED
+        textColor = COLOR["RED"]
         font = ("Arial", 16, "bold")
     else:
-        textColor = GREEN
+        textColor = COLOR["GREEN"]
         font = ("Arial", 16)
 
     ctk.CTkLabel(
