@@ -106,14 +106,28 @@ class ViewGenerateReportView(ctk.CTkFrame):
     # Format DateTime
     # -------------------
     def format_datetime(self, dt_value):
-        if isinstance(dt_value, str):
+        # If None or empty, return N/A
+        if not dt_value:
+            return "N/A"
+
+        # If already a datetime object
+        if isinstance(dt_value, datetime):
+            dt_obj = dt_value
+
+        # If string, try parsing
+        elif isinstance(dt_value, str):
             try:
                 dt_obj = datetime.fromisoformat(dt_value)
             except ValueError:
+                # fallback format
                 dt_obj = datetime.strptime(dt_value, "%Y-%m-%d %H:%M:%S")
+
         else:
-            dt_obj = dt_value
-        return dt_obj.strftime("%d/%m/%Y %I:%M %p")  # No seconds, AM/PM
+            # Unexpected type
+            return "N/A"
+
+        return dt_obj.strftime("%d/%m/%Y %I:%M %p") # No seconds, AM/PM
+    
     
     # -------------------
     # Get Customer Formatted ID
