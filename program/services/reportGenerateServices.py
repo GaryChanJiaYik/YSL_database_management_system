@@ -261,7 +261,7 @@ def add_footer(canvas, doc, generated_date):
     canvas.setFont("Soho-Regular", 9)
 
     # ---- Footer Content ----
-    company_name = "杨式龙跌打馆 Yeoh Sek Leong Tuinalogy Center"
+    company_name = "" #"杨式龙跌打馆 Yeoh Sek Leong Tuinalogy Center"
     created_text = f"Created on: {generated_date}"
 
     page_width = doc.pagesize[0]
