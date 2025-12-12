@@ -369,7 +369,7 @@ class ViewGenerateReportView(ctk.CTkFrame):
         canvas.saveState()
         canvas.setFont("Soho-Regular", 9)
 
-        company_name = "杨式龙跌打馆 Yeoh Sek Leong Tuinalogy Center"
+        company_name = "" # "杨式龙跌打馆 Yeoh Sek Leong Tuinalogy Center"
 
         # Left-aligned footer (20 pt from the left)
         canvas.drawString(20, 15, company_name)
