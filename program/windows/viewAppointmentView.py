@@ -93,13 +93,16 @@ class ViewAppointmentView(ctk.CTkFrame):
             condition_df = pd.read_csv(DB_PATH["CONDITION"])
             customer_df = pd.read_csv(DB_PATH["MAIN"])
 
+            # Clean column names
             for df in [treatment2_df, treatment_df, condition_df, customer_df]:
                 df.columns = df.columns.str.strip()
 
+            # Generate CustomerID
             customer_df["CustomerID"] = (
                 customer_df["Timestamp"].astype(str).str.replace(r"[^\d]", "", regex=True)
             )
 
+            # Convert IDs to strings
             for df in [treatment2_df, treatment_df, condition_df, customer_df]:
                 for col in df.columns:
                     if "Id" in col or "ID" in col:
@@ -112,7 +115,7 @@ class ViewAppointmentView(ctk.CTkFrame):
                 on="treatmentId",
                 how="left",
             )
-            
+
             merged = merged.rename(columns={
                 "conditionId_x": "conditionId",
                 "conditionId_y": "conditionId_treat",
@@ -133,6 +136,7 @@ class ViewAppointmentView(ctk.CTkFrame):
                 how="left",
             )
 
+            # Prepare display DataFrame
             display_df = merged[[
                 "Old Customer ID", "customerId", "Name名", "HP No.手机号",
                 "conditionDescription", "treatmentDescription", "appointmentDate"
@@ -144,12 +148,19 @@ class ViewAppointmentView(ctk.CTkFrame):
                 "appointmentDate": "Appointment",
             })
 
+            # Convert appointment datetime
             display_df["Appointment"] = pd.to_datetime(display_df["Appointment"], errors="coerce")
             display_df["Date"] = display_df["Appointment"].dt.date
             display_df["Time"] = display_df["Appointment"].dt.strftime("%I:%M %p")
+
+            # --- Sort overall by appointment (descending) ---
             display_df = display_df.sort_values(by="Appointment", ascending=False)
 
-            grouped = display_df.sort_values("Date", ascending=False).groupby("Date")
+            # --- Group by date ---
+            grouped = display_df.groupby("Date")
+
+            # Sort group keys descending (latest date first)
+            sorted_dates = sorted(grouped.groups.keys(), reverse=True)
 
             # --- Reset UI ---
             for w in self.scroll_area.winfo_children():
@@ -161,7 +172,12 @@ class ViewAppointmentView(ctk.CTkFrame):
             # -------------------------------------------------------------
             # BUILD UI PER DATE GROUP
             # -------------------------------------------------------------
-            for date, group in grouped:
+            for date in sorted_dates:
+                group = grouped.get_group(date)
+
+                # Sort within group by time (acsending → earliest first)
+                group = group.sort_values("Appointment", ascending=True)
+
                 day_frame = ctk.CTkFrame(self.scroll_area)
                 day_frame.pack(fill="x", pady=(5, 2))
 
@@ -203,7 +219,7 @@ class ViewAppointmentView(ctk.CTkFrame):
                 arrow_label.bind("<Button-1>", lambda e, d=date: self.toggle_section(d))
                 date_label.bind("<Button-1>", lambda e, d=date: self.toggle_section(d))
 
-                # Track checkboxes for Select All
+                # Track for Select All
                 self.group_card_map[date] = []
 
                 # ---------------- CARDS ----------------
@@ -217,7 +233,7 @@ class ViewAppointmentView(ctk.CTkFrame):
                     row1 = ctk.CTkFrame(inner, fg_color="transparent")
                     row1.pack(fill="x")
 
-                    # Checkbox (selection mode only)
+                    # --- Checkbox ---
                     checkbox = None
                     if self.selection_mode:
                         checkbox = ctk.CTkCheckBox(
@@ -228,7 +244,6 @@ class ViewAppointmentView(ctk.CTkFrame):
                         checkbox.pack(side="left", padx=(0, 10))
                         self.group_card_map[date].append(checkbox)
 
-                        # Store appointment info in checkbox
                         checkbox._appointment_info = {
                             "date": str(row["Date"]),
                             "time": row["Time"],
@@ -239,7 +254,7 @@ class ViewAppointmentView(ctk.CTkFrame):
                             "treatment": row["Treatment"]
                         }
 
-                    # Time + Name + Contact (always displayed)
+                    # Time + Name + Contact
                     ctk.CTkLabel(
                         row1,
                         text=f"{row['Time']}  |  {row['Name']}  |  {row['Contact Number']}",
@@ -257,6 +272,7 @@ class ViewAppointmentView(ctk.CTkFrame):
 
         except Exception as e:
             print("❌ Error loading appointments:", e)
+
 
     # -------------------------------------------------------------
     # EXPAND/COLLAPSE GROUPS
