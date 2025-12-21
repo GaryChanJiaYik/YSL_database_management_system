@@ -3,7 +3,7 @@ import os
 from tkinter.filedialog import askopenfilename
 from Constant.appConstant import (
     STANDARD_WINDOW_SIZE, WINDOW_CONDITION_DETAIL, WINDOW_EDIT_CONDITION, WINDOW_EDIT_CUSTOMER, 
-    WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_TREATMENT, FONT
+    WINDOW_CUSTOMER_DETAIL, WINDOW_ADD_TREATMENT, FONT, PREDEFINED_CONDITIONS
 ) 
 from Constant.databaseManipulationFunctions import searchForSingleUser, addOldCustomerID
 from Constant.dbColumn import customerModelAttributeToField, oldCustomerId, name, ic
@@ -17,7 +17,7 @@ from Components.datePickerModal import DatePickerModal
 from Components.timePickerModal import TimePickerModal
 from Components.datetimePickerModal import DateTimePickerModal
 from Components.conditionModelBlock import instantiateConditionModelBlock
-from services.conditionDbFunctions import insertConditionToDb, getAllConditionsByCustomerId
+from services.conditionDbFunctions import insertConditionToDb, insertConditionToDb2, getAllConditionsByCustomerId
 from services.customerFilesServices import (
     customerHasConsentForm, viewCustomerFilePDF, uploadCustomerFile, deleteCustomerFile
 )
@@ -155,9 +155,18 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
             condition_id= generateUUID(),  # Assuming this is auto-generated in the database
             conditionDescription=self.conditionEntry.get("1.0", "end-1c"),
             undergoingTreatment=True,
-            conditionDate= formatted_datetime
+            conditionDate=formatted_datetime,
+            highBloodPressure=self.condition_vars["High blood pressure"].get(),
+            bloodSugar=self.condition_vars["Blood sugar"].get(),
+            cholesterol=self.condition_vars["Cholesterol"].get(),
+            uricAcid=self.condition_vars["Uric acid"].get(),
+            bloating=self.condition_vars["Bloating"].get(),
+            heartDisease=self.condition_vars["Heart Disease"].get(),
+            stroke=self.condition_vars["Stroke"].get(),
+            cancer=self.condition_vars["Cancer"].get()
         )
         insertConditionToDb(conditionModel)
+        insertConditionToDb2(conditionModel)
 
         # Re-render the UI
         self.conditionList = getAllConditionsByCustomerId(self.customerId)
@@ -172,6 +181,8 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
 
 
     def renderAddConditionFrame(self, parentContainer):
+        self.predefined_conditions = PREDEFINED_CONDITIONS
+        
         # Create a frame for the add condition button
         self.addConditionFrame = customtkinter.CTkFrame(master=parentContainer, bg_color="transparent")
         self.addConditionFrame.grid(column=0, row=0, sticky="w", padx=(10, 5), pady=5)
@@ -188,13 +199,43 @@ class CustomerDetailsViewRevamp(customtkinter.CTkFrame):
         )
         self.conditionEntry.grid(row=0, column=1, sticky="w", padx=(10, 5), pady=5)
         
-        # Combined DateTime Field
-        customtkinter.CTkLabel(self.addConditionFrame, text="Date & Time:", pady=1).grid(
-            row=1, column=0, sticky="w", padx=(10, 5), pady=(10, 0)
-        )
+        # Checkbox label
+        customtkinter.CTkLabel(
+            self.addConditionFrame,
+            text="Select Conditions:"
+        ).grid(row=1, column=0, sticky="nw", padx=(10, 5), pady=(5, 0))
 
-        datetimeInputFrame = customtkinter.CTkFrame(self.addConditionFrame, fg_color="transparent")
-        datetimeInputFrame.grid(row=1, column=1, sticky="w", padx=(0, 5), pady=(10, 0))
+        # Frame to hold checkboxes
+        checkboxFrame = customtkinter.CTkFrame(
+            self.addConditionFrame,
+            fg_color="transparent"
+        )
+        checkboxFrame.grid(row=1, column=1, sticky="w", padx=(10, 5), pady=(5, 0))
+
+        self.condition_vars = {}  # store checkbox variables
+        for index, condition in enumerate(self.predefined_conditions):
+            var = customtkinter.BooleanVar(value=False)
+            self.condition_vars[condition] = var
+
+            checkbox = customtkinter.CTkCheckBox(
+                master=checkboxFrame,
+                text=condition,
+                variable=var
+            )
+            checkbox.grid(row=index // 2, column=index % 2, sticky="w", padx=5, pady=2)
+        
+        # Date & Time label
+        customtkinter.CTkLabel(
+            self.addConditionFrame,
+            text="Date & Time:",
+            pady=1
+        ).grid(row=2, column=0, sticky="w", padx=(10, 5), pady=(10, 0))
+
+        datetimeInputFrame = customtkinter.CTkFrame(
+            self.addConditionFrame,
+            fg_color="transparent"
+        )
+        datetimeInputFrame.grid(row=2, column=1, sticky="w", padx=(0, 5), pady=(10, 0))
 
         # Combined datetime field in 24hr format
         self.datetime_value = customtkinter.CTkEntry(datetimeInputFrame, width=180)

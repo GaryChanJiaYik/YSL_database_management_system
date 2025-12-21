@@ -77,4 +77,12 @@ conditionId = "conditionId"
 conditionDescription = "conditionDescription"
 undergoingTreatment = "undergoingTreatment"
 conditionDate = "conditionDate"
-
+# For condition2 db
+highBloodPressure = "highBloodPressure"
+bloodSugar = "bloodSugar"
+cholesterol = "cholesterol"
+uricAcid = "uricAcid"
+bloating = "bloating"
+heartDisease = "heartDisease"
+stroke = "stroke"
+cancer = "cancer"

@@ -53,6 +53,7 @@ FONT_REPORT = {
 DB_PATH = {
     "MAIN": Path(resourcePath('./data/db.csv')),
     "CONDITION": Path(resourcePath('./data/conditionDb.csv')),
+    "CONDITION2": Path(resourcePath('./data/conditionDb2.csv')),
     "TREATMENT": Path(resourcePath('./data/treatmentDb.csv')),
     "TREATMENT_REV": Path(resourcePath('./data/treatmentRevisionHistory.csv')),
     "TREATMENT2": Path(resourcePath('./data/treatmentDb2.csv')),
@@ -63,3 +64,17 @@ DB_PATH = {
 IMG_PATH = {
     "EDIT": Path(resourcePath("program/asset/icons/edit.png"))
 }
+
+# Predefined conditions
+PREDEFINED_CONDITIONS_MAP = {
+    "High blood pressure": "highBloodPressure",
+    "Blood sugar": "bloodSugar",
+    "Cholesterol": "cholesterol",
+    "Uric acid": "uricAcid",
+    "Bloating": "bloating",
+    "Heart Disease": "heartDisease",
+    "Stroke": "stroke",
+    "Cancer": "cancer",
+}
+
+PREDEFINED_CONDITIONS = list(PREDEFINED_CONDITIONS_MAP.keys())

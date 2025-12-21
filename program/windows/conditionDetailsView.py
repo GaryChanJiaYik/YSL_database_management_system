@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from Constant.appConstant import (
     STANDARD_WINDOW_SIZE, WINDOW_ADD_TREATMENT, WINDOW_EDIT_TREATMENT, WINDOW_TREATMENT_DETAIL,
-    WINDOW_VIEW_GENERATE_REPORT, FONT
+    WINDOW_VIEW_GENERATE_REPORT, FONT, PREDEFINED_CONDITIONS_MAP
     )
 from Constant.converterFunctions import formatDateTime
 from Constant.treatmentDatabaseFunctions import getAllTreatmentByConditionID
@@ -241,8 +241,20 @@ class ConditionDetailsView(ctk.CTkFrame):
         
 
         createDetailField(root=self.conditionDetailsField, fieldName="Description", content=conditionModel.conditionDescription, row=1, column=0)
-        createDetailField(root=self.conditionDetailsField, fieldName="Added Date", content=conditionModel.conditionDate, row=2, column=0)
-        self.statusLabel = createDetailField(root=self.conditionDetailsField, fieldName="Status", content="Undergoing Treatement" if conditionModel.undergoingTreatment else "Treated", row=3, column=0)
+        
+        # Show the predifined condition if any
+        selected_conditions = [
+            display_name
+            for display_name, attr_name in PREDEFINED_CONDITIONS_MAP.items()
+            if getattr(conditionModel, attr_name, False)
+        ]
+
+        selected_conditions_str = ", ".join(selected_conditions) if selected_conditions else "None"
+
+        createDetailField(root=self.conditionDetailsField, fieldName="Predefined Conditions", content=selected_conditions_str, row=2, column=0)
+        
+        createDetailField(root=self.conditionDetailsField, fieldName="Added Date", content=conditionModel.conditionDate, row=3, column=0)
+        self.statusLabel = createDetailField(root=self.conditionDetailsField, fieldName="Status", content="Undergoing Treatement" if conditionModel.undergoingTreatment else "Treated", row=4, column=0)
         self.LoadTreatmentStatus()
 
         # Upload Attachment

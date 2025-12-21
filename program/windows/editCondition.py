@@ -1,7 +1,7 @@
 import customtkinter
 import Constant.dbColumn as dbCol
-from Constant.appConstant import STANDARD_TEXT_BOX_WIDTH, STANDARD_TEXT_BOX_HEIGHT, WINDOW_CUSTOMER_DETAIL
-from services.conditionDbFunctions import updateConditionByID, deleteCondition
+from Constant.appConstant import STANDARD_TEXT_BOX_WIDTH, STANDARD_TEXT_BOX_HEIGHT, WINDOW_CUSTOMER_DETAIL, PREDEFINED_CONDITIONS_MAP
+from services.conditionDbFunctions import updateConditionByID, updateCondition2ByID, deleteCondition, deleteCondition2
 from Components.popupModal import renderPopUpModal
 from Components.datePickerModal import DatePickerModal
 from Components.timePickerModal import TimePickerModal
@@ -28,12 +28,12 @@ class EditConditionView(customtkinter.CTkFrame):
         self.entryGridFrame.grid_columnconfigure(1, weight=1)
         self.entryGridFrame.grid_columnconfigure(2, weight=2)
         self.entryGridFrame.grid(row=0, column=0, sticky="w", padx=10, pady=10)
-        index = 1
+        current_row = 1
 
-        for idx, field in enumerate(self.entryFieldList):
+        for _, field in enumerate(self.entryFieldList):
             #render text
-            customtkinter.CTkLabel(self.entryGridFrame, text =dbCol.ConditionModelAttributeToField[field], pady=1).grid(row=idx+1, column=0, sticky='nw', pady=10)
-            customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(row=idx+1, column=1, sticky='nw')
+            customtkinter.CTkLabel(self.entryGridFrame, text =dbCol.ConditionModelAttributeToField[field], pady=1).grid(row=current_row, column=0, sticky='nw', pady=10)
+            customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(row=current_row, column=1, sticky='nw')
             
             # entry = None
             
@@ -41,7 +41,7 @@ class EditConditionView(customtkinter.CTkFrame):
             if field is dbCol.conditionDescription:
                 #create enty text 
                 conditionDescFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent", bg_color="transparent")
-                conditionDescFrame.grid(row=idx+1, column=2, sticky='w')
+                conditionDescFrame.grid(row=current_row, column=2, sticky='w')
 
                 entry = customtkinter.CTkTextbox(conditionDescFrame, width=STANDARD_TEXT_BOX_WIDTH, height=STANDARD_TEXT_BOX_HEIGHT)
                 entry.insert("0.0", self.conditionModel.conditionDescription)
@@ -58,7 +58,7 @@ class EditConditionView(customtkinter.CTkFrame):
             if self.entryFields.get(field) is None:
                 self.entryFields[field] = entry
             
-            index+=1
+            current_row += 1
         
         # # === Date ===
         # customtkinter.CTkLabel(self.entryGridFrame, text="Date:", pady=1).grid(
@@ -96,16 +96,46 @@ class EditConditionView(customtkinter.CTkFrame):
 
         # customtkinter.CTkButton(timeInputFrame, text="Edit", width=60, command=self.openTimePicker).grid(row=0, column=1)
         
+        # Predefined Conditions
+        conditions_frame = customtkinter.CTkFrame(
+            self.entryGridFrame,
+            fg_color="transparent",
+            bg_color="transparent"
+        )
+        conditions_frame.grid(row=current_row, column=2, sticky="w", pady=(5, 10))
+
+        customtkinter.CTkLabel(
+            self.entryGridFrame,
+            text="Conditions",
+            pady=1
+        ).grid(row=current_row, column=0, sticky="nw", pady=10)
+
+        self.condition_vars = {}
+
+        for i, (display_name, attr_name) in enumerate(PREDEFINED_CONDITIONS_MAP.items()):
+            var = customtkinter.BooleanVar(
+                value=getattr(self.conditionModel, attr_name, False)
+            )
+            self.condition_vars[attr_name] = var
+
+            checkbox = customtkinter.CTkCheckBox(
+                master=conditions_frame,
+                text=display_name,
+                variable=var
+            )
+            checkbox.grid(row=i // 2, column=i % 2, sticky="w", padx=5, pady=2)
+        current_row += 1
+        
         # === Combined DateTime Row ===
         customtkinter.CTkLabel(self.entryGridFrame, text="Condition Date Time:", pady=1).grid(
-            row=index, column=0, sticky="w", pady=10
+            row=current_row, column=0, sticky="w", pady=10
         )
         customtkinter.CTkLabel(self.entryGridFrame, text=" ", width=50).grid(
-            row=index, column=1
+            row=current_row, column=1
         )
 
         datetimeInputFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent")
-        datetimeInputFrame.grid(row=index, column=2, sticky="w")
+        datetimeInputFrame.grid(row=current_row, column=2, sticky="w")
 
         self.datetime_value = customtkinter.CTkEntry(datetimeInputFrame, width=180)
         self.datetime_value.configure(state="normal")
@@ -129,10 +159,12 @@ class EditConditionView(customtkinter.CTkFrame):
         self.datetime_edit_button.grid(row=0, column=1)
 
         self.populateDateTimeField(self.conditionModel.conditionDate)
+        
+        current_row += 1
             
         # Add frame for buttons
         self.actionButtonsFrame = customtkinter.CTkFrame(self.entryGridFrame, fg_color="transparent", bg_color="transparent")
-        self.actionButtonsFrame.grid(row=index+3, column=0)
+        self.actionButtonsFrame.grid(row=current_row+1, column=0)
         self.actionButtonsFrame.grid_columnconfigure(0, weight=1)
         self.actionButtonsFrame.grid_columnconfigure(1, minsize=50)
         self.actionButtonsFrame.grid_columnconfigure(2, weight=1)
@@ -156,9 +188,16 @@ class EditConditionView(customtkinter.CTkFrame):
         # else:
         #     self.desc_warning_label.configure(text="")
         
-        success = updateConditionByID(self.conditionModel.conditionId, updated_desc, formatted_dt)
+        # Collect predefined conditions value
+        update_condition = {
+            attr_name: var.get()
+            for attr_name, var in self.condition_vars.items()
+        }
+        
+        success1 = updateConditionByID(self.conditionModel.conditionId, updated_desc, formatted_dt)
+        success2 = updateCondition2ByID(self.conditionModel.conditionId, update_condition)
 
-        if success:
+        if success1 and success2:
             renderPopUpModal(self.parent, "Condition updated successfully", "Success", "Success")
             print("Condition updated")
         else:
@@ -173,9 +212,10 @@ class EditConditionView(customtkinter.CTkFrame):
         # confirm = customtkinter.CTkInputDialog(text="Are you sure you want to delete this condition?", title="Confirm Delete")
         # if confirm.get_input() != "yes":
         #     return
-        success = deleteCondition(self.conditionModel.conditionId)
+        success1 = deleteCondition(self.conditionModel.conditionId)
+        success2 = deleteCondition2(self.conditionModel.conditionId)
 
-        if success:
+        if success1 and success2:
             renderPopUpModal(self.parent, "Condition deleted successfully", "Deleted", "Success")
             print("Condition deleted")
         else:
